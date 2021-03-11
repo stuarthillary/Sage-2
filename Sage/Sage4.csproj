@@ -233,13 +233,17 @@
     <Compile Include="Graphs\ChannelMonitor.cs" />
     <Compile Include="Graphs\ConditionalBranchManager.cs" />
     <Compile Include="Graphs\CountedBranchManager.cs" />
+    <Compile Include="Graphs\IEdge.cs" />
     <Compile Include="Graphs\IEdgeReceiptManager.cs" />
     <Compile Include="Graphs\IHasValidity.cs" />
+    <Compile Include="Graphs\IStatefulEdge.cs" />
     <Compile Include="Graphs\ISupportsPertAnalysis.cs" />
     <Compile Include="Graphs\IVertex.cs" />
+    <Compile Include="Graphs\Ligature.cs" />
     <Compile Include="Graphs\PreEdgesSatisfiedKey.cs" />
     <Compile Include="Graphs\SynchronizerSorter.cs" />
     <Compile Include="Graphs\Tasks\TaskManagementService.cs" />
+    <Compile Include="Graphs\UtilityReferenceInUseException.cs" />
     <Compile Include="Graphs\Validity.cs" />
     <Compile Include="Graphs\VertexSynchronizer.cs" />
     <Compile Include="ItemBased\Interfaces.cs" />

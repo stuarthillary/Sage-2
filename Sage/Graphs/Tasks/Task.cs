@@ -119,7 +119,7 @@ namespace Highpoint.Sage.Graphs.Tasks {
         /// <param name="description">The description of the task.</param>
         /// <param name="guid">The GUID of the task.</param>
         public void InitializeIdentity(IModel model, string name, string description, Guid guid) {
-            IMOHelper.Initialize(ref m_model, model, ref m_name, name, ref m_description, description, ref m_guid, guid);
+            IMOHelper.Initialize(ref m_model, model, ref _name, name, ref _description, description, ref m_guid, guid);
         }
 
         /// <summary>
