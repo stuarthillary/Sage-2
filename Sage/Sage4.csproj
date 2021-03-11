@@ -231,6 +231,7 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Graphs\IHasValidity.cs" />
+    <Compile Include="Graphs\ISupportsPertAnalysis.cs" />
     <Compile Include="Graphs\IVertex.cs" />
     <Compile Include="Graphs\PreEdgesSatisfiedKey.cs" />
     <Compile Include="Graphs\SynchronizerSorter.cs" />
