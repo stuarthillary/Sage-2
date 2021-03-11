@@ -236,11 +236,14 @@
     <Compile Include="Graphs\IEdge.cs" />
     <Compile Include="Graphs\IEdgeReceiptManager.cs" />
     <Compile Include="Graphs\IHasValidity.cs" />
+    <Compile Include="Graphs\IPartOfGraphStructure.cs" />
     <Compile Include="Graphs\IStatefulEdge.cs" />
     <Compile Include="Graphs\ISupportsPertAnalysis.cs" />
     <Compile Include="Graphs\IVertex.cs" />
     <Compile Include="Graphs\Ligature.cs" />
+    <Compile Include="Graphs\PmData.cs" />
     <Compile Include="Graphs\PreEdgesSatisfiedKey.cs" />
+    <Compile Include="Graphs\StructureChangeType.cs" />
     <Compile Include="Graphs\SynchronizerSorter.cs" />
     <Compile Include="Graphs\Tasks\TaskManagementService.cs" />
     <Compile Include="Graphs\UtilityReferenceInUseException.cs" />
@@ -252,7 +255,7 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Graphs\CriticalPathAnalyst.cs" />
-    <Compile Include="Graphs\Dag.cs">
+    <Compile Include="Graphs\StructureChangeTypeSvc.cs">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Graphs\DagCycleChecker.cs">
