@@ -231,6 +231,8 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Graphs\ChannelMonitor.cs" />
+    <Compile Include="Graphs\ConditionalBranchManager.cs" />
+    <Compile Include="Graphs\CountedBranchManager.cs" />
     <Compile Include="Graphs\IEdgeReceiptManager.cs" />
     <Compile Include="Graphs\IHasValidity.cs" />
     <Compile Include="Graphs\ISupportsPertAnalysis.cs" />
@@ -261,7 +263,7 @@
     <Compile Include="Graphs\Edge.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Graphs\EdgeFiringManagers.cs">
+    <Compile Include="Graphs\IEdgeFiringManager.cs">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Graphs\MultiChannelEdgeReceiptManager.cs">
