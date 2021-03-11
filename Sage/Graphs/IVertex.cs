@@ -10,14 +10,35 @@ namespace Highpoint.Sage.Graphs
 {
     public interface IVertex : IVisitable, IXmlPersistable, IHasName, IHasValidity
     {
-        Vertex.WhichVertex Role { get; }
-        Edge PrincipalEdge { get; }
-        IList PredecessorEdges { get; }
-        IList SuccessorEdges { get; }
-        IEdgeFiringManager EdgeFiringManager { get; }
-        IEdgeReceiptManager EdgeReceiptManager { get; }
+        Vertex.WhichVertex Role
+        {
+            get;
+        }
+        Edge PrincipalEdge
+        {
+            get;
+        }
+        IList PredecessorEdges
+        {
+            get;
+        }
+        IList SuccessorEdges
+        {
+            get;
+        }
+        IEdgeFiringManager EdgeFiringManager
+        {
+            get;
+        }
+        IEdgeReceiptManager EdgeReceiptManager
+        {
+            get;
+        }
         void PreEdgeSatisfied(IDictionary graphContext, Edge theEdge);
-        TriggerDelegate FireVertex { get; }
+        TriggerDelegate FireVertex
+        {
+            get;
+        }
     }
 
 }
