@@ -230,6 +230,8 @@
     <Compile Include="Dependencies\ISequencer.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Graphs\ChannelMonitor.cs" />
+    <Compile Include="Graphs\IEdgeReceiptManager.cs" />
     <Compile Include="Graphs\IHasValidity.cs" />
     <Compile Include="Graphs\ISupportsPertAnalysis.cs" />
     <Compile Include="Graphs\IVertex.cs" />
@@ -262,7 +264,7 @@
     <Compile Include="Graphs\EdgeFiringManagers.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Graphs\EdgeReceiptManagers.cs">
+    <Compile Include="Graphs\MultiChannelEdgeReceiptManager.cs">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Graphs\FlowNode.cs" />
