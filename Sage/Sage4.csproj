@@ -247,6 +247,7 @@
     <Compile Include="Graphs\StructureChangeType.cs" />
     <Compile Include="Graphs\SynchronizerSorter.cs" />
     <Compile Include="Graphs\Tasks\ITaskFactory.cs" />
+    <Compile Include="Graphs\Tasks\ITaskManagementService.cs" />
     <Compile Include="Graphs\Tasks\TaskError.cs" />
     <Compile Include="Graphs\Tasks\TaskHasInvalidSelfStateError.cs" />
     <Compile Include="Graphs\Tasks\TaskManagementService.cs" />
