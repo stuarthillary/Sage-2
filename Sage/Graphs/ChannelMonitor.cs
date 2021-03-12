@@ -6,10 +6,10 @@ namespace Highpoint.Sage.Graphs
 {
     public class ChannelMonitor
     {
-        private IVertex _vertex;
-        private object _channelMarker;
-        private ArrayList _myEdges;
-        private ArrayList _preEdgesSatisfied;
+        private readonly IVertex _vertex;
+        private readonly object _channelMarker;
+        private readonly ArrayList _myEdges;
+        private readonly ArrayList _preEdgesSatisfied;
 
         public ChannelMonitor(Vertex vertex, object channelMarker)
         {
