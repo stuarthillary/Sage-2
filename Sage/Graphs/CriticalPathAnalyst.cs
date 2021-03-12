@@ -1,25 +1,27 @@
 ﻿/* This source code licensed under the GNU Affero General Public License */
+using Highpoint.Sage.Utility;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Highpoint.Sage.Utility;
 
-namespace Highpoint.Sage.Graphs {
+namespace Highpoint.Sage.Graphs
+{
     /// <summary>
     /// An engine for determining critical paths through a directed acyclic graph (DAG).
     /// </summary>
     /// <typeparam name="T">The type of task being represented in this DAG.</typeparam>
-    public class CriticalPathAnalyst<T> {
+    public class CriticalPathAnalyst<T>
+    {
 
-        private T m_startNode;
-        private T m_finishNode;
-        private Func<T, DateTime> m_startTime;
-        private Func<T, TimeSpan> m_duration;
-        private Func<T, bool> m_isFixed;
-        private Func<T, IEnumerable<T>> m_successors;
-        private Func<T, IEnumerable<T>> m_predecessors;
-        private List<T> m_criticalPath;
-        private Dictionary<T, TimingData> m_timingData;
+        private readonly T _startNode;
+        private readonly T _finishNode;
+        private readonly Func<T, DateTime> _startTime;
+        private readonly Func<T, TimeSpan> _duration;
+        private readonly Func<T, bool> _isFixed;
+        private readonly Func<T, IEnumerable<T>> _successors;
+        private readonly Func<T, IEnumerable<T>> _predecessors;
+        private List<T> _criticalPath;
+        private Dictionary<T, TimingData> _timingData;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="CriticalPathAnalyst{T}"/> class.
@@ -31,51 +33,58 @@ namespace Highpoint.Sage.Graphs {
         /// <param name="isFixed">A function that, given a task element, returns whether its start time and duration are fixed.</param>
         /// <param name="successors">A function that, given a task element, returns its successors.</param>
         /// <param name="predecessors">A function that, given a task element, returns its predecessors.</param>
-        public CriticalPathAnalyst(T startNode, T finishNode, Func<T, DateTime> startTime, Func<T, TimeSpan> duration, Func<T,bool> isFixed, Func<T, IEnumerable<T>> successors, Func<T, IEnumerable<T>> predecessors) {
-            m_startNode = startNode;
-            m_finishNode = finishNode;
-            m_startTime = startTime;
-            m_duration = duration;
-            m_isFixed = isFixed;
-            m_successors = successors;
-            m_predecessors = predecessors;
+        public CriticalPathAnalyst(T startNode, T finishNode, Func<T, DateTime> startTime, Func<T, TimeSpan> duration, Func<T, bool> isFixed, Func<T, IEnumerable<T>> successors, Func<T, IEnumerable<T>> predecessors)
+        {
+            _startNode = startNode;
+            _finishNode = finishNode;
+            _startTime = startTime;
+            _duration = duration;
+            _isFixed = isFixed;
+            _successors = successors;
+            _predecessors = predecessors;
 
-            m_criticalPath = null;
-            m_timingData = null;
+            _criticalPath = null;
+            _timingData = null;
         }
 
         /// <summary>
         /// Returns the critical path.
         /// </summary>
         /// <value>The critical path.</value>
-        public IEnumerable<T> CriticalPath {
-            get {
-                if (m_criticalPath == null) {
+        public IEnumerable<T> CriticalPath
+        {
+            get
+            {
+                if (_criticalPath == null)
+                {
                     ComputeCriticalPath();
                 }
-                return m_criticalPath;
+                return _criticalPath;
             }
         }
 
         /// <summary>
         /// Computes (or recomputes) the critical path. This is called automatically if necessary when the Critical Path is requested.
         /// </summary>
-        public void ComputeCriticalPath() {
-            m_criticalPath = new List<T>();
-            m_timingData = new Dictionary<T, TimingData>();
-            PropagateForward(TimingDataNodeFor(m_startNode));
+        public void ComputeCriticalPath()
+        {
+            _criticalPath = new List<T>();
+            _timingData = new Dictionary<T, TimingData>();
+            PropagateForward(TimingDataNodeFor(_startNode));
 
-            TimingData tdFinish = TimingDataNodeFor(m_finishNode);
+            TimingData tdFinish = TimingDataNodeFor(_finishNode);
             tdFinish.Fix(tdFinish.EarlyStart, tdFinish.NominalDuration, true);
-            PropagateBackward(TimingDataNodeFor(m_finishNode));
+            PropagateBackward(TimingDataNodeFor(_finishNode));
 
             AnalyzeCriticality();
         }
 
-        private void AnalyzeCriticality() {
+        private void AnalyzeCriticality()
+        {
             // Rough. Starting.
-            foreach (TimingData tdNode in m_timingData.Values.Where(n=>n.IsCritical).OrderBy(n=>n.EarlyStart)) {
-                m_criticalPath.Add(tdNode.Subject);
+            foreach (TimingData tdNode in _timingData.Values.Where(n => n.IsCritical).OrderBy(n => n.EarlyStart))
+            {
+                _criticalPath.Add(tdNode.Subject);
             }
         }
 
@@ -86,16 +95,20 @@ namespace Highpoint.Sage.Graphs {
         /// adjusting early start &amp; finish according to a PERT methodology.
         /// </summary>
         /// <param name="tdNode">The TimingData node.</param>
-        private void PropagateForward(TimingData tdNode) {
-            
+        private void PropagateForward(TimingData tdNode)
+        {
+
             tdNode.EarlyFinish = tdNode.EarlyStart + tdNode.NominalDuration;
 
-            foreach (TimingData successor in m_successors(tdNode.Subject).Select(n=>TimingDataNodeFor(n))) {
-                if (!successor.IsFixed) {
+            foreach (TimingData successor in _successors(tdNode.Subject).Select(n => TimingDataNodeFor(n)))
+            {
+                if (!successor.IsFixed)
+                {
                     successor.EarlyStart = DateTimeOperations.Max(successor.EarlyStart, tdNode.EarlyFinish);
                 }
                 successor.RegisterPredecessor();
-                if (successor.AllPredecessorsHaveWeighedIn) {
+                if (successor.AllPredecessorsHaveWeighedIn)
+                {
                     PropagateForward(successor);
                 }
             }
@@ -106,16 +119,20 @@ namespace Highpoint.Sage.Graphs {
         /// are complete, adjusting late start &amp; finish according to a PERT methodology.
         /// </summary>
         /// <param name="tdNode">The TimingData node.</param>
-        private void PropagateBackward(TimingData tdNode) {
-                
+        private void PropagateBackward(TimingData tdNode)
+        {
+
             tdNode.LateStart = tdNode.LateFinish - tdNode.NominalDuration;
 
-            foreach (TimingData predecessor in m_predecessors(tdNode.Subject).Select(n => TimingDataNodeFor(n))) {
-                if (!predecessor.IsFixed) {
+            foreach (TimingData predecessor in _predecessors(tdNode.Subject).Select(n => TimingDataNodeFor(n)))
+            {
+                if (!predecessor.IsFixed)
+                {
                     predecessor.LateFinish = DateTimeOperations.Min(predecessor.LateFinish, tdNode.LateStart);
                 }
                 predecessor.RegisterSuccessor();
-                if (predecessor.AllSuccessorsHaveWeighedIn) {
+                if (predecessor.AllSuccessorsHaveWeighedIn)
+                {
                     PropagateBackward(predecessor);
                 }
             }
@@ -126,105 +143,145 @@ namespace Highpoint.Sage.Graphs {
         /// </summary>
         /// <param name="node">The client-domain node.</param>
         /// <returns></returns>
-        private TimingData TimingDataNodeFor(T node) {
+        private TimingData TimingDataNodeFor(T node)
+        {
             TimingData tdNode;
-            if (!m_timingData.TryGetValue(node, out tdNode)) {
+            if (!_timingData.TryGetValue(node, out tdNode))
+            {
                 tdNode = new TimingData(
-                    node, 
-                    m_isFixed(node), 
-                    m_startTime(node), 
-                    m_duration(node), 
-                    (short)m_predecessors(node).Count(),
-                    (short)m_successors(node).Count());
-                m_timingData.Add(node, tdNode);
+                    node,
+                    _isFixed(node),
+                    _startTime(node),
+                    _duration(node),
+                    (short)_predecessors(node).Count(),
+                    (short)_successors(node).Count());
+                _timingData.Add(node, tdNode);
             }
             return tdNode;
         }
 
-        private class TimingData : ICriticalPathTimingData {
+        private class TimingData : ICriticalPathTimingData
+        {
 
-            public TimingData(T subject, bool isFixed, DateTime nominalStart, TimeSpan nominalDuration, short nPreds, short nSuccs) {
+            public TimingData(T subject, bool isFixed, DateTime nominalStart, TimeSpan nominalDuration, short nPreds, short nSuccs)
+            {
                 Subject = subject;
-                if (isFixed) {
+                if (isFixed)
+                {
                     Fix(nominalStart, nominalDuration, true);
-                } else {
+                }
+                else
+                {
                     NominalStart = nominalStart;
                     NominalDuration = nominalDuration;
                     EarlyStart = EarlyFinish = DateTime.MinValue; // Explicit for clarity.
                     LateStart = LateFinish = DateTime.MaxValue;
                 }
-                m_totalNumOfPredecessors = nPreds;
-                m_totalNumOfSuccessors = nSuccs;
-                m_totalNumOfPredecessorsWeighedIn = 0;
-                m_totalNumOfSuccessorsWeighedIn = 0;
+                _totalNumOfPredecessors = nPreds;
+                _totalNumOfSuccessors = nSuccs;
+                _totalNumOfPredecessorsWeighedIn = 0;
+                _totalNumOfSuccessorsWeighedIn = 0;
             }
             #region ITimingData Members
 
-            public DateTime EarlyStart { get; set; }
+            public DateTime EarlyStart
+            {
+                get; set;
+            }
 
-            public DateTime LateStart { get; set; }
+            public DateTime LateStart
+            {
+                get; set;
+            }
 
-            public DateTime EarlyFinish { get; set; }
+            public DateTime EarlyFinish
+            {
+                get; set;
+            }
 
-            public DateTime LateFinish { get; set; }
+            public DateTime LateFinish
+            {
+                get; set;
+            }
 
-            public double Criticality { get; set; }
+            public double Criticality
+            {
+                get; set;
+            }
 
-            public bool IsCritical {
-                get { return EarlyStart.Equals(LateStart) && EarlyFinish.Equals(LateFinish); }
+            public bool IsCritical
+            {
+                get
+                {
+                    return EarlyStart.Equals(LateStart) && EarlyFinish.Equals(LateFinish);
+                }
             }
             #endregion
 
             private bool m_fixed;
-            public bool IsFixed { get { return m_fixed; } }
-            public void Fix(DateTime startTime, TimeSpan duration, bool setAsNominal) {
+            public bool IsFixed
+            {
+                get
+                {
+                    return m_fixed;
+                }
+            }
+            public void Fix(DateTime startTime, TimeSpan duration, bool setAsNominal)
+            {
                 EarlyStart = LateStart = startTime;
                 EarlyFinish = LateFinish = startTime + duration;
                 m_fixed = true;
-                if (setAsNominal) {
+                if (setAsNominal)
+                {
                     NominalStart = startTime;
                     NominalDuration = duration;
                 }
             }
 
-            public DateTime NominalStart { get; set; }
-
-            public TimeSpan NominalDuration { get; set; }
-
-            public T Subject { get; set; }
-
-            private short m_totalNumOfPredecessors;
-            private short m_totalNumOfPredecessorsWeighedIn;
-            internal void RegisterPredecessor() {
-                m_totalNumOfPredecessorsWeighedIn++;
+            public DateTime NominalStart
+            {
+                get; set;
             }
 
-            internal bool AllPredecessorsHaveWeighedIn {
-                get {
-                    return m_totalNumOfPredecessorsWeighedIn == m_totalNumOfPredecessors;
+            public TimeSpan NominalDuration
+            {
+                get; set;
+            }
+
+            public T Subject
+            {
+                get; set;
+            }
+
+            private short _totalNumOfPredecessors;
+            private short _totalNumOfPredecessorsWeighedIn;
+            internal void RegisterPredecessor()
+            {
+                _totalNumOfPredecessorsWeighedIn++;
+            }
+
+            internal bool AllPredecessorsHaveWeighedIn
+            {
+                get
+                {
+                    return _totalNumOfPredecessorsWeighedIn == _totalNumOfPredecessors;
                 }
             }
-            private short m_totalNumOfSuccessors;
-            private short m_totalNumOfSuccessorsWeighedIn;
-            internal void RegisterSuccessor() {
-                m_totalNumOfSuccessorsWeighedIn++;
+            private short _totalNumOfSuccessors;
+            private short _totalNumOfSuccessorsWeighedIn;
+            internal void RegisterSuccessor()
+            {
+                _totalNumOfSuccessorsWeighedIn++;
             }
 
-            internal bool AllSuccessorsHaveWeighedIn {
-                get {
-                    return m_totalNumOfSuccessorsWeighedIn == m_totalNumOfSuccessors;
+            internal bool AllSuccessorsHaveWeighedIn
+            {
+                get
+                {
+                    return _totalNumOfSuccessorsWeighedIn == _totalNumOfSuccessors;
                 }
             }
         }
-    }
-
-    public interface ICriticalPathTimingData {
-        DateTime EarlyStart { get; }
-        DateTime LateStart { get; }
-        DateTime EarlyFinish { get; }
-        DateTime LateFinish { get; }
-        bool IsCritical { get; }
-        double Criticality { get; }
     }
 
 

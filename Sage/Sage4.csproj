@@ -233,6 +233,7 @@
     <Compile Include="Graphs\ChannelMonitor.cs" />
     <Compile Include="Graphs\ConditionalBranchManager.cs" />
     <Compile Include="Graphs\CountedBranchManager.cs" />
+    <Compile Include="Graphs\ICriticalPathTimingData.cs" />
     <Compile Include="Graphs\IEdge.cs" />
     <Compile Include="Graphs\IEdgeReceiptManager.cs" />
     <Compile Include="Graphs\IHasValidity.cs" />
