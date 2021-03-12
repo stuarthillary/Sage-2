@@ -246,6 +246,7 @@
     <Compile Include="Graphs\PreEdgesSatisfiedKey.cs" />
     <Compile Include="Graphs\StructureChangeType.cs" />
     <Compile Include="Graphs\SynchronizerSorter.cs" />
+    <Compile Include="Graphs\Tasks\ITaskFactory.cs" />
     <Compile Include="Graphs\Tasks\TaskManagementService.cs" />
     <Compile Include="Graphs\UtilityReferenceInUseException.cs" />
     <Compile Include="Graphs\Validity.cs" />
