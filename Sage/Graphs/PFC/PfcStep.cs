@@ -1,22 +1,24 @@
 /* This source code licensed under the GNU Affero General Public License */
 
-using System;
-using System.Collections.Generic;
-using Highpoint.Sage.SimCore;
 using Highpoint.Sage.Graphs.PFC.Execution;
+using Highpoint.Sage.SimCore;
+using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.Diagnostics;
 
-namespace Highpoint.Sage.Graphs.PFC {
+namespace Highpoint.Sage.Graphs.PFC
+{
 
-    public class PfcStep : PfcNode, IPfcStepNode {
+    public class PfcStep : PfcNode, IPfcStepNode
+    {
 
         #region Private Fields
 
-        private Dictionary<string, IProcedureFunctionChart> m_actions;
-        private Utility.LabelManager m_labelManager;
-        private IPfcUnitInfo m_unit = null;
-        private StepStateMachine m_myStepStateMachine = null;
+        private Dictionary<string, IProcedureFunctionChart> _actions;
+        private readonly Utility.LabelManager _labelManager;
+        private IPfcUnitInfo _unit = null;
+        private StepStateMachine _myStepStateMachine = null;
 
         #endregion Private Fields
 
@@ -35,9 +37,10 @@ namespace Highpoint.Sage.Graphs.PFC {
         /// <param name="description">The description for this step.</param>
         /// <param name="guid">The GUID of this step.</param>
         public PfcStep(IProcedureFunctionChart parent, string name, string description, Guid guid)
-            : base(parent, name, description, guid) {
-            m_actions = new Dictionary<string, IProcedureFunctionChart>();
-            m_labelManager = new Utility.LabelManager();
+            : base(parent, name, description, guid)
+        {
+            _actions = new Dictionary<string, IProcedureFunctionChart>();
+            _labelManager = new Utility.LabelManager();
         }
 
         #endregion Constructors
@@ -48,8 +51,12 @@ namespace Highpoint.Sage.Graphs.PFC {
         /// Gets the type of this element.
         /// </summary>
         /// <value>The type of the element.</value>
-        public override PfcElementType ElementType {
-            get { return PfcElementType.Step; }
+        public override PfcElementType ElementType
+        {
+            get
+            {
+                return PfcElementType.Step;
+            }
         }
 
         #region Element Enumerables
@@ -61,9 +68,12 @@ namespace Highpoint.Sage.Graphs.PFC {
         /// <param name="depth">The depth to which retrieval is to be done.</param>
         /// <param name="filter">The filter predicate that dictates which elements are acceptable.</param>
         /// <param name="children">The children, treated as a return value.</param>
-        public void GetChildren(int depth, Predicate<IPfcElement> filter, ref List<IPfcElement> children) {
-            if (depth > 0 && Actions.Count > 0) {
-                foreach (IProcedureFunctionChart pfc in Actions.Values) {
+        public void GetChildren(int depth, Predicate<IPfcElement> filter, ref List<IPfcElement> children)
+        {
+            if (depth > 0 && Actions.Count > 0)
+            {
+                foreach (IProcedureFunctionChart pfc in Actions.Values)
+                {
                     pfc.GetChildren(depth, filter, ref children);
                 }
             }
@@ -76,7 +86,8 @@ namespace Highpoint.Sage.Graphs.PFC {
         /// </summary>
         /// <param name="path">The path.</param>
         /// <returns></returns>
-        public IPfcElement Find(string path) {
+        public IPfcElement Find(string path)
+        {
             throw new Exception("This method has not been implemented.");
         }
 
@@ -85,17 +96,22 @@ namespace Highpoint.Sage.Graphs.PFC {
         /// should not be changed - use AddAction(string ,IProcedureFunctionChart).
         /// </summary>
         /// <value>The actions.</value>
-        public Dictionary<string, IProcedureFunctionChart> Actions {
+        public Dictionary<string, IProcedureFunctionChart> Actions
+        {
             [DebuggerStepThrough]
-            get {
-                if (m_actions == null) {
-                    lock (typeof(PfcStep)) {
-                        if (m_actions == null) {
-                            m_actions = new Dictionary<string, IProcedureFunctionChart>();
+            get
+            {
+                if (_actions == null)
+                {
+                    lock (typeof(PfcStep))
+                    {
+                        if (_actions == null)
+                        {
+                            _actions = new Dictionary<string, IProcedureFunctionChart>();
                         }
                     }
                 }
-                return m_actions;
+                return _actions;
             }
         }
 
@@ -104,18 +120,22 @@ namespace Highpoint.Sage.Graphs.PFC {
         /// </summary>
         /// <param name="actionName">The name of this action.</param>
         /// <param name="pfc">The Pfc that contains procedural details of this action.</param>
-        public void AddAction(string actionName, IProcedureFunctionChart pfc) {
+        public void AddAction(string actionName, IProcedureFunctionChart pfc)
+        {
             Actions.Add(actionName, pfc);
         }
 
-        private static PfcAction _defaultPfcAction = delegate(PfcExecutionContext pfcec, StepStateMachine ssm){return;};
-        private PfcAction m_pfcAction = _defaultPfcAction;
-        public PfcAction LeafLevelAction{
-            get { 
-                return m_pfcAction==null?_defaultPfcAction:m_pfcAction; 
-            } 
-            set { 
-                m_pfcAction = value; 
+        private static readonly PfcAction _defaultPfcAction = delegate (PfcExecutionContext pfcec, StepStateMachine ssm) { return; };
+        private PfcAction _pfcAction = _defaultPfcAction;
+        public PfcAction LeafLevelAction
+        {
+            get
+            {
+                return _pfcAction ?? _defaultPfcAction;
+            }
+            set
+            {
+                _pfcAction = value;
             }
         }
 
@@ -124,26 +144,34 @@ namespace Highpoint.Sage.Graphs.PFC {
         /// action, as well as preconditiond for running.
         /// </summary>
         /// <param name="actor">The actor that will provide the behaviors.</param>
-        public void SetActor(PfcActor actor) {
+        public void SetActor(PfcActor actor)
+        {
             LeafLevelAction = new PfcAction(actor.Run);
             Precondition = new PfcAction(actor.GetPermissionToStart);
         }
 
 
-        public StepStateMachine MyStepStateMachine {
-            get {
-                if (m_myStepStateMachine == null) {
+        public StepStateMachine MyStepStateMachine
+        {
+            get
+            {
+                if (_myStepStateMachine == null)
+                {
                     // ReSharper disable once UnusedVariable
-                    object obj = ( (ProcedureFunctionChart)Parent ).ExecutionEngine; // Forces initialization so everyone has a SSM.
+                    object obj = ((ProcedureFunctionChart)Parent).ExecutionEngine; // Forces initialization so everyone has a SSM.
                 }
-                return m_myStepStateMachine;
+                return _myStepStateMachine;
             }
-            internal set {
-                if (m_myStepStateMachine != null && value != null) {
-                    string message = string.Format(s_msg_Replace_Existing_Sm, Name);
+            internal set
+            {
+                if (_myStepStateMachine != null && value != null)
+                {
+                    string message = string.Format(_msgReplaceExistingSm, Name);
                     throw new ApplicationException(message);
-                } else {
-                    m_myStepStateMachine = value;
+                }
+                else
+                {
+                    _myStepStateMachine = value;
                 }
             }
         }
@@ -155,7 +183,7 @@ namespace Highpoint.Sage.Graphs.PFC {
         public event PfcAction PfcStarting;
 #pragma warning restore 67
 
-        private static readonly string s_msg_Replace_Existing_Sm = "Attempt to replace an existing step state machine on {0}. " 
+        private static readonly string _msgReplaceExistingSm = "Attempt to replace an existing step state machine on {0}. "
             + "This could be due to initializing the Execution Engine on a PFC before that PFC's construction is complete.";
 
         /// <summary>
@@ -163,31 +191,42 @@ namespace Highpoint.Sage.Graphs.PFC {
         /// </summary>
         /// <param name="myPfcec">My pfcec.</param>
         /// <param name="ssm">The StepStateMachine that will govern this run.</param>
-        public virtual void GetPermissionToStart(PfcExecutionContext myPfcec, StepStateMachine ssm) {
-            
+        public virtual void GetPermissionToStart(PfcExecutionContext myPfcec, StepStateMachine ssm)
+        {
+
             IExecutive exec = myPfcec.Model.Executive;
             Debug.Assert(exec.CurrentEventType == ExecEventType.Detachable);
-            if (EarliestStart != null && EarliestStart > exec.Now) {
+            if (EarliestStart != null && EarliestStart > exec.Now)
+            {
                 exec.CurrentEventController.SuspendUntil(EarliestStart.Value);
             }
 
-            m_precondition?.Invoke(myPfcec,ssm);
+            _precondition?.Invoke(myPfcec, ssm);
         }
 
-        private PfcAction m_precondition = null;
-        public PfcAction Precondition { 
-            set { 
-                m_precondition = value;
+        private PfcAction _precondition = null;
+        public PfcAction Precondition
+        {
+            set
+            {
+                _precondition = value;
             }
-            get {
-                return m_precondition;
+            get
+            {
+                return _precondition;
             }
         }
 
         /// <summary>
         /// Returns the Guid of the element in the source recipe that is represented by this PfcStep.
         /// </summary>
-        public Guid RecipeSourceGuid { get { return Guid; } }
+        public Guid RecipeSourceGuid
+        {
+            get
+            {
+                return Guid;
+            }
+        }
 
         #endregion
 
@@ -195,7 +234,8 @@ namespace Highpoint.Sage.Graphs.PFC {
         /// Returns the actions under this Step as a procedure function chart.
         /// </summary>
         /// <returns>A procedure function chart containing the actions under this Step.</returns>
-        public ProcedureFunctionChart ToProcedureFunctionChart() {
+        public ProcedureFunctionChart ToProcedureFunctionChart()
+        {
             return ProcedureFunctionChart.CreateFromStep(this, false);
         }
 
@@ -204,22 +244,29 @@ namespace Highpoint.Sage.Graphs.PFC {
         /// </summary>
         /// <param name="autoFlatten">if set to <c>true</c>, flattens each PFC under this step and its actions and their steps' actions.</param>
         /// <returns>A procedure function chart containing the actions under this Step.</returns>
-        public ProcedureFunctionChart ToProcedureFunctionChart(bool autoFlatten) {
-            return ProcedureFunctionChart.CreateFromStep(this,autoFlatten);
+        public ProcedureFunctionChart ToProcedureFunctionChart(bool autoFlatten)
+        {
+            return ProcedureFunctionChart.CreateFromStep(this, autoFlatten);
         }
 
         /// <summary>
         /// Gets the unit with which this step is associated.
         /// </summary>
         /// <value>The unit.</value>
-        public IPfcUnitInfo UnitInfo {
-            get {
-                if (m_unit == null) {
-                    m_unit = new PfcUnitInfo(null, -1);
+        public IPfcUnitInfo UnitInfo
+        {
+            get
+            {
+                if (_unit == null)
+                {
+                    _unit = new PfcUnitInfo(null, -1);
                 }
-                return m_unit;
+                return _unit;
             }
-            set { m_unit = value; }
+            set
+            {
+                _unit = value;
+            }
         }
 
         #region IHasLabel Members
@@ -229,8 +276,9 @@ namespace Highpoint.Sage.Graphs.PFC {
         /// </summary>
         /// <param name="label">The label.</param>
         /// <param name="context">The context - use null or string.Empty for the default context.</param>
-        public void SetLabel(string label, string context) {
-            m_labelManager.SetLabel(label, context);
+        public void SetLabel(string label, string context)
+        {
+            _labelManager.SetLabel(label, context);
         }
 
         /// <summary>
@@ -238,18 +286,22 @@ namespace Highpoint.Sage.Graphs.PFC {
         /// </summary>
         /// <param name="context">The context - use null or string.Empty for the default context.</param>
         /// <returns></returns>
-        public string GetLabel(string context) {
-            return m_labelManager.GetLabel(context);
+        public string GetLabel(string context)
+        {
+            return _labelManager.GetLabel(context);
         }
 
         #endregion
 
-        public class StepComparer : IComparer<IPfcStepNode> {
+        public class StepComparer : IComparer<IPfcStepNode>
+        {
             #region IComparer<IPfcStepNode> Members
 
-            public int Compare(IPfcStepNode x, IPfcStepNode y) {
+            public int Compare(IPfcStepNode x, IPfcStepNode y)
+            {
                 int retval = Comparer.Default.Compare(x.GraphOrdinal, y.GraphOrdinal);
-                if (retval == 0) {
+                if (retval == 0)
+                {
                     Utility.GuidOps.Compare(x.Guid, y.Guid);
                 }
                 return retval;
