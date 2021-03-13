@@ -4,16 +4,17 @@
 #  Highpoint Software Systems is a Wisconsin Limited Liability Corporation.
 ###############################################################################*/
 using System;
-using _Debug = System.Diagnostics.Debug;
 using System.Collections;
 
-namespace Highpoint.Sage.Dependencies {
+namespace Highpoint.Sage.Dependencies
+{
 
     /// <summary>
     /// This interface is implemented by the class whose objects are to
     /// act as vertices in the Directed Acyclic Graph.
     /// </summary>
-    public interface IDependencyVertex {
+    public interface IDependencyVertex
+    {
 
         /// <summary>
         /// An IComparable that determines how otherwise equal vertices
@@ -21,7 +22,10 @@ namespace Highpoint.Sage.Dependencies {
         /// vertices are equal after a dependency analysis is done,
         /// and that both are independent of each other in the graph.
         /// </summary>
-        IComparable SortCriteria{get;}
+        IComparable SortCriteria
+        {
+            get;
+        }
 
         /// <summary>
         /// This is a list of other vertices, that implement 
@@ -30,7 +34,10 @@ namespace Highpoint.Sage.Dependencies {
         /// before this implementer can generate a stable output. In other
         /// words, they are vertices that provide input to this vertex.
         /// </summary>
-        ICollection PredecessorList { get; }
+        ICollection PredecessorList
+        {
+            get;
+        }
 
     }
 }

@@ -3,15 +3,16 @@
 #  Material previously published at http://builder.com.com/5100-6387_14-5025380.html
 ###############################################################################*/
 
-using _Debug = System.Diagnostics.Debug;
 using System.Collections;
 
-namespace Highpoint.Sage.Dependencies {
+namespace Highpoint.Sage.Dependencies
+{
     /// <summary>
     /// Implemented by an object that perform a sequence determination
     /// across a collection of vertices that implement IDependencyVertex.
     /// </summary>
-    public interface ISequencer {
+    public interface ISequencer
+    {
 
         /// <summary>
         /// Call this with a collection of IDependencyVertex objects to 
