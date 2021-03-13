@@ -1,21 +1,23 @@
 /* This source code licensed under the GNU Affero General Public License */
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Collections;
-using System.Diagnostics;
 using Highpoint.Sage.Utility;
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
 
-namespace Highpoint.Sage.Graphs.PFC {
+namespace Highpoint.Sage.Graphs.PFC
+{
     /// <summary>
     /// The PfcAnalyst is a static class that provides analytical helper methods.
     /// </summary>
-    public class PfcAnalyst {
-
-        private static readonly bool s_diagnostics = Diagnostics.DiagnosticAids.Diagnostics("PFC.Analyst");
+    public class PfcAnalyst
+    {
+        private static readonly bool _diagnostics = Diagnostics.DiagnosticAids.Diagnostics("PFC.Analyst");
 
         #region Path-Related Queries
-        public static int AssignWeightsForBroadestNonLoopingPath(ProcedureFunctionChart pfc) {
+        public static int AssignWeightsForBroadestNonLoopingPath(ProcedureFunctionChart pfc)
+        {
 
             pfc.Nodes.ForEach(n => n.NodeColor = NodeColor.White);
             pfc.Links.ForEach(n => n.Priority = null);
@@ -26,16 +28,21 @@ namespace Highpoint.Sage.Graphs.PFC {
             return retval;
         }
 
-        private static int WeightAssignmentPropagationForBroadestNonLoopingPath(PfcStep step) {
+        private static int WeightAssignmentPropagationForBroadestNonLoopingPath(PfcStep step)
+        {
 
-            if (step.NodeColor == NodeColor.Black) return int.MinValue;
+            if (step.NodeColor == NodeColor.Black)
+                return int.MinValue;
 
-            if (!step.Successors.Any()) return 1; // We've reached a terminal step. (strictly, should be a transition.)
+            if (!step.Successors.Any())
+                return 1; // We've reached a terminal step. (strictly, should be a transition.)
 
             step.NodeColor = NodeColor.Black;
-            foreach (PfcLink link in step.Successors) {
-                if (link.Priority == null) {
-                    link.Priority = WeightAssignmentPropagationForBroadestNonLoopingPath(( (PfcTransition)link.Successor ));
+            foreach (PfcLink link in step.Successors)
+            {
+                if (link.Priority == null)
+                {
+                    link.Priority = WeightAssignmentPropagationForBroadestNonLoopingPath(((PfcTransition)link.Successor));
                 }
             }
             step.NodeColor = NodeColor.White;
@@ -45,26 +52,35 @@ namespace Highpoint.Sage.Graphs.PFC {
         }
 
 
-        private static int WeightAssignmentPropagationForBroadestNonLoopingPath(PfcTransition trans) {
-            if (trans.NodeColor == NodeColor.Black) return int.MinValue;
+        private static int WeightAssignmentPropagationForBroadestNonLoopingPath(PfcTransition trans)
+        {
+            if (trans.NodeColor == NodeColor.Black)
+                return int.MinValue;
 
-            if (trans.Successors.Count == 0) return 1; // We've reached a terminal transition.
+            if (trans.Successors.Count == 0)
+                return 1; // We've reached a terminal transition.
 
             trans.NodeColor = NodeColor.Black;
-            foreach (PfcLink link in trans.Successors) {
-                if (link.Priority == null) {
-                    link.Priority = WeightAssignmentPropagationForBroadestNonLoopingPath(( (PfcStep)link.Successor ));
+            foreach (PfcLink link in trans.Successors)
+            {
+                if (link.Priority == null)
+                {
+                    link.Priority = WeightAssignmentPropagationForBroadestNonLoopingPath(((PfcStep)link.Successor));
                 }
             }
             trans.NodeColor = NodeColor.White;
 
             int total = 0;
-            foreach (PfcLink link in trans.Successors) {
-                if (link.Priority < 0 ) {
+            foreach (PfcLink link in trans.Successors)
+            {
+                if (link.Priority < 0)
+                {
                     total = trans.Successors.Where(n => n.Priority != null && n.Priority.Value < 0).Max(n => n.Priority).Value + 1;
                     break;
-                } else {
-                    total += link.Priority.Value; 
+                }
+                else
+                {
+                    total += link.Priority.Value;
                 }
             }
             return total;
@@ -81,10 +97,14 @@ namespace Highpoint.Sage.Graphs.PFC {
         /// <returns>
         /// 	<c>true</c> if the specified link is preceded by a transition.; otherwise, <c>false</c>.
         /// </returns>
-        public static bool IsPostTransitionLink(IPfcLinkElement link) {
-            if (link.Predecessor == null) {
+        public static bool IsPostTransitionLink(IPfcLinkElement link)
+        {
+            if (link.Predecessor == null)
+            {
                 return false;
-            } else {
+            }
+            else
+            {
                 return link.Predecessor.ElementType.Equals(PfcElementType.Transition);
             }
         }
@@ -96,10 +116,14 @@ namespace Highpoint.Sage.Graphs.PFC {
         /// <returns>
         /// 	<c>true</c> if the specified link is followed by a transition.; otherwise, <c>false</c>.
         /// </returns>
-        public static bool IsPreTransitionLink(IPfcLinkElement link) {
-            if (link.Successor == null) {
+        public static bool IsPreTransitionLink(IPfcLinkElement link)
+        {
+            if (link.Successor == null)
+            {
                 return false;
-            } else {
+            }
+            else
+            {
                 return link.Successor.ElementType.Equals(PfcElementType.Transition);
             }
         }
@@ -113,18 +137,26 @@ namespace Highpoint.Sage.Graphs.PFC {
         /// 	<c>true</c> if the specified link is the sole successor of its one immediate precedent node; otherwise, (if there
         /// are any number of predecessors other than one, or if the one predecessor node has any number but one successor nodes)<c>false</c>.
         /// </returns>
-        public static bool IsSoleSuccessor(IPfcElement element) {
-            if (element == null) {
+        public static bool IsSoleSuccessor(IPfcElement element)
+        {
+            if (element == null)
+            {
                 return false;
             }
-            if (element.ElementType.Equals(PfcElementType.Link)) {
+            if (element.ElementType.Equals(PfcElementType.Link))
+            {
                 IPfcLinkElement link = (IPfcLinkElement)element;
-                if (link.Predecessor == null) {
+                if (link.Predecessor == null)
+                {
                     return false;
-                } else {
+                }
+                else
+                {
                     return link.Predecessor.Successors.Count == 1;
                 }
-            } else {
+            }
+            else
+            {
                 IPfcNode node = (IPfcNode)element;
                 return node.PredecessorNodes.Count == 1 && node.PredecessorNodes[0].SuccessorNodes.Count == 1;
             }
@@ -139,18 +171,26 @@ namespace Highpoint.Sage.Graphs.PFC {
         /// <returns>
         /// 	<c>true</c> if the specified element is a part of a path that has parallel paths; otherwise, <c>false</c>.
         /// </returns>
-        public static bool HasParallelPaths(IPfcElement element) {
-            if (element == null) {
+        public static bool HasParallelPaths(IPfcElement element)
+        {
+            if (element == null)
+            {
                 return false;
             }
-            if (element.ElementType.Equals(PfcElementType.Link)) {
+            if (element.ElementType.Equals(PfcElementType.Link))
+            {
                 IPfcLinkElement linkElement = (IPfcLinkElement)element;
-                if (linkElement.Predecessor != null && linkElement.Predecessor.ElementType.Equals(PfcElementType.Transition) && linkElement.Predecessor.Successors.Count > 1) {
+                if (linkElement.Predecessor != null && linkElement.Predecessor.ElementType.Equals(PfcElementType.Transition) && linkElement.Predecessor.Successors.Count > 1)
+                {
                     return true;
-                } else {
+                }
+                else
+                {
                     return HasParallelPaths(((IPfcLinkElement)element).Predecessor);
                 }
-            } else {
+            }
+            else
+            {
                 IPfcNode prevDivergenceNode = GetPrevDivergenceNode((IPfcNode)element);
                 return prevDivergenceNode != null && prevDivergenceNode.ElementType.Equals(PfcElementType.Transition);
             }
@@ -165,18 +205,26 @@ namespace Highpoint.Sage.Graphs.PFC {
         /// <returns>
         /// 	<c>true</c> if the specified element is a part of a path that has parallel paths; otherwise, <c>false</c>.
         /// </returns>
-        public static bool HasAlternatePaths(IPfcElement element) {
-            if (element == null) {
+        public static bool HasAlternatePaths(IPfcElement element)
+        {
+            if (element == null)
+            {
                 return false;
             }
-            if (element.ElementType.Equals(PfcElementType.Link)) {
+            if (element.ElementType.Equals(PfcElementType.Link))
+            {
                 IPfcLinkElement linkElement = (IPfcLinkElement)element;
-                if (linkElement.Predecessor != null && linkElement.Predecessor.ElementType.Equals(PfcElementType.Step) && linkElement.Predecessor.Successors.Count > 1) {
+                if (linkElement.Predecessor != null && linkElement.Predecessor.ElementType.Equals(PfcElementType.Step) && linkElement.Predecessor.Successors.Count > 1)
+                {
                     return true;
-                } else {
+                }
+                else
+                {
                     return HasAlternatePaths(((IPfcLinkElement)element).Predecessor);
                 }
-            } else {
+            }
+            else
+            {
                 IPfcNode prevDivergenceNode = GetPrevDivergenceNode((IPfcNode)element);
                 return prevDivergenceNode != null && prevDivergenceNode.ElementType.Equals(PfcElementType.Step);
             }
@@ -191,26 +239,36 @@ namespace Highpoint.Sage.Graphs.PFC {
         /// <returns>
         /// 	<c>true</c> if the specified element is the last element on a path; otherwise, <c>false</c>.
         /// </returns>
-        public static bool IsLastElementOnPath(IPfcElement element) {
+        public static bool IsLastElementOnPath(IPfcElement element)
+        {
 
-            if (element.ElementType.Equals(PfcElementType.Link)) {
+            if (element.ElementType.Equals(PfcElementType.Link))
+            {
                 IPfcNode pre = ((IPfcLinkElement)element).Predecessor;
-                if (pre.SuccessorNodes.Count == 1) {
+                if (pre.SuccessorNodes.Count == 1)
+                {
                     return false;
                 }
 
                 IPfcNode post = ((IPfcLinkElement)element).Successor;
-                if (post.PredecessorNodes.Count == 1) {
+                if (post.PredecessorNodes.Count == 1)
+                {
                     return false;
                 }
-            } else {
-                foreach (IPfcNode pre in ((IPfcNode)element).PredecessorNodes) {
-                    if (pre.SuccessorNodes.Count == 1) {
+            }
+            else
+            {
+                foreach (IPfcNode pre in ((IPfcNode)element).PredecessorNodes)
+                {
+                    if (pre.SuccessorNodes.Count == 1)
+                    {
                         return false;
                     }
                 }
-                foreach (IPfcNode post in ((IPfcNode)element).SuccessorNodes) {
-                    if (post.PredecessorNodes.Count == 1) {
+                foreach (IPfcNode post in ((IPfcNode)element).SuccessorNodes)
+                {
+                    if (post.PredecessorNodes.Count == 1)
+                    {
                         return false;
                     }
                 }
@@ -227,7 +285,8 @@ namespace Highpoint.Sage.Graphs.PFC {
         /// <returns>
         /// 	<c>true</c> if the specified element is the last element on an alternate path; otherwise, <c>false</c>.
         /// </returns>
-        public static bool IsLastElementOnAlternatePath(IPfcElement element) {
+        public static bool IsLastElementOnAlternatePath(IPfcElement element)
+        {
             return HasAlternatePaths(element) && IsLastElementOnPath(element);
         }
 
@@ -240,7 +299,8 @@ namespace Highpoint.Sage.Graphs.PFC {
         /// <returns>
         /// 	<c>true</c> if the specified element is the last element on a parallel path; otherwise, <c>false</c>.
         /// </returns>
-        public static bool IsLastElementOnParallelPath(IPfcElement element) {
+        public static bool IsLastElementOnParallelPath(IPfcElement element)
+        {
             return HasParallelPaths(element) && IsLastElementOnPath(element);
         }
 
@@ -250,8 +310,10 @@ namespace Highpoint.Sage.Graphs.PFC {
         /// </summary>
         /// <param name="divergenceNode">The divergence node.</param>
         /// <returns>The convergence node, if this node is a divergence node, otherwise null.</returns>
-        public static IPfcNode GetConvergenceNodeFor(IPfcNode divergenceNode) {
-            if (divergenceNode.SuccessorNodes.Count < 2) {
+        public static IPfcNode GetConvergenceNodeFor(IPfcNode divergenceNode)
+        {
+            if (divergenceNode.SuccessorNodes.Count < 2)
+            {
                 return null;
             }
 
@@ -266,8 +328,10 @@ namespace Highpoint.Sage.Graphs.PFC {
         /// <returns>
         /// The join node, if the provided node is a convergence node, otherwise null.
         /// </returns>
-        public static IPfcNode GetDivergenceNodeFor(IPfcNode convergenceNode) {
-            if (convergenceNode.PredecessorNodes.Count < 2) {
+        public static IPfcNode GetDivergenceNodeFor(IPfcNode convergenceNode)
+        {
+            if (convergenceNode.PredecessorNodes.Count < 2)
+            {
                 return null;
             }
 
@@ -280,7 +344,8 @@ namespace Highpoint.Sage.Graphs.PFC {
         /// </summary>
         /// <param name="element">The specified element.</param>
         /// <returns>The join element, if any - otherwise, null.</returns>
-        public static IPfcStepNode GetJoinNodeForAlternatePaths(IPfcElement element) {
+        public static IPfcStepNode GetJoinNodeForAlternatePaths(IPfcElement element)
+        {
             return GetJoinNodeForParallelPath(element) as IPfcStepNode;
         }
 
@@ -290,7 +355,8 @@ namespace Highpoint.Sage.Graphs.PFC {
         /// </summary>
         /// <param name="element">The specified element.</param>
         /// <returns>The join transition, if any - otherwise, null.</returns>
-        public static IPfcTransitionNode GetJoinTransitionForSimultaneousPaths(IPfcElement element) {
+        public static IPfcTransitionNode GetJoinTransitionForSimultaneousPaths(IPfcElement element)
+        {
             return GetJoinNodeForParallelPath(element) as IPfcTransitionNode;
         }
 
@@ -301,7 +367,8 @@ namespace Highpoint.Sage.Graphs.PFC {
         /// </summary>
         /// <param name="element">The specified element.</param>
         /// <returns>The join element, if any - otherwise, null.</returns>
-        public static IPfcElement GetJoinNodeForParallelPath(IPfcElement element) {
+        public static IPfcElement GetJoinNodeForParallelPath(IPfcElement element)
+        {
             // Algorithm: Find the divergence node. Do a traversal for each outbound path until there
             // are no more nodes (end of path) or we've been there before (loopback). On encountering
             // each node for the first time under each path, increment a counter for that path.
@@ -310,7 +377,8 @@ namespace Highpoint.Sage.Graphs.PFC {
             // node, we've found the convergence node.
 
             IPfcNode node = element as IPfcNode;
-            if (node == null) {
+            if (node == null)
+            {
                 node = ((IPfcLinkElement)element).Successor;
             }
             IPfcNode prevDivNode = GetPrevDivergenceNode((IPfcNode)element);
@@ -319,12 +387,14 @@ namespace Highpoint.Sage.Graphs.PFC {
 
             IPfcNode convergenceNode = null;
 
-            if (prevDivNode == null) {
+            if (prevDivNode == null)
+            {
                 return null;
             }
 
             int nParallelPaths = prevDivNode.SuccessorNodes.Count;
-            foreach (IPfcNode firstNodeInPath in prevDivNode.SuccessorNodes) {
+            foreach (IPfcNode firstNodeInPath in prevDivNode.SuccessorNodes)
+            {
                 List<IPfcNode> beenThere = new List<IPfcNode>();
                 Traverse(nParallelPaths, firstNodeInPath, beenThere, hitCounts, ref convergenceNode);
             }
@@ -339,7 +409,8 @@ namespace Highpoint.Sage.Graphs.PFC {
         /// </summary>
         /// <param name="element">The specified element.</param>
         /// <returns>The join element, if any - otherwise, null.</returns>
-        public static IPfcElement GetDivergenceElementForParallelPath(IPfcElement element) {
+        public static IPfcElement GetDivergenceElementForParallelPath(IPfcElement element)
+        {
             return GetPrevDivergenceNode(element);
         }
 
@@ -348,13 +419,16 @@ namespace Highpoint.Sage.Graphs.PFC {
         /// </summary>
         /// <param name="origin">The origin.</param>
         /// <returns></returns>
-        public static List<IPfcNode> GetPermissibleTargetsForLinkFrom(IPfcNode origin) {
+        public static List<IPfcNode> GetPermissibleTargetsForLinkFrom(IPfcNode origin)
+        {
             //DateTime dt = DateTime.Now;
-            
+
             List<IPfcNode> retval = new List<IPfcNode>();
             List<IPfcNode> candidates = new List<IPfcNode>(origin.Parent.Nodes);
-            foreach (IPfcNode target in candidates) {
-                if ( IsTargetNodeLegal(origin,target) ) {
+            foreach (IPfcNode target in candidates)
+            {
+                if (IsTargetNodeLegal(origin, target))
+                {
                     retval.Add(target);
                 }
             }
@@ -364,15 +438,18 @@ namespace Highpoint.Sage.Graphs.PFC {
             return retval;
         }
 
-        public static bool IsTargetNodeLegal(IPfcNode origin, IPfcNode target) {
+        public static bool IsTargetNodeLegal(IPfcNode origin, IPfcNode target)
+        {
             bool retval = false;
             IProcedureFunctionChart parent = origin.Parent;
 
             // We only evaluate step-to-step links, or transition-to-transition links,
             // meaning that we must always add a shim node between them.
-            if (origin.ElementType.Equals(target.ElementType)) {
+            if (origin.ElementType.Equals(target.ElementType))
+            {
 
-                if (s_diagnostics) {
+                if (_diagnostics)
+                {
                     Console.WriteLine("Before: " + StringOperations.ToCommasAndAndedListOfNames<IPfcNode>(parent.Nodes));
                 }
 
@@ -380,28 +457,35 @@ namespace Highpoint.Sage.Graphs.PFC {
                 IPfcNode shimNode;
                 parent.Bind(origin, target, out link1, out shimNode, out link2, false);
 
-                if (s_diagnostics) {
+                if (_diagnostics)
+                {
                     Console.WriteLine("During: " + StringOperations.ToCommasAndAndedListOfNames<IPfcNode>(parent.Nodes));
                 }
 
                 PfcValidator validator = new PfcValidator(parent);
                 retval = validator.PfcIsValid();
 
-                if (shimNode != null) {
-                    parent.Unbind(origin, shimNode,true);
+                if (shimNode != null)
+                {
+                    parent.Unbind(origin, shimNode, true);
                     parent.Unbind(shimNode, target, true);
                     parent.UpdateStructure();
-                } else {
+                }
+                else
+                {
                     parent.Unbind(origin, target);
                 }
 
-                if (s_diagnostics) {
+                if (_diagnostics)
+                {
                     Console.WriteLine("After: " + StringOperations.ToCommasAndAndedListOfNames<IPfcNode>(parent.Nodes));
                 }
 
                 parent.ElementFactory.Retract();
-        
-            } else {
+
+            }
+            else
+            {
                 return false;
             }
 
@@ -413,10 +497,13 @@ namespace Highpoint.Sage.Graphs.PFC {
         /// </summary>
         /// <param name="pfc">The PFC.</param>
         /// <returns>The start step.</returns>
-        public static IPfcStepNode GetStartStep(IProcedureFunctionChart pfc) {
+        public static IPfcStepNode GetStartStep(IProcedureFunctionChart pfc)
+        {
 
-            foreach (IPfcStepNode step in pfc.Steps ) {
-                if (step.SuccessorNodes.Count == 0) {
+            foreach (IPfcStepNode step in pfc.Steps)
+            {
+                if (step.SuccessorNodes.Count == 0)
+                {
                     return step;
                 }
             }
@@ -429,10 +516,13 @@ namespace Highpoint.Sage.Graphs.PFC {
         /// </summary>
         /// <param name="pfc">The PFC.</param>
         /// <returns>The finish step.</returns>
-        public static IPfcStepNode GetFinishStep(IProcedureFunctionChart pfc) {
+        public static IPfcStepNode GetFinishStep(IProcedureFunctionChart pfc)
+        {
 
-            foreach (IPfcStepNode step in pfc.Steps) {
-                if (step.PredecessorNodes.Count == 0) {
+            foreach (IPfcStepNode step in pfc.Steps)
+            {
+                if (step.PredecessorNodes.Count == 0)
+                {
                     return step;
                 }
             }
@@ -447,25 +537,31 @@ namespace Highpoint.Sage.Graphs.PFC {
         /// <param name="startPoint">The starting point.</param>
         /// <param name="stepsOnly">if set to <c>true</c> it returns steps only. Otherwise, it returns all nodes.</param>
         /// <returns>The primary path.</returns>
-        public static List<IPfcNode> GetPrimaryPath(IPfcNode startPoint, bool stepsOnly) {
+        public static List<IPfcNode> GetPrimaryPath(IPfcNode startPoint, bool stepsOnly)
+        {
             List<IPfcNode> retval = new List<IPfcNode>();
             IPfcNode cursor = startPoint;
-            while (true) {
-                if (retval.Contains(cursor)) {
+            while (true)
+            {
+                if (retval.Contains(cursor))
+                {
                     int firstElementInLoop = retval.IndexOf(cursor);
                     ArrayList loopers = new ArrayList();
-                    for (int i = firstElementInLoop; i < retval.Count; i++) {
+                    for (int i = firstElementInLoop; i < retval.Count; i++)
+                    {
                         loopers.Add(retval[i]);
                     }
                     string looperString = StringOperations.ToCommasAndAndedList(loopers);
                     throw new ApplicationException("Primary path contains a loop, which consists of " + looperString + "!");
                 }
 
-                if (!stepsOnly || (cursor.ElementType.Equals(PfcElementType.Step))) {
+                if (!stepsOnly || (cursor.ElementType.Equals(PfcElementType.Step)))
+                {
                     retval.Add(cursor);
                 }
 
-                if (cursor.Successors.Count == 0) {
+                if (cursor.Successors.Count == 0)
+                {
                     break;
                 }
                 cursor = cursor.SuccessorNodes[0];
@@ -481,31 +577,40 @@ namespace Highpoint.Sage.Graphs.PFC {
         /// <param name="startPoint">The starting point.</param>
         /// <param name="stepsOnly">if set to <c>true</c> it returns steps only. Otherwise, it returns all nodes.</param>
         /// <returns>The primary path as a string.</returns>
-        public static string GetPrimaryPathAsString(IPfcNode startPoint, bool stepsOnly) {
+        public static string GetPrimaryPathAsString(IPfcNode startPoint, bool stepsOnly)
+        {
             List<IPfcNode> primaryPathList = GetPrimaryPath(startPoint, stepsOnly);
             string primaryPath = StringOperations.ToCommasAndAndedListOfNames<IPfcNode>(primaryPathList);
 
             return primaryPath;
         }
 
-        public static Dictionary<IPfcNode, int> GetNodeDepths(ProcedureFunctionChart pfc) {
+        public static Dictionary<IPfcNode, int> GetNodeDepths(ProcedureFunctionChart pfc)
+        {
             Dictionary<IPfcNode, int> depths = new Dictionary<IPfcNode, int>();
             //List<IPfcStepNode> nodes = 
             //Debug.Assert( nodes.Count == 1, "A PFC was passed into PFCAnalyst.GetNodeDepths(...) that had " + nodes.Count + " finish steps. This is illegal." );
-            IPfcNode node = pfc.GetFinishTransition( );
+            IPfcNode node = pfc.GetFinishTransition();
             GetDepth(node, ref depths);
             return depths;
         }
 
-        private static int GetDepth(IPfcNode node, ref Dictionary<IPfcNode, int> depths) {
-            if (depths.ContainsKey(node)) {
+        private static int GetDepth(IPfcNode node, ref Dictionary<IPfcNode, int> depths)
+        {
+            if (depths.ContainsKey(node))
+            {
                 return depths[node];
-            } else if (node.PredecessorNodes.Count == 0) {
+            }
+            else if (node.PredecessorNodes.Count == 0)
+            {
                 depths[node] = 0;
                 return 0;
-            } else {
+            }
+            else
+            {
                 int maxPred = int.MinValue;
-                foreach (IPfcNode pred in node.PredecessorNodes) {
+                foreach (IPfcNode pred in node.PredecessorNodes)
+                {
                     maxPred = Math.Max(maxPred, GetDepth(pred, ref depths));
                 }
                 depths[node] = maxPred + 1;
@@ -519,12 +624,16 @@ namespace Highpoint.Sage.Graphs.PFC {
 
         #region Target-Related Queries
 
-        private static IPfcNode GetPrevParallelDivergenceNode(IPfcNode origin) {
+        private static IPfcNode GetPrevParallelDivergenceNode(IPfcNode origin)
+        {
             IPfcNode ppdn = GetPrevDivergenceNode(origin);
-            if (ppdn != null) {
-                while (ppdn.ElementType.Equals(PfcElementType.Step) || ppdn.PredecessorNodes.Count == 0) {
+            if (ppdn != null)
+            {
+                while (ppdn.ElementType.Equals(PfcElementType.Step) || ppdn.PredecessorNodes.Count == 0)
+                {
                     ppdn = GetPrevDivergenceNode(ppdn);
-                    if (ppdn == null) {
+                    if (ppdn == null)
+                    {
                         break;
                     }
                 }
@@ -535,7 +644,7 @@ namespace Highpoint.Sage.Graphs.PFC {
         #endregion Target-Related Queries
 
         #region Dependency Checker Stuff
-        
+
         ///// <summary>
         ///// Sorts the pfcNodes in the provided list in order of their execution dependencies.
         ///// </summary>
@@ -659,17 +768,24 @@ namespace Highpoint.Sage.Graphs.PFC {
         /// <param name="transitions">The IPfcNodeList that contains the transitions that govern the desired behaviors.</param>
         /// <param name="precedingStep">if set to <c>true</c> returns a preceding step of the transition, if false, a following step.</param>
         /// <returns>A dictionary of Step-to-Transition mappings.</returns>
-        public static Dictionary<IPfcStepNode, IPfcTransitionNode> GetTransitionToStepMappings(PfcNodeList transitions, bool precedingStep) {
+        public static Dictionary<IPfcStepNode, IPfcTransitionNode> GetTransitionToStepMappings(PfcNodeList transitions, bool precedingStep)
+        {
             Dictionary<IPfcStepNode, IPfcTransitionNode> retval = new Dictionary<IPfcStepNode, IPfcTransitionNode>();
-            foreach (IPfcTransitionNode transition in transitions) {
+            foreach (IPfcTransitionNode transition in transitions)
+            {
                 Debug.Assert(transition.ElementType.Equals(PfcElementType.Transition), "The nodes passed in to the GetTransitionToStepMappings must be Transitions.");
 
-                if (precedingStep) {
-                    if (transition.PredecessorNodes.Count > 0 && transition.PredecessorNodes[0].ElementType.Equals(PfcElementType.Transition)) {
+                if (precedingStep)
+                {
+                    if (transition.PredecessorNodes.Count > 0 && transition.PredecessorNodes[0].ElementType.Equals(PfcElementType.Transition))
+                    {
                         retval.Add((IPfcStepNode)transition.PredecessorNodes[0], (IPfcTransitionNode)transition);
                     }
-                } else {
-                    if (transition.SuccessorNodes.Count > 0 && transition.SuccessorNodes[0].ElementType.Equals(PfcElementType.Transition)) {
+                }
+                else
+                {
+                    if (transition.SuccessorNodes.Count > 0 && transition.SuccessorNodes[0].ElementType.Equals(PfcElementType.Transition))
+                    {
                         retval.Add((IPfcStepNode)transition.SuccessorNodes[0], (IPfcTransitionNode)transition);
                     }
                 }
@@ -679,24 +795,39 @@ namespace Highpoint.Sage.Graphs.PFC {
 
         #region Private (Support) methods
 
-        private static bool AllNodes(IPfcNode node) { return true; }
-        private static bool StepsOnly(IPfcNode node) { return node.ElementType.Equals(PfcElementType.Step); }
-        private static bool TransitionsOnly(IPfcNode node) { return node.ElementType.Equals(PfcElementType.Transition); }
+        private static bool AllNodes(IPfcNode node)
+        {
+            return true;
+        }
+        private static bool StepsOnly(IPfcNode node)
+        {
+            return node.ElementType.Equals(PfcElementType.Step);
+        }
+        private static bool TransitionsOnly(IPfcNode node)
+        {
+            return node.ElementType.Equals(PfcElementType.Transition);
+        }
 
-        private static IPfcNode GetPrevDivergenceNode(IPfcElement element) {
+        private static IPfcNode GetPrevDivergenceNode(IPfcElement element)
+        {
             List<IPfcNode> beenThere = new List<IPfcNode>();
-            if (element.ElementType.Equals(PfcElementType.Link)) {
+            if (element.ElementType.Equals(PfcElementType.Link))
+            {
                 beenThere.Add(((IPfcLinkElement)element).Successor);
                 return GetPrevDivergenceNode(((IPfcLinkElement)element).Successor, 0, beenThere);
-            } else {
+            }
+            else
+            {
                 beenThere.Add((IPfcNode)element);
                 return GetPrevDivergenceNode((IPfcNode)element, 0, beenThere);
             }
         }
 
-        private static IPfcNode GetPrevDivergenceNode(IPfcNode node, int convergenceLevel, List<IPfcNode> beenThere) {
+        private static IPfcNode GetPrevDivergenceNode(IPfcNode node, int convergenceLevel, List<IPfcNode> beenThere)
+        {
 
-            if (s_diagnostics) {
+            if (_diagnostics)
+            {
                 Console.WriteLine("Looking for PDN's of " + node.Name + ".");
             }
 
@@ -728,33 +859,41 @@ namespace Highpoint.Sage.Graphs.PFC {
             //    return null; // Nothing promising here...
             //} Can't do this since we just added P in the preceding stack layer, it's now 'node', and we'll always return null.
 
-            foreach (IPfcNode p in node.PredecessorNodes) {
+            foreach (IPfcNode p in node.PredecessorNodes)
+            {
 
                 // If we haven't seen this node, remember it. If we have, then skip it.
-                if (beenThere.Contains(p)) {
+                if (beenThere.Contains(p))
+                {
                     continue;
-                } else {
+                }
+                else
+                {
                     beenThere.Add(p);
                 }
 
                 // If P has more than one successor, it's a divergence node, so decrement convergenceLevel.
-                if (p.SuccessorNodes.Count > 1) {
+                if (p.SuccessorNodes.Count > 1)
+                {
                     convergenceLevel--;
                 }
 
                 // If convergenceLevel is now -1, then P is the prev divergence node, so return P.
-                if (convergenceLevel == -1) {
+                if (convergenceLevel == -1)
+                {
                     return p;
                 }
 
                 // If P has more than one predecessor, it's a convergence node, so increment convergenceLevel.
-                if (p.PredecessorNodes.Count > 1) {
+                if (p.PredecessorNodes.Count > 1)
+                {
                     convergenceLevel++;
                 }
 
                 IPfcNode pprime = GetPrevDivergenceNode(p, convergenceLevel, beenThere);
 
-                if (pprime != null) {
+                if (pprime != null)
+                {
                     return pprime;
                 }
 
@@ -763,32 +902,40 @@ namespace Highpoint.Sage.Graphs.PFC {
             return null;
         }
 
-        private static void Traverse(int nParPaths, IPfcNode currentNode, List<IPfcNode> beenThere, Dictionary<IPfcNode, int> hitCounts, ref IPfcNode convergenceNode) {
+        private static void Traverse(int nParPaths, IPfcNode currentNode, List<IPfcNode> beenThere, Dictionary<IPfcNode, int> hitCounts, ref IPfcNode convergenceNode)
+        {
 
             // If we've been to this node already, the outbound path has rejoined,
             // and all downstream nodes have been accounted.
-            if (beenThere.Contains(currentNode)) {
+            if (beenThere.Contains(currentNode))
+            {
                 return;
             }
 
             // If we've already identified the convergence node, we're done.
-            if (convergenceNode != null) {
+            if (convergenceNode != null)
+            {
                 return;
             }
 
             // We're at this node for the first time in this outbound path from divergence node.
             // Annotate it visited for this path, and increment its hit count.
             beenThere.Add(currentNode);
-            if (!hitCounts.ContainsKey(currentNode)) {
+            if (!hitCounts.ContainsKey(currentNode))
+            {
                 hitCounts.Add(currentNode, 0);
             }
             hitCounts[currentNode]++;
 
-            if (hitCounts[currentNode] == nParPaths) {
+            if (hitCounts[currentNode] == nParPaths)
+            {
                 convergenceNode = currentNode;
-            } else {
+            }
+            else
+            {
                 // Proceed with the traversal.
-                foreach (IPfcNode downstream in currentNode.SuccessorNodes) {
+                foreach (IPfcNode downstream in currentNode.SuccessorNodes)
+                {
                     Traverse(nParPaths, downstream, beenThere, hitCounts, ref convergenceNode);
                 }
             }
@@ -807,25 +954,34 @@ namespace Highpoint.Sage.Graphs.PFC {
         /// <param name="depth">The current traversal depth.</param>
         /// <param name="nodeFilter">The node filter - applied to all zero-depth nodes to see if they are
         /// acceptable to add to the retval list.</param>
-        private static void GetZeroDepthSuccessors(PfcNodeList beenThere, PfcNodeList retval, IPfcNode from, int depth, Predicate<IPfcNode> nodeFilter) {
-            if (s_diagnostics) {
+        private static void GetZeroDepthSuccessors(PfcNodeList beenThere, PfcNodeList retval, IPfcNode from, int depth, Predicate<IPfcNode> nodeFilter)
+        {
+            if (_diagnostics)
+            {
                 Console.WriteLine("Checking zero-depth successors from " + from.Name + ", which is at depth " + depth + ".");
             }
-            if (beenThere.Contains(from)) {
+            if (beenThere.Contains(from))
+            {
                 return;
-            } else {
+            }
+            else
+            {
                 beenThere.Add(from);
             }
 
-            if (from.SuccessorNodes.Count > 1 && from.ElementType.Equals(PfcElementType.Transition) ) {
+            if (from.SuccessorNodes.Count > 1 && from.ElementType.Equals(PfcElementType.Transition))
+            {
                 depth++;
             }
 
-            foreach (IPfcNode to in from.SuccessorNodes) {
-                if (to.PredecessorNodes.Count > 1 && to.ElementType.Equals(PfcElementType.Transition)) {
+            foreach (IPfcNode to in from.SuccessorNodes)
+            {
+                if (to.PredecessorNodes.Count > 1 && to.ElementType.Equals(PfcElementType.Transition))
+                {
                     depth--;
                 }
-                if (depth == 0 && nodeFilter(to) && !retval.Contains(to)) {
+                if (depth == 0 && nodeFilter(to) && !retval.Contains(to))
+                {
                     retval.Add(to);
                 }
                 GetZeroDepthSuccessors(beenThere, retval, to, depth, nodeFilter);
@@ -845,25 +1001,34 @@ namespace Highpoint.Sage.Graphs.PFC {
         /// <param name="depth">The current traversal depth.</param>
         /// <param name="nodeFilter">The node filter - applied to all zero-depth nodes to see if they are
         /// acceptable to add to the retval list.</param>
-        private static void GetZeroDepthPredecessors(PfcNodeList beenThere, PfcNodeList retval, IPfcNode from, int depth, Predicate<IPfcNode> nodeFilter) {
-            if (s_diagnostics) {
+        private static void GetZeroDepthPredecessors(PfcNodeList beenThere, PfcNodeList retval, IPfcNode from, int depth, Predicate<IPfcNode> nodeFilter)
+        {
+            if (_diagnostics)
+            {
                 Console.WriteLine("Checking zero-depth predecessors from " + from.Name + ", which is at depth " + depth + ".");
             }
-            if (beenThere.Contains(from)) {
+            if (beenThere.Contains(from))
+            {
                 return;
-            } else {
+            }
+            else
+            {
                 beenThere.Add(from);
             }
 
-            if (from.PredecessorNodes.Count > 1 && from.ElementType.Equals(PfcElementType.Transition)) {
+            if (from.PredecessorNodes.Count > 1 && from.ElementType.Equals(PfcElementType.Transition))
+            {
                 depth--;
             }
 
-            foreach (IPfcNode to in from.PredecessorNodes) {
-                if (to.SuccessorNodes.Count > 1 && to.ElementType.Equals(PfcElementType.Transition) ) {
+            foreach (IPfcNode to in from.PredecessorNodes)
+            {
+                if (to.SuccessorNodes.Count > 1 && to.ElementType.Equals(PfcElementType.Transition))
+                {
                     depth++;
                 }
-                if (depth == 0 && nodeFilter(to) && !retval.Contains(to)) {
+                if (depth == 0 && nodeFilter(to) && !retval.Contains(to))
+                {
                     retval.Add(to);
                 }
                 GetZeroDepthPredecessors(beenThere, retval, to, depth, nodeFilter);
@@ -873,16 +1038,22 @@ namespace Highpoint.Sage.Graphs.PFC {
         #endregion Private (Support) methods
 
 
-        public static List<IPfcNode> GetNodesOnBroadestNonLoopingPath(ProcedureFunctionChart pfc, bool restoreOldLinkPriorities = true) {
+        public static List<IPfcNode> GetNodesOnBroadestNonLoopingPath(ProcedureFunctionChart pfc, bool restoreOldLinkPriorities = true)
+        {
             Dictionary<PfcLink, int?> oldVal = null;
-            if (restoreOldLinkPriorities) {
+            if (restoreOldLinkPriorities)
+            {
                 oldVal = new Dictionary<PfcLink, int?>();
                 pfc.Links.ForEach(n => oldVal.Add((PfcLink)n, ((PfcLink)n).Priority));
             }
             AssignWeightsForBroadestNonLoopingPath(pfc);
             List<IPfcNode> retval = GetNodesOnPriorityPath(pfc);
-            if (restoreOldLinkPriorities) {
-                foreach (PfcLink link in oldVal.Keys) { link.Priority = oldVal[link]; }
+            if (restoreOldLinkPriorities)
+            {
+                foreach (PfcLink link in oldVal.Keys)
+                {
+                    link.Priority = oldVal[link];
+                }
             }
             return retval;
         }
@@ -893,7 +1064,8 @@ namespace Highpoint.Sage.Graphs.PFC {
         /// </summary>
         /// <param name="pfc">The PFC.</param>
         /// <returns></returns>
-        public static List<IPfcNode> GetNodesOnPriorityPath(ProcedureFunctionChart pfc) {
+        public static List<IPfcNode> GetNodesOnPriorityPath(ProcedureFunctionChart pfc)
+        {
 
             // Do a breadth-first traversal, determining the sequence of operation steps executed in each unit.
             List<IPfcNode> sequence = new List<IPfcNode>();
@@ -904,43 +1076,62 @@ namespace Highpoint.Sage.Graphs.PFC {
             working.Enqueue(starter);
 
             IPfcNode current;
-            while (working.Count() > 0) {
+            while (working.Count() > 0)
+            {
                 current = working.Dequeue();
-                if ( s_diagnostics ) Console.WriteLine("Dequeueing {0}, leaving {1} elements in queue.", current.Name, working.Count());
+                if (_diagnostics)
+                    Console.WriteLine("Dequeueing {0}, leaving {1} elements in queue.", current.Name, working.Count());
                 Debug.Assert(current.NodeColor == NodeColor.Gray);
-                if (current.Successors.Count() == 0) {
+                if (current.Successors.Count() == 0)
+                {
                     current.NodeColor = NodeColor.Black; // It's the last one.
                     sequence.Add(current);
-                    if (s_diagnostics) Console.WriteLine("\tIt's the last one in the queue.");
-                } else {
+                    if (_diagnostics)
+                        Console.WriteLine("\tIt's the last one in the queue.");
+                }
+                else
+                {
                     // If it's a step node, then it's a pass-in, or it's a serial convergence.
                     // Either way, we only need one predecessor to be black. And it will be.
-                    if (current is IPfcStepNode || current.PredecessorNodes.TrueForAll(n => n.NodeColor == NodeColor.Black)) {
-                        if (s_diagnostics) Console.WriteLine("\tAdvancing.");
+                    if (current is IPfcStepNode || current.PredecessorNodes.TrueForAll(n => n.NodeColor == NodeColor.Black))
+                    {
+                        if (_diagnostics)
+                            Console.WriteLine("\tAdvancing.");
                         current.NodeColor = NodeColor.Black;
                         // We can advance.
-                        if (current.SuccessorNodes.Count() == 1 || current is IPfcTransitionNode) {
+                        if (current.SuccessorNodes.Count() == 1 || current is IPfcTransitionNode)
+                        {
                             // Single follower, or parallel divergence, all successors are enqueued.
-                            foreach (IPfcNode next in current.SuccessorNodes) {
-                                if (next.NodeColor == NodeColor.White) {
+                            foreach (IPfcNode next in current.SuccessorNodes)
+                            {
+                                if (next.NodeColor == NodeColor.White)
+                                {
                                     next.NodeColor = NodeColor.Gray;
-                                    if (s_diagnostics) Console.WriteLine("\t\tEnqueueing {0}.", next.Name);
+                                    if (_diagnostics)
+                                        Console.WriteLine("\t\tEnqueueing {0}.", next.Name);
                                     working.Enqueue(next);
                                 }
                             }
-                        } else { // Serial divergence - enqueue only the highest priority node.
+                        }
+                        else
+                        { // Serial divergence - enqueue only the highest priority node.
                             IPfcNode next = current.Successors.OrderByDescending(n => n.Priority).First().Successor;
-                            if (next.NodeColor == NodeColor.White) {
+                            if (next.NodeColor == NodeColor.White)
+                            {
                                 next.NodeColor = NodeColor.Gray;
-                                if (s_diagnostics) Console.WriteLine("\t\tEnqueueing {0}.", next.Name);
+                                if (_diagnostics)
+                                    Console.WriteLine("\t\tEnqueueing {0}.", next.Name);
                                 working.Enqueue(next);
                             }
                             //System.Diagnostics.Debug.Assert(next.SuccessorNodes.Count() < 2); // Duality violation, if not.
                         }
                         current.NodeColor = NodeColor.Black;
-                        if (s_diagnostics) Console.WriteLine("\t->Logging execution of {0}.", current.Name);
+                        if (_diagnostics)
+                            Console.WriteLine("\t->Logging execution of {0}.", current.Name);
                         sequence.Add(current);
-                    } else {
+                    }
+                    else
+                    {
                         working.Enqueue(current); // All preds are not black. Must try again later.
                     }
                 }
