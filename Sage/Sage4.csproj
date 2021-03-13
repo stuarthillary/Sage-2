@@ -262,7 +262,10 @@
     <Compile Include="Graphs\PFC\ParticipantDirectory.cs" />
     <Compile Include="Graphs\PFC\PfcElementFactory.cs" />
     <Compile Include="Graphs\PFC\PfcElementType.cs" />
+    <Compile Include="Graphs\PFC\PfcNodeList.cs" />
     <Compile Include="Graphs\PFC\PfcPortDirection.cs" />
+    <Compile Include="Graphs\PFC\PfcStepNodeList.cs" />
+    <Compile Include="Graphs\PFC\PfcTransitionNodeList.cs" />
     <Compile Include="Graphs\PFC\PFCValidityException.cs" />
     <Compile Include="Graphs\PFC\PredecessorsComplete.cs" />
     <Compile Include="Graphs\PFC\RoteString.cs" />
@@ -313,7 +316,7 @@
     <Compile Include="Graphs\PertAnalyst.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Graphs\PFC\Collections.cs" />
+    <Compile Include="Graphs\PFC\PfcLinkElementList.cs" />
     <Compile Include="Graphs\PFC\Execution\Actions\Sequencer.cs" />
     <Compile Include="Graphs\PFC\Execution\Actions\SimpleDelay.cs" />
     <Compile Include="Graphs\PFC\Execution\ExecutionEngine.cs" />
