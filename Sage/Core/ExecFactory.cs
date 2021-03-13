@@ -146,9 +146,12 @@ namespace Highpoint.Sage.SimCore
                 _requiredType = "Highpoint.Sage.SimCore.Executive, Sage";
 #if !NETSTANDARD
                 NameValueCollection nvc = (NameValueCollection)ConfigurationManager.GetSection("Sage");
-                if (nvc == null) {
+                if (nvc == null)
+                {
                     _Debug.WriteLine("Warning - <Sage> section missing from config file for " + Process.GetCurrentProcess().ProcessName);
-                } else if (nvc["ExecutiveType"] != null) {
+                }
+                else if (nvc["ExecutiveType"] != null)
+                {
                     m_requiredType = nvc["ExecutiveType"];
                 }
 #endif
