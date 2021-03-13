@@ -10,9 +10,9 @@ namespace Highpoint.Sage.Graphs.PFC {
 
         #region Private Members
 
-        private IPfcNode m_predecessor = null;
-        private IPfcNode m_successor = null;
-        private bool m_isLoopback = false;
+        private IPfcNode _predecessor = null;
+        private IPfcNode _successor = null;
+        private bool _isLoopback = false;
 
         #endregion Private Members
 
@@ -31,12 +31,12 @@ namespace Highpoint.Sage.Graphs.PFC {
         /// </summary>
         /// <value>The predecessor.</value>
         public IPfcNode Predecessor {
-            get { return m_predecessor; }
+            get { return _predecessor; }
             set {
-                if (m_predecessor == null || value == null) {
-                    m_predecessor = value;
+                if (_predecessor == null || value == null) {
+                    _predecessor = value;
                 } else {
-                    throw new PfcStructureViolationException(string.Format(_linkErrorString, value.Name, Name, Name, "predecessor"));
+                    throw new PfcStructureViolationException(string.Format(linkErrorString, value.Name, Name, Name, "predecessor"));
                 }
             }
         }
@@ -46,12 +46,12 @@ namespace Highpoint.Sage.Graphs.PFC {
         /// </summary>
         /// <value>The successor.</value>
         public IPfcNode Successor {
-            get { return m_successor; }
+            get { return _successor; }
             set {
-                if (m_successor == null || value == null) {
-                    m_successor = value;
+                if (_successor == null || value == null) {
+                    _successor = value;
                 } else {
-                    throw new PfcStructureViolationException(string.Format(_linkErrorString, value.Name, Name, Name, "successor"));
+                    throw new PfcStructureViolationException(string.Format(linkErrorString, value.Name, Name, Name, "successor"));
                 }
             }
         }
@@ -70,16 +70,16 @@ namespace Highpoint.Sage.Graphs.PFC {
         /// <value>
         /// 	<c>true</c> if this instance is a loopback; otherwise, <c>false</c>.
         /// </value>
-        public bool IsLoopback { get { return m_isLoopback; } set { m_isLoopback = value; } }
+        public bool IsLoopback { get { return _isLoopback; } set { _isLoopback = value; } }
 
         /// <summary>
         /// Detaches this link from its predecessor and successor.
         /// </summary>
         public void Detach() {
             Predecessor.Successors.Remove(this);
-            m_predecessor = null;
+            _predecessor = null;
             Successor.Predecessors.Remove(this);
-            m_successor = null;
+            _successor = null;
         }
 
         #endregion
@@ -108,7 +108,7 @@ namespace Highpoint.Sage.Graphs.PFC {
         /// 	<c>true</c> if this instance is connected; otherwise, <c>false</c>.
         /// </returns>
         public override bool IsConnected() {
-            return m_predecessor != null && m_successor != null;
+            return _predecessor != null && _successor != null;
         }
 
         /// <summary>
@@ -153,7 +153,7 @@ namespace Highpoint.Sage.Graphs.PFC {
 
         #endregion Implementation of Abstract Subclass "SfcElement"
 
-        private static string _linkErrorString = "Trying to link {0} to {1}, where {2} already has a {3}.";
+        private static readonly string linkErrorString = "Trying to link {0} to {1}, where {2} already has a {3}.";
 
 
         /// <summary>
