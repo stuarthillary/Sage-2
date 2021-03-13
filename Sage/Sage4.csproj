@@ -243,6 +243,9 @@
     <Compile Include="Graphs\IVertex.cs" />
     <Compile Include="Graphs\Ligature.cs" />
     <Compile Include="Graphs\PFC\AggregateLinkType.cs" />
+    <Compile Include="Graphs\PFC\DualModeString.cs" />
+    <Compile Include="Graphs\PFC\ExpressionElement.cs" />
+    <Compile Include="Graphs\PFC\ExpressionType.cs" />
     <Compile Include="Graphs\PFC\IPfcBooleanExpression.cs" />
     <Compile Include="Graphs\PFC\IPfcElement.cs" />
     <Compile Include="Graphs\PFC\IPfcExpression.cs" />
@@ -253,12 +256,16 @@
     <Compile Include="Graphs\PFC\IPfcTransitionNode.cs" />
     <Compile Include="Graphs\PFC\IPfcUnitInfo.cs" />
     <Compile Include="Graphs\PFC\IProcedureFunctionChart.cs" />
+    <Compile Include="Graphs\PFC\Macro.cs" />
     <Compile Include="Graphs\PFC\NodeColor.cs" />
     <Compile Include="Graphs\PFC\OperationType.cs" />
+    <Compile Include="Graphs\PFC\ParticipantDirectory.cs" />
     <Compile Include="Graphs\PFC\PfcElementFactory.cs" />
     <Compile Include="Graphs\PFC\PfcElementType.cs" />
     <Compile Include="Graphs\PFC\PfcPortDirection.cs" />
     <Compile Include="Graphs\PFC\PFCValidityException.cs" />
+    <Compile Include="Graphs\PFC\PredecessorsComplete.cs" />
+    <Compile Include="Graphs\PFC\RoteString.cs" />
     <Compile Include="Graphs\PFC\StandardMacros.cs" />
     <Compile Include="Graphs\PmData.cs" />
     <Compile Include="Graphs\PreEdgesSatisfiedKey.cs" />
@@ -313,7 +320,7 @@
     <Compile Include="Graphs\PFC\Execution\ExecutionContext.cs" />
     <Compile Include="Graphs\PFC\Execution\PfcActor.cs" />
     <Compile Include="Graphs\PFC\Execution\StateMachines.cs" />
-    <Compile Include="Graphs\PFC\Expressions.cs" />
+    <Compile Include="Graphs\PFC\Expression.cs" />
     <Compile Include="Graphs\PFC\IPfcElementFactory.cs" />
     <Compile Include="Graphs\PFC\PfcLink.cs" />
     <Compile Include="Graphs\PFC\PfcAnalyst.cs" />
