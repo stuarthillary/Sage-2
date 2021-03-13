@@ -1,69 +1,61 @@
 /* This source code licensed under the GNU Affero General Public License */
-using System;
-using System.Collections.Generic;
 using Highpoint.Sage.SimCore;
+using System;
 using System.Collections;
+using System.Collections.Generic;
 using _Debug = System.Diagnostics.Debug;
 
-namespace Highpoint.Sage.Graphs.PFC.Execution {
+namespace Highpoint.Sage.Graphs.PFC.Execution
+{
 
-    public class ExecutionEngineConfiguration {
-
-        public static readonly TimeSpan DEFAULT_SCANNING_PERIOD = TimeSpan.FromMinutes(1.0);
-        public static readonly bool DEFAULT_STRUCTURE_LOCKING = true;
-        public static readonly int DEFAULT_ = 1;
-
-        public ExecutionEngineConfiguration() {}
-
-        public ExecutionEngineConfiguration(TimeSpan scanningPeriod) {
-            ScanningPeriod = scanningPeriod;
-        }
-
-        public TimeSpan ScanningPeriod { get; set; } = DEFAULT_SCANNING_PERIOD;
-        public bool StructureLockedDuringRun { get; set; } = DEFAULT_STRUCTURE_LOCKING;
-    }
-
-    internal class ExecutionEngine {
+    internal class ExecutionEngine
+    {
 
         #region Private Fields
-        private StepStateMachine m_startStep;
-        private IModel m_model;
-        private Dictionary<IPfcStepNode, StepStateMachine> m_stepStateMachines;
-        private Dictionary<IPfcTransitionNode, TransitionStateMachine> m_transitionStateMachines;
-        private ExecutionEngineConfiguration m_executionEngineConfiguration;
+        private StepStateMachine _startStep;
+        private IModel _model;
+        private Dictionary<IPfcStepNode, StepStateMachine> _stepStateMachines;
+        private Dictionary<IPfcTransitionNode, TransitionStateMachine> _transitionStateMachines;
+        private ExecutionEngineConfiguration _executionEngineConfiguration;
         #endregion Private Fields
 
-        public ExecutionEngine(IProcedureFunctionChart pfc) : this(pfc, new ExecutionEngineConfiguration()){}
+        public ExecutionEngine(IProcedureFunctionChart pfc) : this(pfc, new ExecutionEngineConfiguration()) { }
 
-        public ExecutionEngine(IProcedureFunctionChart pfc, ExecutionEngineConfiguration eec) {
-            m_executionEngineConfiguration = eec;
-            m_model = pfc.Model;
-            m_stepStateMachines = new Dictionary<IPfcStepNode, StepStateMachine>();
-            m_transitionStateMachines = new Dictionary<IPfcTransitionNode, TransitionStateMachine>();
+        public ExecutionEngine(IProcedureFunctionChart pfc, ExecutionEngineConfiguration eec)
+        {
+            _executionEngineConfiguration = eec;
+            _model = pfc.Model;
+            _stepStateMachines = new Dictionary<IPfcStepNode, StepStateMachine>();
+            _transitionStateMachines = new Dictionary<IPfcTransitionNode, TransitionStateMachine>();
 
-            foreach (IPfcStepNode pfcStepNode in pfc.Steps) {
+            foreach (IPfcStepNode pfcStepNode in pfc.Steps)
+            {
                 StepStateMachine ssm = new StepStateMachine(pfcStepNode);
-                ssm.StructureLocked = m_executionEngineConfiguration.StructureLockedDuringRun;
-                m_stepStateMachines.Add(pfcStepNode,ssm);
+                ssm.StructureLocked = _executionEngineConfiguration.StructureLockedDuringRun;
+                _stepStateMachines.Add(pfcStepNode, ssm);
                 ssm.MyStep = pfcStepNode;
                 ((PfcStep)pfcStepNode).MyStepStateMachine = ssm;
             }
 
-            foreach (IPfcTransitionNode pfcTransNode in pfc.Transitions) {
+            foreach (IPfcTransitionNode pfcTransNode in pfc.Transitions)
+            {
                 TransitionStateMachine tsm = new TransitionStateMachine(pfcTransNode);
-                tsm.ScanningPeriod = m_executionEngineConfiguration.ScanningPeriod;
-                m_transitionStateMachines.Add(pfcTransNode, tsm);
+                tsm.ScanningPeriod = _executionEngineConfiguration.ScanningPeriod;
+                _transitionStateMachines.Add(pfcTransNode, tsm);
                 tsm.MyTransition = pfcTransNode;
                 ((PfcTransition)pfcTransNode).MyTransitionStateMachine = tsm;
             }
 
             StepStateMachineEvent ssme = new StepStateMachineEvent(anSSM_StepStateChanged);
-            foreach (IPfcStepNode step in pfc.Steps) {
+            foreach (IPfcStepNode step in pfc.Steps)
+            {
                 step.MyStepStateMachine.StepStateChanged += ssme;
-                foreach (IPfcTransitionNode transNode in step.SuccessorNodes) {
+                foreach (IPfcTransitionNode transNode in step.SuccessorNodes)
+                {
                     step.MyStepStateMachine.SuccessorStateMachines.Add(transNode.MyTransitionStateMachine);
                 }
-                if (step.MyStepStateMachine.SuccessorStateMachines.Count == 0) {
+                if (step.MyStepStateMachine.SuccessorStateMachines.Count == 0)
+                {
                     string message =
                         $"Step {step.Name} in PFC {step.Parent.Name} has no successor transition. A PFC must end with a termination transition. (Did you acquire an Execution Engine while the Pfc was still under construction?)";
                     throw new ApplicationException(message);
@@ -71,23 +63,26 @@ namespace Highpoint.Sage.Graphs.PFC.Execution {
             }
 
             TransitionStateMachineEvent tsme = new TransitionStateMachineEvent(aTSM_TransitionStateChanged);
-            foreach (IPfcTransitionNode trans in pfc.Transitions) {
-                TransitionStateMachine thisTsm = m_transitionStateMachines[trans];
+            foreach (IPfcTransitionNode trans in pfc.Transitions)
+            {
+                TransitionStateMachine thisTsm = _transitionStateMachines[trans];
                 thisTsm.TransitionStateChanged += tsme;
-                foreach (IPfcStepNode stepNode in trans.SuccessorNodes) {
-                    thisTsm.SuccessorStateMachines.Add(m_stepStateMachines[stepNode]);
+                foreach (IPfcStepNode stepNode in trans.SuccessorNodes)
+                {
+                    thisTsm.SuccessorStateMachines.Add(_stepStateMachines[stepNode]);
                 }
-                foreach (IPfcStepNode stepNode in trans.PredecessorNodes) {
-                    thisTsm.PredecessorStateMachines.Add(m_stepStateMachines[stepNode]);
+                foreach (IPfcStepNode stepNode in trans.PredecessorNodes)
+                {
+                    thisTsm.PredecessorStateMachines.Add(_stepStateMachines[stepNode]);
                 }
             }
 
             List<IPfcStepNode> startSteps = pfc.GetStartSteps();
             _Debug.Assert(startSteps.Count == 1);
-            m_startStep = m_stepStateMachines[startSteps[0]];
+            _startStep = _stepStateMachines[startSteps[0]];
         }
 
-        void aTSM_TransitionStateChanged(TransitionStateMachine tsm, object userData )
+        void aTSM_TransitionStateChanged(TransitionStateMachine tsm, object userData)
         {
             TransitionStateChanged?.Invoke(tsm, userData);
         }
@@ -103,28 +98,37 @@ namespace Highpoint.Sage.Graphs.PFC.Execution {
         /// </summary>
         /// <param name="exec">The exec.</param>
         /// <param name="userData">The user data.</param>
-        public void Run(IExecutive exec, object userData) {
+        public void Run(IExecutive exec, object userData)
+        {
 
-            if (exec.CurrentEventType != ExecEventType.Detachable) {
-                m_model.Executive.RequestEvent(
-                    delegate(IExecutive exec1, object userData1) { Run(exec, (IDictionary)userData1); }, exec.Now, exec.CurrentPriorityLevel, userData, ExecEventType.Detachable);
-            } else {
+            if (exec.CurrentEventType != ExecEventType.Detachable)
+            {
+                _model.Executive.RequestEvent(
+                    delegate (IExecutive exec1, object userData1)
+                    {
+                        Run(exec, (IDictionary)userData1);
+                    }, exec.Now, exec.CurrentPriorityLevel, userData, ExecEventType.Detachable);
+            }
+            else
+            {
                 // We already got this permission as a part of the permission to start the PFC.
                 //m_startStep.GetStartPermission((IDictionary)userData);
-                m_startStep.Start((PfcExecutionContext)userData);
+                _startStep.Start((PfcExecutionContext)userData);
             }
         }
 
-        public StepStateMachine StateMachineForStep(IPfcStepNode step) {
-            return m_stepStateMachines[step];
+        public StepStateMachine StateMachineForStep(IPfcStepNode step)
+        {
+            return _stepStateMachines[step];
         }
 
-        public TransitionStateMachine StateMachineForTransition(IPfcTransitionNode trans) {
-            return m_transitionStateMachines[trans];
+        public TransitionStateMachine StateMachineForTransition(IPfcTransitionNode trans)
+        {
+            return _transitionStateMachines[trans];
         }
 
         public event StepStateMachineEvent StepStateChanged;
-        public event TransitionStateMachineEvent TransitionStateChanged; 
+        public event TransitionStateMachineEvent TransitionStateChanged;
 
     }
 }

@@ -244,6 +244,7 @@
     <Compile Include="Graphs\Ligature.cs" />
     <Compile Include="Graphs\PFC\AggregateLinkType.cs" />
     <Compile Include="Graphs\PFC\DualModeString.cs" />
+    <Compile Include="Graphs\PFC\Execution\ExecutionEngineConfiguration.cs" />
     <Compile Include="Graphs\PFC\ExpressionElement.cs" />
     <Compile Include="Graphs\PFC\ExpressionType.cs" />
     <Compile Include="Graphs\PFC\IPfcBooleanExpression.cs" />
