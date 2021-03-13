@@ -169,11 +169,16 @@
     <Compile Include="AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Core\CausalityException.cs" />
     <Compile Include="Core\DefaultValueAttribute.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Core\DetachableEvent.cs" />
     <Compile Include="Core\ExceptionHandler.cs" />
     <Compile Include="Core\ExecController.cs" />
+    <Compile Include="Core\ExecEvent.cs" />
+    <Compile Include="Core\ExecEventComparer.cs" />
+    <Compile Include="Core\ExecEventRemover.cs" />
     <Compile Include="Core\ExecFactory.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -184,6 +189,7 @@
     <Compile Include="Core\ExecutiveFastLight.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Core\IExecEvent.cs" />
     <Compile Include="Core\IExecutive.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -216,6 +222,7 @@
     <Compile Include="Core\ModelObjectDictionary.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Core\RuntimeException.cs" />
     <Compile Include="Core\StateMachine.cs">
       <SubType>Code</SubType>
     </Compile>

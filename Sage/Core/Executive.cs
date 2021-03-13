@@ -1,53 +1,55 @@
 /* This source code licensed under the GNU Affero General Public License */
 
 using System;
-using System.Diagnostics;
-using _Debug = System.Diagnostics.Debug;
 using System.Collections;
-using System.Collections.Specialized;
-using System.Threading;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.Threading;
+using _Debug = System.Diagnostics.Debug;
 // ReSharper disable RedundantDefaultMemberInitializer
 
-namespace Highpoint.Sage.SimCore {
+namespace Highpoint.Sage.SimCore
+{
 
     /// <summary>
     /// This is a full-featured executive, with rescindable and detachable events, support for pause and resume and
     /// event priority sorting within the same timeslice, and detection of causality violations. Use FastExecutive
     /// if these features are unimportant and you want blistering speed.
     /// </summary>
-    internal sealed class Executive : MarshalByRefObject, IExecutive {
-        private DateTime? m_lastEventServiceTime = null;
-        private Exception m_terminationException = null;
-        private readonly ExecEventType m_defaultEventType = ExecEventType.Synchronous;
-        private ExecState m_state = ExecState.Stopped;
-        private DateTime m_now = DateTime.MinValue;
-        private SortedList m_events = new SortedList(new ExecEventComparer());
-        private Stack m_removals = new Stack();
-        private double m_currentPriorityLevel = double.MinValue;
-        private long m_nextReqHashCode = 0;
-        private bool m_stopRequested = false;
-        private bool m_abortRequested = false;
-        private Guid m_guid;
-        private int m_runNumber = -1;
-        private UInt32 m_eventCount = 0;
-        private int m_numDaemonEventsInQueue = 0;
-        private int m_numEventsInQueue = 0;
-        private ExecEventType m_currentEventType;
+    internal sealed class Executive : MarshalByRefObject, IExecutive
+    {
+        private DateTime? _lastEventServiceTime = null;
+        private Exception _terminationException = null;
+        private readonly ExecEventType _defaultEventType = ExecEventType.Synchronous;
+        private ExecState _state = ExecState.Stopped;
+        private DateTime _now = DateTime.MinValue;
+        private SortedList _events = new SortedList(new ExecEventComparer());
+        private Stack _removals = new Stack();
+        private double _currentPriorityLevel = double.MinValue;
+        private long _nextReqHashCode = 0;
+        private bool _stopRequested = false;
+        private bool _abortRequested = false;
+        private Guid _guid;
+        private int _runNumber = -1;
+        private uint _eventCount = 0;
+        private int _numDaemonEventsInQueue = 0;
+        private int _numEventsInQueue = 0;
+        private ExecEventType _currentEventType;
 
-        private DetachableEvent m_currentDetachableEvent = null;
-        
-        private static readonly bool s_diagnostics = Diagnostics.DiagnosticAids.Diagnostics("Executive");
+        private DetachableEvent _currentDetachableEvent = null;
+
+        private static readonly bool _diagnostics = Diagnostics.DiagnosticAids.Diagnostics("Executive");
         private static bool _ignoreCausalityViolations = true;
 
         private static bool _clrConfigDone = false;
-        
-        private object m_eventLock = new Object();
+
+        private object _eventLock = new Object();
         public int EventLockCount = 0;
 
-        internal Executive(Guid execGuid) {
-            m_guid = execGuid;
-            m_currentEventType = ExecEventType.None;
+        internal Executive(Guid execGuid)
+        {
+            _guid = execGuid;
+            _currentEventType = ExecEventType.None;
 
 #if !NETSTANDARD
             #region >>> Set up from-config-file parameters <<<
@@ -56,27 +58,36 @@ namespace Highpoint.Sage.SimCore {
             int desiredMinIocThreads = 50;
             int desiredMaxIocThreads = 100;
             NameValueCollection nvc = null;
-            try {
+            try
+            {
                 nvc = (NameValueCollection)System.Configuration.ConfigurationManager.GetSection("Sage");
-            } catch (Exception e ){
+            }
+            catch (Exception e )
+            {
                 Console.WriteLine(e);
             }
-            if (nvc == null) {
-                _Debug.WriteLine(s_cannot_Find_Sage_Section);
+            if (nvc == null)
+            {
+                _Debug.WriteLine(_cannot_Find_Sage_Section);
                 // Leave at default values.
-            } else {
+            }
+            else
+            {
                 string workerThreads = nvc["WorkerThreads"];
-                if (workerThreads == null || ( !int.TryParse(workerThreads, out desiredMaxWorkerThreads) )) {
-                    _Debug.WriteLine(s_cannot_Find_Workerthread_Directive);
+                if (workerThreads == null || ( !int.TryParse(workerThreads, out desiredMaxWorkerThreads) ))
+                {
+                    _Debug.WriteLine(_cannot_Find_Workerthread_Directive);
                 } // else wt has been set to the desired value.
 
                 string ignoreCausalityViolations = nvc["IgnoreCausalityViolations"];
-                if (ignoreCausalityViolations == null || !bool.TryParse(ignoreCausalityViolations, out _ignoreCausalityViolations)) {
-                    _Debug.WriteLine(s_cannot_Find_Causality_Directive);
+                if (ignoreCausalityViolations == null || !bool.TryParse(ignoreCausalityViolations, out _ignoreCausalityViolations))
+                {
+                    _Debug.WriteLine(_cannot_Find_Causality_Directive);
                 } // else micv has been set to the desired value.
             }
 
-            if (!_clrConfigDone) {
+            if (!_clrConfigDone)
+            {
                 if (desiredMinWorkerThreads > desiredMaxWorkerThreads)
                     Swap(ref desiredMinWorkerThreads, ref desiredMaxWorkerThreads);
                 if ( desiredMinIocThreads > desiredMaxIocThreads )
@@ -98,22 +109,20 @@ namespace Highpoint.Sage.SimCore {
                     ThreadPool.SetMinThreads(desiredMinIocThreads, desiredMaxIocThreads);
 
                     _clrConfigDone = true;
-                } catch (System.Runtime.InteropServices.COMException ce) {
+                }
+                catch (System.Runtime.InteropServices.COMException ce)
+                {
                     string msg = string.Format("Failed attempt to set CLR Threadpool Working Threads [{0},{1}] and IO Completion Threads [{2},{3}].\r\n{4}",
                         desiredMinWorkerThreads, desiredMaxWorkerThreads, desiredMinIocThreads, desiredMaxIocThreads, ce);
                     _Debug.WriteLine(msg);
                 }
             }
-#endregion
-#endif
-        }
+            #endregion
 
-        private static void Swap(ref int a, ref int b) { int tmp = a; a = b; b = tmp; }
+            #region Error Messages
 
-    #region Error Messages
-
-    private static readonly string s_cannot_Find_Sage_Section =
-@"Missing Sage section of config file. Defaulting to maintaining between 100 and 900 execution threads.
+        private static readonly string _cannot_Find_Sage_Section =
+    @"Missing Sage section of config file. Defaulting to maintaining between 100 and 900 execution threads.
 Add the following two sections to your app.config to fix this issue:
 <configSections>
     <section name=""Sage"" type=""System.Configuration.NameValueSectionHandler, System, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089"" />
@@ -125,44 +134,77 @@ Add the following two sections to your app.config to fix this issue:
 </Sage>
 NOTE - everything will still work fine, we're just defaulting to maintaining between 100 and 900 worker threads for now, and ignoring causality exceptions.";
 
-    private static readonly string s_cannot_Find_Workerthread_Directive =
-@"Unable to find (or parse) WorkerThread directive in Sage section of App Config file. Add the following to the Sage section:
+        private static readonly string _cannot_Find_Workerthread_Directive =
+    @"Unable to find (or parse) WorkerThread directive in Sage section of App Config file. Add the following to the Sage section:
 <Sage>\r\n<add key=""WorkerThreads"" value=""100""/>\r\n</Sage>
 NOTE - everything will still work fine, we're just defaulting to maintaining between 100 and 900 worker threads for now.";
 
-    private static readonly string s_cannot_Find_Causality_Directive =
-@"Unable to find Causality Exception directive in Sage section of App Config file. Add the following to the Sage section:
+        private static readonly string _cannot_Find_Causality_Directive =
+    @"Unable to find Causality Exception directive in Sage section of App Config file. Add the following to the Sage section:
     <add key=""IgnoreCausalityViolations"" value=""true""/>
 NOTE - the engine will still run, we'll just ignore it if an event is requested earlier than tNow during a simulation.";
 
-    #endregion
+        #endregion
+#endif
+        }
+
+        private static void Swap(ref int a, ref int b)
+        {
+            int tmp = a;
+            a = b;
+            b = tmp;
+        }
 
         internal ArrayList RunningDetachables = new ArrayList();
 
         /// <summary>
         /// Returns a read-only list of the detachable events that are currently running.
         /// </summary>
-        public ArrayList LiveDetachableEvents { get { return ArrayList.ReadOnly(RunningDetachables); } }
+        public ArrayList LiveDetachableEvents
+        {
+            get
+            {
+                return ArrayList.ReadOnly(RunningDetachables);
+            }
+        }
 
         /// <summary>
         /// Returns a read-only list of the ExecEvents currently in queue for execution.
         /// Cast the elements in the list to IExecEvent to access the items' field values.
         /// </summary>
-        public IList EventList { get { return ArrayList.ReadOnly(m_events.GetKeyList()); } }
+        public IList EventList
+        {
+            get
+            {
+                return ArrayList.ReadOnly(_events.GetKeyList());
+            }
+        }
 
-        public Guid Guid => m_guid;
+        public Guid Guid => _guid;
 
         /// <summary>
         /// Returns the simulation time that the executive is currently processing. Any event submitted with a requested
         /// service time prior to this time, will initiate a causality violation. If the App.Config file is not set to
         /// ignore these (see below), this will result in a CausalityException being thrown.
         /// </summary>
-        public DateTime Now { get { return m_now; } }
+        public DateTime Now
+        {
+            get
+            {
+                return _now;
+            }
+        }
 
         /// <summary>
         /// If this executive has been run, this holds the DateTime of the last event serviced. May be from a previous run.
         /// </summary>
-        public DateTime? LastEventServed { get { return m_lastEventServiceTime; } }
+        public DateTime? LastEventServed
+        {
+            get
+            {
+                return _lastEventServiceTime;
+            }
+        }
 
         /// <summary>
         /// Returns the simulation time that the executive is currently processing. For a given time, any priority event
@@ -170,12 +212,24 @@ NOTE - the engine will still run, we'll just ignore it if an event is requested 
         /// is requested with priority 2.0, (higher priorities are serviced first), that event will be the next to be
         /// serviced.
         /// </summary>
-        public double CurrentPriorityLevel { get { return m_currentPriorityLevel; } }
+        public double CurrentPriorityLevel
+        {
+            get
+            {
+                return _currentPriorityLevel;
+            }
+        }
 
         /// <summary>
         /// The state of the executive - Stopped, Running, Paused, Finished.
         /// </summary>
-        public ExecState State { get { return m_state; } }
+        public ExecState State
+        {
+            get
+            {
+                return _state;
+            }
+        }
 
         /// <summary>
         /// Requests that the executive queue up a daemon event to be serviced at a specific time and
@@ -186,8 +240,9 @@ NOTE - the engine will still run, we'll just ignore it if an event is requested 
         /// <param name="priority">The priority of the callback. Higher numbers mean higher priorities.</param>
         /// <param name="userData">Object data to be provided in the callback.</param>
         /// <returns>A code that can subsequently be used to identify the request, e.g. for removal.</returns>
-        public long RequestDaemonEvent(ExecEventReceiver eer, DateTime when, double priority, object userData){
-            return RequestEvent(eer, when, priority, userData, m_defaultEventType,true);
+        public long RequestDaemonEvent(ExecEventReceiver eer, DateTime when, double priority, object userData)
+        {
+            return RequestEvent(eer, when, priority, userData, _defaultEventType, true);
         }
 
         /// <summary>
@@ -199,8 +254,9 @@ NOTE - the engine will still run, we'll just ignore it if an event is requested 
         /// <returns>
         /// A code that can subsequently be used to identify the request, e.g. for removal.
         /// </returns>
-        public long RequestEvent(ExecEventReceiver eer, DateTime when) {
-            return RequestEvent(eer, when, 0.0, null, m_defaultEventType, false);
+        public long RequestEvent(ExecEventReceiver eer, DateTime when)
+        {
+            return RequestEvent(eer, when, 0.0, null, _defaultEventType, false);
         }
 
         /// <summary>
@@ -213,8 +269,9 @@ NOTE - the engine will still run, we'll just ignore it if an event is requested 
         /// <returns>
         /// A code that can subsequently be used to identify the request, e.g. for removal.
         /// </returns>
-        public long RequestEvent(ExecEventReceiver eer, DateTime when, object userData) {
-            return RequestEvent(eer, when, 0.0, userData, m_defaultEventType, false);
+        public long RequestEvent(ExecEventReceiver eer, DateTime when, object userData)
+        {
+            return RequestEvent(eer, when, 0.0, userData, _defaultEventType, false);
         }
 
         /// <summary>
@@ -231,8 +288,9 @@ NOTE - the engine will still run, we'll just ignore it if an event is requested 
         /// <param name="userData">An object of any type that the code scheduling the event (i.e. making this call) wants to
         /// have passed to the code executing the event (i.e. the body of the ExecEventReceiver.)</param>
         /// <returns>A long, which is a number that serves as a key. This key is used, for example, to unrequest the event.</returns>
-        public long RequestEvent(ExecEventReceiver eer, DateTime when, double priority, object userData){
-            return RequestEvent(eer, when, priority, userData, m_defaultEventType, false );
+        public long RequestEvent(ExecEventReceiver eer, DateTime when, double priority, object userData)
+        {
+            return RequestEvent(eer, when, priority, userData, _defaultEventType, false);
         }
 
         /// <summary>
@@ -249,8 +307,9 @@ NOTE - the engine will still run, we'll just ignore it if an event is requested 
         /// have passed to the code executing the event (i.e. the body of the ExecEventReceiver.)</param>
         /// <param name="execEventType">Specifies the type of event dispatching to be employed for this event.</param>
         /// <returns>A long, which is a number that serves as a key. This key is used, for example, to unrequest the event.</returns>
-        public long RequestEvent(ExecEventReceiver eer, DateTime when, double priority, object userData, ExecEventType execEventType){
-            return RequestEvent(eer,when,priority,userData,execEventType,false);
+        public long RequestEvent(ExecEventReceiver eer, DateTime when, double priority, object userData, ExecEventType execEventType)
+        {
+            return RequestEvent(eer, when, priority, userData, execEventType, false);
         }
 
         /// <summary>
@@ -269,7 +328,8 @@ NOTE - the engine will still run, we'll just ignore it if an event is requested 
                 {
                     newKey = RequestEvent(@event.ExecEventReceiver, newTime, @event.Priority, @event.UserData,
                         @event.EventType, @event.IsDaemon);
-                    if ( deleteOldOne ) UnRequestEvent(eventID);
+                    if (deleteOldOne)
+                        UnRequestEvent(eventID);
                     break;
                 }
 
@@ -286,91 +346,122 @@ NOTE - the engine will still run, we'll just ignore it if an event is requested 
         /// <param name="userData">Object data to be provided in the callback.</param>
         /// <param name="execEventType">The way the event is to be served by the executive.</param>
         /// <returns>A code that can subsequently be used to identify the request, e.g. for removal.</returns>
-        public long RequestImmediateEvent(ExecEventReceiver eer, object userData, ExecEventType execEventType) {
-            lock (m_events) {
-                return RequestEvent(eer, m_now, m_currentPriorityLevel, userData, execEventType, false);
+        public long RequestImmediateEvent(ExecEventReceiver eer, object userData, ExecEventType execEventType)
+        {
+            lock (_events)
+            {
+                return RequestEvent(eer, _now, _currentPriorityLevel, userData, execEventType, false);
             }
         }
 
-        private long RequestEvent(ExecEventReceiver eer, DateTime when, double priority, object userData, ExecEventType execEventType, bool isDaemon){
-            if (!m_stopRequested && !m_abortRequested) {
+        private long RequestEvent(ExecEventReceiver eer, DateTime when, double priority, object userData, ExecEventType execEventType, bool isDaemon)
+        {
+            if (!_stopRequested && !_abortRequested)
+            {
                 Debug.Assert(eer != null, "An event was requested to call into a null callback.");
-                lock (m_events) {
-                    if (m_state == ExecState.Running) {
-                        if (when < m_now) {
-                            if (!_ignoreCausalityViolations) {
-                                throw new CausalityException("Event requested for time " + when + ", but executive is at time " + m_now + ". " +
+                lock (_events)
+                {
+                    if (_state == ExecState.Running)
+                    {
+                        if (when < _now)
+                        {
+                            if (!_ignoreCausalityViolations)
+                            {
+                                throw new CausalityException("Event requested for time " + when + ", but executive is at time " + _now + ". " +
                                     "\r\nAdd \"<add key=\"IgnoreCausalityViolations\" value=\"true\"/>\r\n" +
                                     "to the Sage section of your app.config file to prevent these exceptions. (Submitted event requests will be ignored.)");
-                            } else {
+                            }
+                            else
+                            {
                                 return long.MinValue;
                             }
                         }
                     }
-                    if (m_state != ExecState.Finished) {
-                        m_nextReqHashCode++;
-                        if (isDaemon) m_numDaemonEventsInQueue++;
-                        m_numEventsInQueue++;
-                        m_events.Add(ExecEvent.Get(eer, when, priority, userData, execEventType, m_nextReqHashCode, isDaemon), m_nextReqHashCode);
-                        if (s_diagnostics) {
+                    if (_state != ExecState.Finished)
+                    {
+                        _nextReqHashCode++;
+                        if (isDaemon)
+                            _numDaemonEventsInQueue++;
+                        _numEventsInQueue++;
+                        _events.Add(ExecEvent.Get(eer, when, priority, userData, execEventType, _nextReqHashCode, isDaemon), _nextReqHashCode);
+                        if (_diagnostics)
+                        {
                             _Debug.WriteLine("Event requested for time " + when + ", to call back at " + eer.Target + "(" + eer.Target.GetHashCode() + ")." + eer.Method.Name);
                         }
-                        return m_nextReqHashCode;
-                    } else {
+                        return _nextReqHashCode;
+                    }
+                    else
+                    {
                         throw new ApplicationException("Event service cannot be requested from an Executive that is in the \"Finished\" state.");
                     }
                 }
-            } else {
+            }
+            else
+            {
                 return -1;
             }
         }
 
-        public void UnRequestEvent(long requestedEventHashCode){
-            if ( requestedEventHashCode == long.MinValue ) return; // illegitimate key.
-            m_removals.Push(new ExecEventRemover(requestedEventHashCode));
+        public void UnRequestEvent(long requestedEventHashCode)
+        {
+            if (requestedEventHashCode == long.MinValue)
+                return; // illegitimate key.
+            _removals.Push(new ExecEventRemover(requestedEventHashCode));
         }
 
-        public void UnRequestEvents(object execEventReceiverTarget){
-            m_removals.Push(new ExecEventRemover(execEventReceiverTarget));
+        public void UnRequestEvents(object execEventReceiverTarget)
+        {
+            _removals.Push(new ExecEventRemover(execEventReceiverTarget));
         }
 
-        public void UnRequestEvents(IExecEventSelector eventSelector){
-            m_removals.Push(new ExecEventRemover(eventSelector));
+        public void UnRequestEvents(IExecEventSelector eventSelector)
+        {
+            _removals.Push(new ExecEventRemover(eventSelector));
         }
 
-        public void UnRequestEvents(Delegate execEventReceiverMethod){
-            m_removals.Push(new ExecEventRemover((Delegate)execEventReceiverMethod));
+        public void UnRequestEvents(Delegate execEventReceiverMethod)
+        {
+            _removals.Push(new ExecEventRemover((Delegate)execEventReceiverMethod));
         }
 
         #region Join Handling
-        private class JoinSet {
+        private class JoinSet
+        {
 
-            private Executive m_exec;
-            private List<long> m_eventCodes;
-            private IDetachableEventController m_idec;
+            private readonly Executive _exec;
+            private readonly List<long> _eventCodes;
+            private IDetachableEventController _idec;
 
-            public JoinSet(Executive exec, long[] eventCodes) {
-                m_exec = exec;
-                m_eventCodes = new List<long>(eventCodes);
-                foreach (long eventCode in eventCodes) {
-                    ((ExecEvent)m_exec.m_events.GetKey(m_exec.m_events.IndexOfValue(eventCode))).ServiceCompleted += new EventMonitor(ee_ServiceCompleted);
+            public JoinSet(Executive exec, long[] eventCodes)
+            {
+                _exec = exec;
+                _eventCodes = new List<long>(eventCodes);
+                foreach (long eventCode in eventCodes)
+                {
+                    ((ExecEvent)_exec._events.GetKey(_exec._events.IndexOfValue(eventCode))).ServiceCompleted += new EventMonitor(ee_ServiceCompleted);
                 }
             }
 
-            private void ee_ServiceCompleted(long key, ExecEventReceiver eer, double priority, DateTime when, object userData, ExecEventType eventType) {
-                m_eventCodes.Remove(key);
-                if (m_eventCodes.Count == 0) {
-                    m_idec.Resume();
+            private void ee_ServiceCompleted(long key, ExecEventReceiver eer, double priority, DateTime when, object userData, ExecEventType eventType)
+            {
+                _eventCodes.Remove(key);
+                if (_eventCodes.Count == 0)
+                {
+                    _idec.Resume();
                 }
             }
 
-            public void Join() {
-                Debug.Assert(m_exec.CurrentEventType == ExecEventType.Detachable, "Cannot call Join on a non-Detachable event.");
-                m_idec = m_exec.CurrentEventController;
+            public void Join()
+            {
+                Debug.Assert(_exec.CurrentEventType == ExecEventType.Detachable, "Cannot call Join on a non-Detachable event.");
+                _idec = _exec.CurrentEventController;
                 List<string> eventCodes = new List<string>();
-                m_eventCodes.ForEach(delegate(long ec){eventCodes.Add(ec.ToString());});
+                _eventCodes.ForEach(delegate (long ec)
+                {
+                    eventCodes.Add(ec.ToString());
+                });
                 Console.WriteLine("I am waiting to join on " + Utility.StringOperations.ToCommasAndAndedList(eventCodes) + ".");
-                m_idec.Suspend();
+                _idec.Suspend();
                 Console.WriteLine("I am done waiting to join on " + Utility.StringOperations.ToCommasAndAndedList(eventCodes) + ".");
             }
         }
@@ -381,189 +472,241 @@ NOTE - the engine will still run, we'll just ignore it if an event is requested 
         /// the provided events must have been requested already, and none can have already been serviced.
         /// </summary>
         /// <param name="eventCodes">The event codes.</param>
-        public void Join(params long[] eventCodes) {
+        public void Join(params long[] eventCodes)
+        {
             JoinSet joinSet = new JoinSet(this, eventCodes);
             joinSet.Join();
         }
 
         #endregion
 
-        public int RunNumber { get { return m_runNumber; } }
+        public int RunNumber
+        {
+            get
+            {
+                return _runNumber;
+            }
+        }
 
         /// <summary>
         /// The number of events that have been serviced on this run.
         /// </summary>
-        public UInt32 EventCount { get { return m_eventCount; } }
-
-        private DateTime m_startTime = DateTime.MinValue;
-        public void SetStartTime(DateTime startTime) {
-            m_startTime = startTime;
+        public uint EventCount
+        {
+            get
+            {
+                return _eventCount;
+            }
         }
 
-        public void Start() {
+        private DateTime _startTime = DateTime.MinValue;
+        public void SetStartTime(DateTime startTime)
+        {
+            _startTime = startTime;
+        }
 
-            m_pauseMgr = new Thread(new ThreadStart(_DoPause));
-            m_pauseMgr.Name = "Pause Management";
-            m_pauseMgr.Start();
+        public void Start()
+        {
 
-            lock (this) {
+            _pauseMgr = new Thread(new ThreadStart(doPause));
+            _pauseMgr.Name = "Pause Management";
+            _pauseMgr.Start();
 
-                m_now = m_startTime;
+            lock (this)
+            {
+
+                _now = _startTime;
 
                 #region Initial bookkeeping setup
-                m_terminationException = null;
-                m_runNumber++;
-                m_eventCount = 0;
+                _terminationException = null;
+                _runNumber++;
+                _eventCount = 0;
                 #endregion Initial bookkeeping setup
 
                 #region Diagnostics
-                if (s_diagnostics) {
+                if (_diagnostics)
+                {
                     _Debug.WriteLine("Executive starting with the following events queued up...");
                 }
                 #endregion Diagnostics
 
                 #region Kickoff Events
-                m_executiveStarted?.Invoke(this);
-                if (ExecutiveStartedSingleShot != null) {
-                    ExecutiveStartedSingleShot(this);
-                    ExecutiveStartedSingleShot = (ExecutiveEvent)Delegate.RemoveAll(ExecutiveStartedSingleShot, ExecutiveStartedSingleShot);
+                _executiveStarted?.Invoke(this);
+                if (_executiveStartedSingleShot != null)
+                {
+                    _executiveStartedSingleShot(this);
+                    _executiveStartedSingleShot = (ExecutiveEvent)Delegate.RemoveAll(_executiveStartedSingleShot, _executiveStartedSingleShot);
                 }
                 #endregion Kickoff Events
 
-                m_state = ExecState.Running;
+                _state = ExecState.Running;
 
-                uint initialEventCount = m_eventCount;
+                uint initialEventCount = _eventCount;
 
-                while (!m_stopRequested && !m_abortRequested && ( m_numEventsInQueue > m_numDaemonEventsInQueue )) {
+                while (!_stopRequested && !_abortRequested && (_numEventsInQueue > _numDaemonEventsInQueue))
+                {
 
-                    Monitor.Enter(m_runLock);
-                    Monitor.Exit(m_runLock);
+                    Monitor.Enter(_runLock);
+                    Monitor.Exit(_runLock);
 
                     #region Diagnostics
-                    if (s_diagnostics)
+                    if (_diagnostics)
                         DumpEventQueue();
                     #endregion Diagnostics
 
-                    m_eventCount++;
+                    _eventCount++;
 
                     #region Process queued-up event removal requests
-                    while (m_removals.Count > 0) {
-                        ExecEventRemover er = (ExecEventRemover)m_removals.Pop();
-                        er.Filter(ref m_events);
+                    while (_removals.Count > 0)
+                    {
+                        ExecEventRemover er = (ExecEventRemover)_removals.Pop();
+                        er.Filter(ref _events);
 
                         // Now determine the correct number of regular and daemon events in the executive.
                         // TODO: Can we do this outside the while loop?
-                        m_numDaemonEventsInQueue = 0;
-                        m_numEventsInQueue = 0;
-                        foreach (ExecEvent ee in m_events.Keys) {
-                            m_numEventsInQueue++;
+                        _numDaemonEventsInQueue = 0;
+                        _numEventsInQueue = 0;
+                        foreach (ExecEvent ee in _events.Keys)
+                        {
+                            _numEventsInQueue++;
                             if (ee.IsDaemon)
-                                m_numDaemonEventsInQueue++;
+                                _numDaemonEventsInQueue++;
                         }
                     }
                     #endregion Process queued-up event removal requests
 
                     ExecEvent currentEvent;
                     #region Identify and select the current event
-                    lock (m_events) {
+                    lock (_events)
+                    {
                         // TODO: While awaiting this lock, the last even may have been resc
-                        if (m_numEventsInQueue > 0) {
-                            try {  // MTHACK
-                                currentEvent = (ExecEvent)m_events.GetKey(0);
-                                m_events.RemoveAt(0);
-                                m_currentPriorityLevel = currentEvent.m_priority;
-                                m_lastEventServiceTime = m_now;
-                                m_now = currentEvent.m_when;
-                            } catch { // MTHACK 
+                        if (_numEventsInQueue > 0)
+                        {
+                            try
+                            {  // MTHACK
+                                currentEvent = (ExecEvent)_events.GetKey(0);
+                                _events.RemoveAt(0);
+                                _currentPriorityLevel = currentEvent.Priority;
+                                _lastEventServiceTime = _now;
+                                _now = currentEvent.When;
+                            }
+                            catch
+                            { // MTHACK 
                                 break;  // MTHACK 
                             } // MTHACK 
-                        } else {
+                        }
+                        else
+                        {
                             break;
                         }
                     }
                     #endregion Identify and select the current event
 
-                    m_eventAboutToFire?.Invoke(currentEvent.Key, currentEvent.Eer, currentEvent.m_priority, currentEvent.m_when, currentEvent.m_userData, currentEvent.m_eventType);
+                    _eventAboutToFire?.Invoke(currentEvent.Key, currentEvent.ExecEventReceiver, currentEvent.Priority, currentEvent.When, currentEvent.UserData, currentEvent.EventType);
 
-                    try {
-                        m_currentEventType = currentEvent.m_eventType;
-                        if (currentEvent.IsDaemon) m_numDaemonEventsInQueue--;
-                        m_numEventsInQueue--;
-                        if (s_diagnostics)
-                            _Debug.WriteLine(string.Format(_eventSvcMsg, currentEvent, currentEvent.Eer.Target, currentEvent.Eer.Target.GetHashCode(), currentEvent.Eer.Method.Name));
-                        switch (currentEvent.m_eventType) {
+                    try
+                    {
+                        _currentEventType = currentEvent.EventType;
+                        if (currentEvent.IsDaemon)
+                            _numDaemonEventsInQueue--;
+                        _numEventsInQueue--;
+                        if (_diagnostics)
+                            _Debug.WriteLine(string.Format(_eventSvcMsg, currentEvent, currentEvent.ExecEventReceiver.Target, currentEvent.ExecEventReceiver.Target.GetHashCode(), currentEvent.ExecEventReceiver.Method.Name));
+                        switch (currentEvent.EventType)
+                        {
                             case ExecEventType.Synchronous:
-                                currentEvent.Eer(this, currentEvent.m_userData);
+                                currentEvent.ExecEventReceiver(this, currentEvent.UserData);
                                 currentEvent.OnServiceCompleted();
                                 break;
                             case ExecEventType.Detachable:
-                                m_currentDetachableEvent = new DetachableEvent(this, currentEvent);
-                                m_currentDetachableEvent.Begin();
-                                m_currentDetachableEvent = null;
+                                _currentDetachableEvent = new DetachableEvent(this, currentEvent);
+                                _currentDetachableEvent.Begin();
+                                _currentDetachableEvent = null;
                                 break;
                             case ExecEventType.Asynchronous:
                                 ThreadPool.QueueUserWorkItem(AsyncExecutor, new object[] { this, currentEvent });
                                 break;
                             default:
-                                throw new ExecutiveException("EventType " + currentEvent.m_eventType + " is not yet supported.");
+                                throw new ExecutiveException("EventType " + currentEvent.EventType + " is not yet supported.");
                         }
-                        m_eventHasCompleted?.Invoke(currentEvent.Key, currentEvent.Eer, currentEvent.m_priority, currentEvent.m_when, currentEvent.m_userData, currentEvent.m_eventType);
+                        _eventHasCompleted?.Invoke(currentEvent.Key, currentEvent.ExecEventReceiver, currentEvent.Priority, currentEvent.When, currentEvent.UserData, currentEvent.EventType);
 
-                    } catch (Exception e) {
-                        m_terminationException = e;
+                    }
+                    catch (Exception e)
+                    {
+                        _terminationException = e;
                         // TODO: Re-throw this exception on the simulation executor's thread.
                         //_Debug.WriteLine("Exception thrown back into the executive : " + e);
                         //Trace.Flush();
-                        m_stopRequested = true;
-                    } finally {
-                        m_currentEventType = ExecEventType.None;
+                        _stopRequested = true;
+                    }
+                    finally
+                    {
+                        _currentEventType = ExecEventType.None;
                     }
 
-                    while (EventLockCount > 0) {
-                        Monitor.Pulse(m_eventLock);
-                        lock (m_eventLock) { }
+                    while (EventLockCount > 0)
+                    {
+                        Monitor.Pulse(_eventLock);
+                        lock (_eventLock)
+                        {
+                        }
                     }
 
-                    if (m_clockAboutToChange != null) {
-                        if (m_numEventsInQueue > m_numDaemonEventsInQueue ) {
-                            DateTime nextEventTime = ( (ExecEvent)m_events.GetKey(0) ).m_when;
+                    if (_clockAboutToChange != null)
+                    {
+                        if (_numEventsInQueue > _numDaemonEventsInQueue)
+                        {
+                            DateTime nextEventTime = ((ExecEvent)_events.GetKey(0)).When;
                             //DateTime nextEventTime = ((ExecEvent)m_events[0]).m_when;
-                            if (nextEventTime > m_now) {
-                            m_clockAboutToChange(this);
+                            if (nextEventTime > _now)
+                            {
+                                _clockAboutToChange(this);
                             }
                         }
                     }
                 }
 
-                if (initialEventCount == m_eventCount) {
+                if (initialEventCount == _eventCount)
+                {
                     _Debug.WriteLine("Simulation completed without having executed a single event.");
                 }
 
-                if (m_stopRequested) {
-                    if (m_events.Count > 0) {
-                        m_state = ExecState.Paused;
-                        if (m_executiveStopped != null)
-                            m_executiveStopped(this);
-                    } else {
-                        m_state = ExecState.Stopped;
+                if (_stopRequested)
+                {
+                    if (_events.Count > 0)
+                    {
+                        _state = ExecState.Paused;
+                        if (_executiveStopped != null)
+                            _executiveStopped(this);
                     }
-                    m_stopRequested = false; // We've taken care of it.
-                } else {
-                    m_state = ExecState.Finished;
+                    else
+                    {
+                        _state = ExecState.Stopped;
+                    }
+                    _stopRequested = false; // We've taken care of it.
+                }
+                else
+                {
+                    _state = ExecState.Finished;
                 }
 
-                if (RunningDetachables.Count > 0) {
+                if (RunningDetachables.Count > 0)
+                {
                     // TODO: Move this error reporting into a StringBuilder, and report it upward, rather than just to Console.
                     ArrayList tmp = new ArrayList(RunningDetachables);
-                    foreach (DetachableEvent de in tmp) {
+                    foreach (DetachableEvent de in tmp)
+                    {
                         bool issuedError = false;
-                        if (de.IsWaiting()) {
-                            if (!de.HasAbortHandler) {
+                        if (de.IsWaiting())
+                        {
+                            if (!de.HasAbortHandler)
+                            {
                                 if (!issuedError)
                                     _Debug.WriteLine("ERROR : MODEL FINISHED WITH SOME TASKS STILL WAITING TO COMPLETE!");
                                 issuedError = true;
                                 _Debug.WriteLine("\tWaiting Event : " + de.RootEvent.ToString());
-                                _Debug.WriteLine("\tEvent initially called into " + ( (ExecEvent)de.RootEvent ).Eer.Target + ", on method " + ( (ExecEvent)de.RootEvent ).Eer.Method.Name);
+                                _Debug.WriteLine("\tEvent initially called into " + ((ExecEvent)de.RootEvent).ExecEventReceiver.Target + ", on method " + ((ExecEvent)de.RootEvent).ExecEventReceiver.Method.Name);
                                 _Debug.WriteLine("\tThe event was suspended at time " + de.TimeOfLastWait + ", and was never resumed.");
                                 if (de.SuspendedStackTrace != null)
                                     _Debug.WriteLine("CALL STACK:\r\n" + de.SuspendedStackTrace);
@@ -571,13 +714,13 @@ NOTE - the engine will still run, we'll just ignore it if an event is requested 
                             de.Abort();
                         }
                     }
-                    m_currentDetachableEvent = null;
+                    _currentDetachableEvent = null;
 
                     while (RunningDetachables.Count > 0)
                         Thread.SpinWait(1);
 
-                    if (m_executiveAborted != null)
-                        m_executiveAborted(this);
+                    if (_executiveAborted != null)
+                        _executiveAborted(this);
                 }
 
                 //if (m_terminationException != null) {
@@ -588,28 +731,35 @@ NOTE - the engine will still run, we'll just ignore it if an event is requested 
                 //}
             }
 
-            m_pauseMgr.Abort();
+            _pauseMgr.Abort();
 
-            m_executiveFinished?.Invoke(this);
+            _executiveFinished?.Invoke(this);
 
-            if (m_terminationException != null && !m_abortRequested) {
-                throw new RuntimeException(String.Format("Executive with hashcode {0} experienced an exception in user code.", GetHashCode()), m_terminationException);
+            if (_terminationException != null && !_abortRequested)
+            {
+                throw new RuntimeException(String.Format("Executive with hashcode {0} experienced an exception in user code.", GetHashCode()), _terminationException);
             }
-            m_abortRequested = false;
+            _abortRequested = false;
         }
         private static string _eventSvcMsg = "Serving {0} event to {1}({2}).{3}";
 
 
-        private void DumpEventQueue() {
-            lock (m_events) {
+        private void DumpEventQueue()
+        {
+            lock (_events)
+            {
                 _Debug.WriteLine("Event Queue: (highest number served next)");
-                foreach (DictionaryEntry de in m_events) {
+                foreach (DictionaryEntry de in _events)
+                {
                     ExecEvent ee = (ExecEvent)de.Key;
-                    if (ee.Eer.Target is DetachableEvent) {
-                        ExecEventReceiver eer = ((ExecEvent)((DetachableEvent)ee.Eer.Target).RootEvent).Eer;
-                        _Debug.WriteLine(de.Value + ").\t" + ee.m_eventType + " Event is waiting to be fired at time " + ee.m_when + " into " + eer.Target + "(" + eer.Target.GetHashCode() + "), " + eer.Method.Name);
-                    } else {
-                        _Debug.WriteLine(de.Value + ").\t" + ee.m_eventType + " Event is waiting to be fired at time " + ee.m_when + " into " + ee.Eer.Target + "(" + ee.Eer.Target.GetHashCode() + "), " + ee.Eer.Method.Name);
+                    if (ee.ExecEventReceiver.Target is DetachableEvent)
+                    {
+                        ExecEventReceiver eer = ((ExecEvent)((DetachableEvent)ee.ExecEventReceiver.Target).RootEvent).ExecEventReceiver;
+                        _Debug.WriteLine(de.Value + ").\t" + ee.EventType + " Event is waiting to be fired at time " + ee.When + " into " + eer.Target + "(" + eer.Target.GetHashCode() + "), " + eer.Method.Name);
+                    }
+                    else
+                    {
+                        _Debug.WriteLine(de.Value + ").\t" + ee.EventType + " Event is waiting to be fired at time " + ee.When + " into " + ee.ExecEventReceiver.Target + "(" + ee.ExecEventReceiver.Target.GetHashCode() + "), " + ee.ExecEventReceiver.Method.Name);
                     }
                 }
                 _Debug.WriteLine("***********************************");
@@ -617,101 +767,131 @@ NOTE - the engine will still run, we'll just ignore it if an event is requested 
         }
 
 
-        public IDetachableEventController CurrentEventController {
-            get {
-                return m_currentDetachableEvent;
+        public IDetachableEventController CurrentEventController
+        {
+            get
+            {
+                return _currentDetachableEvent;
             }
         }
 
         /// <summary>
         /// The type of event currently being serviced by the executive.
         /// </summary>
-        public ExecEventType CurrentEventType { get { return m_currentEventType; } }
+        public ExecEventType CurrentEventType
+        {
+            get
+            {
+                return _currentEventType;
+            }
+        }
 
-        internal void SetCurrentEventType(ExecEventType eet){
-            m_currentEventType = eet;
+        internal void SetCurrentEventType(ExecEventType eet)
+        {
+            _currentEventType = eet;
         }
 
 
-        internal void SetCurrentEventController(DetachableEvent de){
+        internal void SetCurrentEventController(DetachableEvent de)
+        {
             //if ( m_currentDetachableEvent != null ) {
             //    throw new ExecutiveException("Attempt to overwrite the current detachable event!");
             //}
-            m_currentDetachableEvent = de;
+            _currentDetachableEvent = de;
         }
 
-        private object m_pauseLock = new object();
-        private object m_runLock = new object();
-        private Thread m_pauseMgr = null;
-        private void _DoPause() {
-            try {
-                while (true) {
-                    lock (m_runLock) {
+        private readonly object _pauseLock = new object();
+        private readonly object _runLock = new object();
+        private Thread _pauseMgr = null;
+        private void doPause()
+        {
+            try
+            {
+                while (true)
+                {
+                    lock (_runLock)
+                    {
                         //Console.WriteLine("Pause thread is waiting for a pulse on RunLock.");
-                        
-                        Monitor.Wait(m_runLock);
+
+                        Monitor.Wait(_runLock);
                         //Console.WriteLine("Pause thread received a pulse on RunLock.");
                     }
-                    m_state = ExecState.Paused;
-                    lock (m_pauseLock) {
+                    _state = ExecState.Paused;
+                    lock (_pauseLock)
+                    {
                         //Console.WriteLine("Pause thread is acquiring an exclusive handle on RunLock.");
-                        Monitor.Enter(m_runLock);
+                        Monitor.Enter(_runLock);
                         //Console.WriteLine("Pause thread is waiting for a pulse on PauseLock.");
-                        Monitor.Wait(m_pauseLock);
+                        Monitor.Wait(_pauseLock);
                         //Console.WriteLine("Pause thread received a pulse on PauseLock.");
                         //Console.WriteLine("Pause thread is releasing its exclusive handle on RunLock.");
-                        Monitor.Exit(m_runLock);
+                        Monitor.Exit(_runLock);
                     }
-                    m_state = ExecState.Running;
+                    _state = ExecState.Running;
                 }
-            } catch (ThreadAbortException) {
+            }
+            catch (ThreadAbortException)
+            {
                 Thread.ResetAbort();
             }
         }
         /// <summary>
         /// If running, pauses the executive and transitions its state to 'Paused'.
         /// </summary>
-        public void Pause() {
-            if (m_state.Equals(ExecState.Running)) {
-                lock (m_runLock) {
+        public void Pause()
+        {
+            if (_state.Equals(ExecState.Running))
+            {
+                lock (_runLock)
+                {
                     //Console.WriteLine("User thread is pulsing RunLock.");
-                    Monitor.Pulse(m_runLock);
+                    Monitor.Pulse(_runLock);
                 }
-                if (m_executivePaused != null) m_executivePaused(this);
+                if (_executivePaused != null)
+                    _executivePaused(this);
             }
         }
 
         /// <summary>
         /// If paused, unpauses the executive and transitions its state to 'Running'.
         /// </summary>
-        public void Resume() {
-            if (m_state.Equals(ExecState.Paused)) {
-                lock (m_pauseLock) {
+        public void Resume()
+        {
+            if (_state.Equals(ExecState.Paused))
+            {
+                lock (_pauseLock)
+                {
                     //Console.WriteLine("User thread is pulsing PauseLock.");
-                    Monitor.Pulse(m_pauseLock);
+                    Monitor.Pulse(_pauseLock);
                 }
-                if (m_executiveResumed != null) m_executiveResumed(this);
+                if (_executiveResumed != null)
+                    _executiveResumed(this);
             }
         }
 
-        public void Stop(){
+        public void Stop()
+        {
             // State change happens in the processing loop when 'm_stopRequested' is discovered true.
-            m_stopRequested = true;
-            if (m_state.Equals(ExecState.Paused)) {
-                lock (m_pauseLock) {
+            _stopRequested = true;
+            if (_state.Equals(ExecState.Paused))
+            {
+                lock (_pauseLock)
+                {
                     //Console.WriteLine("User thread is pulsing PauseLock.");
-                    Monitor.Pulse(m_pauseLock);
+                    Monitor.Pulse(_pauseLock);
                 }
             }
         }
 
 
-        public void Abort(){
+        public void Abort()
+        {
             // We need to do two things. First, we have to abort any Detachable Events that are currently
             // running. Second, we need to scrub all possible graphcontexts that could have been in process
             // in those detachable events.
-            m_abortRequested = true;
-            foreach ( DetachableEvent de in RunningDetachables ) de.Abort();
+            _abortRequested = true;
+            foreach (DetachableEvent de in RunningDetachables)
+                de.Abort();
 
             Reset();
         }
@@ -719,45 +899,56 @@ NOTE - the engine will still run, we'll just ignore it if an event is requested 
         /// <summary>
         /// Resets the executive - this clears the event list and resets now to 1/1/01, 12:00 AM
         /// </summary>
-        public void Reset(){
-            m_state = ExecState.Stopped;
-            m_now = DateTime.MinValue;
-            m_events = new SortedList(new ExecEventComparer());
-            m_currentPriorityLevel = double.MinValue;
-            m_stopRequested = false;
-            m_numEventsInQueue = 0;
-            m_numDaemonEventsInQueue = 0;
+        public void Reset()
+        {
+            _state = ExecState.Stopped;
+            _now = DateTime.MinValue;
+            _events = new SortedList(new ExecEventComparer());
+            _currentPriorityLevel = double.MinValue;
+            _stopRequested = false;
+            _numEventsInQueue = 0;
+            _numDaemonEventsInQueue = 0;
 
             // We were hanging the executive if we reset while it was paused.
             Resume();
 
-            if (m_executiveReset != null) m_executiveReset(this);
+            if (_executiveReset != null)
+                _executiveReset(this);
         }
 
         /// <summary>
         /// Removes all instances of .NET event and simulation discrete event callbacks from this executive.
         /// </summary>
         /// <param name="target">The object to be detached from this executive.</param>
-        public void Detach(object target) {
+        public void Detach(object target)
+        {
 
-            foreach (ExecutiveEvent md in new ExecutiveEvent[] { m_clockAboutToChange, m_executiveAborted, m_executiveFinished, m_executiveReset, m_executiveStarted, ExecutiveStartedSingleShot, m_executiveStopped}) {
-                if (md == null) continue;
+            foreach (ExecutiveEvent md in new ExecutiveEvent[] { _clockAboutToChange, _executiveAborted, _executiveFinished, _executiveReset, _executiveStarted, _executiveStartedSingleShot, _executiveStopped })
+            {
+                if (md == null)
+                    continue;
                 ExecutiveEvent tmp = md;
                 List<ExecutiveEvent> lstDels = new List<ExecutiveEvent>();
-                foreach (ExecutiveEvent ee in md.GetInvocationList()) {
-                    if (ee.Target == target) {
+                foreach (ExecutiveEvent ee in md.GetInvocationList())
+                {
+                    if (ee.Target == target)
+                    {
                         lstDels.Add(ee);
                     }
                 }
                 lstDels.ForEach(n => tmp -= n);
             }
 
-            foreach (EventMonitor em in new EventMonitor[] { m_eventAboutToFire, m_eventHasCompleted }) {
-                if (em == null) continue;
+            foreach (EventMonitor em in new EventMonitor[] { _eventAboutToFire, _eventHasCompleted })
+            {
+                if (em == null)
+                    continue;
                 EventMonitor tmp = em;
                 List<EventMonitor> lstDels = new List<EventMonitor>();
-                foreach (EventMonitor ee in em.GetInvocationList()) {
-                    if (ee.Target == target) {
+                foreach (EventMonitor ee in em.GetInvocationList())
+                {
+                    if (ee.Target == target)
+                    {
                         lstDels.Add(ee);
                     }
                 }
@@ -773,98 +964,183 @@ NOTE - the engine will still run, we'll just ignore it if an event is requested 
         // in a detachable event and adding a handler to an executive event. For that reason, all public
         // event members are methods with add {} and remove {} that defer to private event members. This
         // does not cause the aforementioned lockup.
-        private event ExecutiveEvent m_executiveStarted;
-        private event ExecutiveEvent ExecutiveStartedSingleShot;
-        private event ExecutiveEvent m_executiveStopped;
-        private event ExecutiveEvent m_executivePaused;
-        private event ExecutiveEvent m_executiveResumed;
-        private event ExecutiveEvent m_executiveFinished;
-        private event ExecutiveEvent m_executiveAborted;
-        private event ExecutiveEvent m_executiveReset;
-        private event ExecutiveEvent m_clockAboutToChange;
-        private event EventMonitor m_eventAboutToFire;
-        private event EventMonitor m_eventHasCompleted;
+        private event ExecutiveEvent _executiveStarted;
+        private event ExecutiveEvent _executiveStartedSingleShot;
+        private event ExecutiveEvent _executiveStopped;
+        private event ExecutiveEvent _executivePaused;
+        private event ExecutiveEvent _executiveResumed;
+        private event ExecutiveEvent _executiveFinished;
+        private event ExecutiveEvent _executiveAborted;
+        private event ExecutiveEvent _executiveReset;
+        private event ExecutiveEvent _clockAboutToChange;
+        private event EventMonitor _eventAboutToFire;
+        private event EventMonitor _eventHasCompleted;
 
 
-        public event ExecutiveEvent ExecutiveStarted_SingleShot {
-            add { ExecutiveStartedSingleShot += value; }
-            remove { ExecutiveStartedSingleShot -= value; }
+        public event ExecutiveEvent ExecutiveStarted_SingleShot
+        {
+            add
+            {
+                _executiveStartedSingleShot += value;
+            }
+            remove
+            {
+                _executiveStartedSingleShot -= value;
+            }
         }
-        public event ExecutiveEvent ExecutiveStarted {
-            add { m_executiveStarted += value; }
-            remove { m_executiveStarted -= value; }
+        public event ExecutiveEvent ExecutiveStarted
+        {
+            add
+            {
+                _executiveStarted += value;
+            }
+            remove
+            {
+                _executiveStarted -= value;
+            }
         }
 
         /// <summary>
         /// Fired when this executive pauses.
         /// </summary>
-        public event ExecutiveEvent ExecutivePaused {
-            add { m_executivePaused += value; }
-            remove { m_executivePaused -= value; }
+        public event ExecutiveEvent ExecutivePaused
+        {
+            add
+            {
+                _executivePaused += value;
+            }
+            remove
+            {
+                _executivePaused -= value;
+            }
         }
         /// <summary>
         /// Fired when this executive resumes.
         /// </summary>
-        public event ExecutiveEvent ExecutiveResumed {
-            add { m_executiveResumed += value; }
-            remove { m_executiveResumed -= value; }
+        public event ExecutiveEvent ExecutiveResumed
+        {
+            add
+            {
+                _executiveResumed += value;
+            }
+            remove
+            {
+                _executiveResumed -= value;
+            }
         }
 
-        public event ExecutiveEvent ExecutiveStopped {
-            add { m_executiveStopped += value; }
-            remove { m_executiveStopped -= value; }
+        public event ExecutiveEvent ExecutiveStopped
+        {
+            add
+            {
+                _executiveStopped += value;
+            }
+            remove
+            {
+                _executiveStopped -= value;
+            }
         }
-        public event ExecutiveEvent ExecutiveFinished {
-            add { m_executiveFinished += value; }
-            remove { m_executiveFinished -= value; }
+        public event ExecutiveEvent ExecutiveFinished
+        {
+            add
+            {
+                _executiveFinished += value;
+            }
+            remove
+            {
+                _executiveFinished -= value;
+            }
         }
-        public event ExecutiveEvent ExecutiveAborted {
-            add { m_executiveAborted += value; }
-            remove { m_executiveAborted -= value; }
+        public event ExecutiveEvent ExecutiveAborted
+        {
+            add
+            {
+                _executiveAborted += value;
+            }
+            remove
+            {
+                _executiveAborted -= value;
+            }
         }
-        public event ExecutiveEvent ExecutiveReset {
-            add { m_executiveReset += value; }
-            remove { m_executiveReset -= value; }
+        public event ExecutiveEvent ExecutiveReset
+        {
+            add
+            {
+                _executiveReset += value;
+            }
+            remove
+            {
+                _executiveReset -= value;
+            }
         }
 
         /// <summary>
         /// Fired after service of the last event scheduled in the executive to fire at a specific time,
         /// assuming that there are more non-daemon events to fire.
         /// </summary>
-        public event ExecutiveEvent ClockAboutToChange {
-            add { m_clockAboutToChange += value; }
-            remove { m_clockAboutToChange -= value; }
+        public event ExecutiveEvent ClockAboutToChange
+        {
+            add
+            {
+                _clockAboutToChange += value;
+            }
+            remove
+            {
+                _clockAboutToChange -= value;
+            }
         }
 
         /// <summary>
         /// Fired after an event has been selected to be fired, but before it actually fires.
         /// </summary>
-        public event EventMonitor EventAboutToFire {
-            add { m_eventAboutToFire += value; }
-            remove { m_eventAboutToFire -= value; }
+        public event EventMonitor EventAboutToFire
+        {
+            add
+            {
+                _eventAboutToFire += value;
+            }
+            remove
+            {
+                _eventAboutToFire -= value;
+            }
         }
 
         /// <summary>
         /// Fired after an event has been selected to be fired, and after it actually fires.
         /// </summary>
-        public event EventMonitor EventHasCompleted {
-            add { m_eventHasCompleted += value; }
-            remove { m_eventHasCompleted -= value; }
+        public event EventMonitor EventHasCompleted
+        {
+            add
+            {
+                _eventHasCompleted += value;
+            }
+            remove
+            {
+                _eventHasCompleted -= value;
+            }
         }
 
         /// <summary>
         /// Must call this before disposing of a model.
         /// </summary>
         /// <value></value>
-        public void Dispose() {
-            try { if (m_pauseMgr != null && m_pauseMgr.IsAlive) m_pauseMgr.Abort(); } catch { }
+        public void Dispose()
+        {
+            try
+            {
+                if (_pauseMgr != null && _pauseMgr.IsAlive)
+                    _pauseMgr.Abort();
+            }
+            catch { }
         }
 
         /// <summary>
         /// Acquires the event lock.
         /// </summary>
-        internal void AcquireEventLock(){
-            lock ( m_eventLock ) {
+        internal void AcquireEventLock()
+        {
+            lock (_eventLock)
+            {
                 Interlocked.Increment(ref EventLockCount);
             }
         }
@@ -872,43 +1148,59 @@ NOTE - the engine will still run, we'll just ignore it if an event is requested 
         /// <summary>
         /// Releases the event lock.
         /// </summary>
-        internal void ReleaseEventLock() {
-            lock ( m_eventLock ) {
+        internal void ReleaseEventLock()
+        {
+            lock (_eventLock)
+            {
                 Interlocked.Decrement(ref EventLockCount);
             }
         }
 
-        private static readonly bool s_dumpVolatileClearing = false;
-        public void ClearVolatiles(IDictionary dictionary){
-            if (s_dumpVolatileClearing) _Debug.WriteLine("---------------------- C L E A R I N G   V O L A T I L E S --------------------------------");
+        private static readonly bool _dumpVolatileClearing = false;
+        public void ClearVolatiles(IDictionary dictionary)
+        {
+            if (_dumpVolatileClearing)
+                _Debug.WriteLine("---------------------- C L E A R I N G   V O L A T I L E S --------------------------------");
             ArrayList entriesToRemove = new ArrayList();
-            foreach ( DictionaryEntry de in dictionary ) {
-                
-                if (s_dumpVolatileClearing) _Debug.WriteLine("Checking key " + de.Key + " and value " + de.Value);
+            foreach (DictionaryEntry de in dictionary)
+            {
 
-                if ( de.Key.GetType().GetCustomAttributes(typeof(TaskGraphVolatileAttribute),true).Length > 0 ) {
+                if (_dumpVolatileClearing)
+                    _Debug.WriteLine("Checking key " + de.Key + " and value " + de.Value);
+
+                if (de.Key.GetType().GetCustomAttributes(typeof(TaskGraphVolatileAttribute), true).Length > 0)
+                {
                     entriesToRemove.Add(de.Key);
-                } else if ( de.Value != null ) {
-                    if ( de.Value.GetType().GetCustomAttributes(typeof(TaskGraphVolatileAttribute),true).Length > 0 ) {
+                }
+                else if (de.Value != null)
+                {
+                    if (de.Value.GetType().GetCustomAttributes(typeof(TaskGraphVolatileAttribute), true).Length > 0)
+                    {
                         entriesToRemove.Add(de.Key);
                     }
                 }
             }
-            foreach ( object key in entriesToRemove ) {
-                if (s_dumpVolatileClearing) _Debug.WriteLine("Removing volatile listed under key " + key);
+            foreach (object key in entriesToRemove)
+            {
+                if (_dumpVolatileClearing)
+                    _Debug.WriteLine("Removing volatile listed under key " + key);
                 dictionary.Remove(key);
             }
-            if (s_dumpVolatileClearing) _Debug.WriteLine("---------------------- C L E A R E D  " + entriesToRemove.Count + "   V O L A T I L E S --------------------------------");
+            if (_dumpVolatileClearing)
+                _Debug.WriteLine("---------------------- C L E A R E D  " + entriesToRemove.Count + "   V O L A T I L E S --------------------------------");
 
-            if (s_dumpVolatileClearing) {
+            if (_dumpVolatileClearing)
+            {
                 _Debug.WriteLine("Here's what's left:");
-                foreach ( DictionaryEntry de in dictionary ) {
+                foreach (DictionaryEntry de in dictionary)
+                {
                     _Debug.WriteLine(de.Key + "\t" + de.Value);
                 }
             }
         }
 
-        private static void AsyncExecutor(object payload) { 
+        private static void AsyncExecutor(object payload)
+        {
             object[] p = (object[])payload;
             IExecutive executive = (IExecutive)p[0];
             ExecEvent execEvent = (ExecEvent)p[1];
@@ -916,531 +1208,4 @@ NOTE - the engine will still run, we'll just ignore it if an event is requested 
         }
     }
 
-    /// <summary>
-    /// MissingParameterException is thrown when a required parameter is missing. Typically used in a late bound, read-from-name/value pair collection scenario.
-    /// </summary>
-    [Serializable]
-    public class RuntimeException : Exception {
-
-        #region protected ctors
-        /// <summary>
-        /// Initializes a new instance of this class with serialized data. 
-        /// </summary>
-        /// <param name="info">The <see cref="System.Runtime.Serialization.SerializationInfo"/> that holds the serialized object data about the exception being thrown. </param>
-        /// <param name="context">The <see cref="System.Runtime.Serialization.StreamingContext"/> that contains contextual information about the source or destination.</param>
-        protected RuntimeException(System.Runtime.Serialization.SerializationInfo info, System.Runtime.Serialization.StreamingContext context) : base(info, context) { }
-        #endregion
-
-        #region public ctors
-        /// <summary>
-        /// Creates a new instance of the <see cref="T:AnalysisFailedException"/> class.
-        /// </summary>
-        public RuntimeException() { }
-        /// <summary>
-        /// Creates a new instance of the <see cref="T:AnalysisFailedException"/> class with a specific message and an inner exception.
-        /// </summary>
-        /// <param name="message">The exception message.</param>
-        /// <param name="innerException">The exception inner exception.</param>
-        public RuntimeException(string message, Exception innerException) : base(message, innerException) { }
-        #endregion
-   }
-
-
-
-    /// <summary>
-    /// A CausalityException is raised if the executive encounters a request to fire an event at a time earlier than the
-    /// current time whose events are being served.
-    /// </summary>
-    /// <seealso cref="System.ApplicationException" />
-    public class CausalityException : Exception {
-        public CausalityException(string message):base(message){}
-    }
-
-    /// <summary>
-    /// Delegate DetachableEventAbortHandler is the signature implemented by a method intended to respond to the aborting of a detachable event.
-    /// </summary>
-    /// <param name="exec">The executive whose detachable event is being aborted.</param>
-    /// <param name="idec">The detachable event controller.</param>
-    /// <param name="args">The arguments that were to have been provided to the ExecEventReceiver.</param>
-    public delegate void DetachableEventAbortHandler(IExecutive exec, IDetachableEventController idec, params object[] args);
-    
-    internal class DetachableEvent : IDetachableEventController {
-
-        #region >>> Private Fields <<<
-        private static readonly bool s_diagnostics = Diagnostics.DiagnosticAids.Diagnostics("DetachableEventController");
-        private StackTrace m_suspendedStackTrace = null;
-        private static int _lockNum = 0;
-        private string m_lock = "Lock #" + _lockNum++;
-        private Executive m_exec;
-        private ExecEvent  m_currEvent;
-        private bool m_abortRequested = false;
-        private long m_isWaitingCount;
-        private DateTime m_timeOfLastWait;
-        #endregion
-
-        private DetachableEventAbortHandler m_abortHandler;
-        private object[] m_args = null;
-        public void SetAbortHandler(DetachableEventAbortHandler handler, params object[] args) {
-            m_abortHandler = handler;
-            m_args = args;
-        }
-
-        public void ClearAbortHandler() {
-            m_abortHandler = null;
-            m_args = null;
-        }
-
-        public void FireAbortHandler() {
-            if (m_abortHandler != null) {
-                m_abortHandler(m_exec, this, m_args);
-                ClearAbortHandler();
-            }
-        }
-        
-        public DetachableEvent(Executive exec, ExecEvent currentEvent){
-            m_exec = exec;
-            m_currEvent = currentEvent;
-            m_exec.RunningDetachables.Add(this);
-        }
-
-        public void Begin(){
-            Debug.Assert(!m_abortRequested,"(Re)beginning an aborted DetachableEvent");
-
-            // This method runs in the executive's event service thread.
-            lock ( m_lock ) {
-                object userData = m_currEvent.m_userData;
-                IAsyncResult iar = m_currEvent.Eer.BeginInvoke(m_exec,userData,new AsyncCallback(End),null);
-                Interlocked.Increment(ref m_isWaitingCount);
-                m_timeOfLastWait = m_exec.Now;
-                Monitor.Wait(m_lock); // Keeps exec from running off and launching another event.
-                Interlocked.Decrement(ref m_isWaitingCount);
-                if ( m_abortRequested ) Abort();
-            }
-        }
-
-        /// <summary>
-        /// Suspends this detachable event until it is explicitly resumed.
-        /// </summary>
-        public void Suspend(){
-            Debug.Assert(!m_abortRequested,"Suspending an aborted DetachableEvent");
-            Debug.Assert(m_exec.CurrentEventType.Equals(ExecEventType.Detachable),m_errMsg1 + m_exec.CurrentEventType,m_errMsg1Explanation);
-
-            // This method runs on the DE's execution thread. The only way to get the DE is to use Executive's
-            // CurrentEventController property, and this DE should be used immediately, not held for later.
-            Debug.Assert(Equals(m_exec.CurrentEventController),"Suspend called from someone else's thread!");
-            lock ( m_lock ) {
-                //_Debug.WriteLine(this.m_currEvent.m_eer.Target+"."+this.m_currEvent.m_eer.Method + "de is suspending." + GetHashCode());
-                if ( s_diagnostics ) m_suspendedStackTrace = new StackTrace();
-
-                m_exec.SetCurrentEventController(null);
-                Monitor.Pulse(m_lock);
-                Interlocked.Increment(ref m_isWaitingCount);
-                m_timeOfLastWait = m_exec.Now;
-                Monitor.Wait(m_lock);
-                m_exec.SetCurrentEventType(ExecEventType.Detachable); // Whatever it was, it is now a detachable.
-                Interlocked.Decrement(ref m_isWaitingCount);
-                if ( m_abortRequested ) DoAbort();
-            }
-        }
-
-        public void SuspendUntil(DateTime when){
-            // This method runs on the DE's execution thread.
-            Debug.Assert(m_exec.CurrentEventType.Equals(ExecEventType.Detachable),m_errMsg1 + m_exec.CurrentEventType,m_errMsg1Explanation);
-            m_exec.RequestEvent(new ExecEventReceiver(_Resume),when,0,null);
-            Suspend();
-        }
-
-        public void SuspendFor(TimeSpan howLong) { SuspendUntil(m_exec.Now + howLong); }
-
-
-        public void Resume(double overridePriorityLevel){
-            Debug.Assert(!m_abortRequested,"Resumed an aborted DetachableEvent");
-            // This method is called by someone else's thread. The DE should be suspended at this point.
-            Debug.Assert(!Equals(m_exec.CurrentEventController),"Resume called from DE's own thread!");
-            m_exec.AcquireEventLock();
-            m_exec.RequestEvent(new ExecEventReceiver(_Resume),m_exec.Now,overridePriorityLevel,null);
-            m_exec.ReleaseEventLock();
-        }
-
-        public void Resume(){
-            Resume(m_exec.CurrentPriorityLevel);
-        }
-
-        public bool HasAbortHandler { get { return m_abortHandler != null; } }
-
-        internal void Abort(){
-            Debug.Assert(!m_abortRequested,"(Re)aborting an aborted DetachableEvent");
-            FireAbortHandler();
-            lock ( m_lock ) {
-                m_abortRequested = true;
-                Monitor.Pulse(m_lock);
-            }
-        }
-
-        private void DoAbort(){
-            Debug.Assert(!Equals(m_exec.CurrentEventController),"DoAbort called from someone else's thread!");
-
-            lock ( m_lock ) {
-                Monitor.Pulse(m_lock);
-            }
-
-            if ( Diagnostics.DiagnosticAids.Diagnostics("Executive.BreakOnThreadAbort") ) {
-                Debugger.Break();
-            }
-
-            Thread.CurrentThread.Abort();
-
-        }
-        
-        private void _Resume(IExecutive exec, object userData){
-            // This method is always called on the Executive's event service thread.
-            lock ( m_lock ) {
-
-                //_Debug.WriteLine(this.m_currEvent.m_eer.Target+"."+this.m_currEvent.m_eer.Method + "de is resuming." + GetHashCode());
-
-                if ( s_diagnostics ) m_suspendedStackTrace = null;
-
-                //_Debug.WriteLine(DateTime.Now.Ticks + "Task Resume is Pulsing " + m_lock);Trace.Out.Flush();
-                m_exec.SetCurrentEventController(this);
-                Monitor.Pulse(m_lock);
-                Interlocked.Increment(ref m_isWaitingCount);
-                if ( m_isWaitingCount > 1 ) Monitor.Wait(m_lock);
-                Interlocked.Decrement(ref m_isWaitingCount);
-
-            }
-        }
-
-        private void End(IAsyncResult iar){
-
-            try {
-                m_exec.RunningDetachables.Remove(this);
-                //_Debug.WriteLine(this.m_currEvent.m_eer.Target+"."+this.m_currEvent.m_eer.Method + "de is finishing." + GetHashCode());
-                lock (m_lock) {
-                    m_currEvent.OnServiceCompleted();
-                    Monitor.Pulse(m_lock);
-                }
-                //_Debug.WriteLine(this.m_currEvent.m_eer.Target+"."+this.m_currEvent.m_eer.Method + "de is really finishing." + GetHashCode());
-                m_currEvent.Eer.EndInvoke(iar);
-            } catch (ThreadAbortException) {
-                //_Debug.WriteLine(tae.Message); // Must explicitly catch the ThreadAbortException or it bubbles up.
-            } catch (Exception e) {
-                // TODO: Report this to an Executive Errors & Warnings collection.
-                _Debug.WriteLine("Caught model error : " + e);
-                m_exec.Stop();
-            }
-        }
-
-
-        public StackTrace SuspendedStackTrace { 
-            get {
-                return m_suspendedStackTrace; 
-            }
-        }
-
-        public IExecEvent RootEvent { get { return m_currEvent; } }
-
-        public bool IsWaiting(){ return m_isWaitingCount > 0; }
-
-        public DateTime TimeOfLastWait { get { return m_timeOfLastWait; } }
-
-        private string m_errMsg1 = "Detachable event control being inappropriately exercised from an event of type ";
-        private string m_errMsg1Explanation = "The caller is trying to suspend an event thread from a thread that was not launched as result of a detachable event.";
-    }
-
-    internal class ExecEvent : IExecEvent {
-        private static bool _usePool = false;
-        private static Queue<ExecEvent> _pool = new Queue<ExecEvent>();
-        public static ExecEvent Get(ExecEventReceiver eer, DateTime when, double priority, object userData, ExecEventType eet, long key, bool isDaemon) {
-            ExecEvent retval;
-            if (_pool.Count == 0) {
-                retval = new ExecEvent(eer, when, priority, userData, eet, key, isDaemon);
-            } else {
-                retval = _pool.Dequeue();
-                retval.Initialize(eer, when, priority, userData, eet, key, isDaemon);
-            }
-            return retval;
-        }
-
-        private ExecEvent(ExecEventReceiver eer,DateTime when,double priority,object userData, ExecEventType eet, long key, bool isDaemon){
-            Initialize(eer, when, priority, userData, eet, key, isDaemon);
-        }
-
-        private void Initialize(ExecEventReceiver eer, DateTime when, double priority, object userData, ExecEventType eet, long key, bool isDaemon) {
-            Eer = eer;
-            m_when = when;
-            m_priority = priority;
-            m_userData = userData;
-            m_eventType = eet;
-            m_key = key;
-            IsDaemon = isDaemon;
-            Ticks = when.Ticks;
-            ServiceCompleted = null;
-        }
-
-        public bool IsDaemon { get; set; }
-        public ExecEventReceiver Eer;
-        public DateTime m_when;
-        public double m_priority;
-        public object m_userData;
-        public ExecEventType m_eventType;
-        public long m_key;
-        internal long Ticks;
-        public override string ToString(){return "Event: Time= " + m_when + ", pri= " + m_priority + ", type= " + m_eventType + ", userData= "+m_userData;}
-
-        #region IExecEvent Members
-
-        public ExecEventReceiver ExecEventReceiver {
-            get { return Eer; }
-        }
-
-        public DateTime When {
-            get { return m_when; }
-        }
-
-        public double Priority {
-            get { return m_priority; }
-        }
-
-        public object UserData {
-            get { return m_userData; }
-        }
-
-        public ExecEventType EventType {
-            get { return m_eventType; }
-        }
-
-        public long Key {
-            get { return m_key; }
-        }
-        #endregion
-
-        public void OnServiceCompleted() {
-            if (ServiceCompleted != null) {
-                ServiceCompleted(Key, ExecEventReceiver, Priority, When, UserData, EventType);
-            }
-            if (_usePool) {
-                _pool.Enqueue(this);
-            }
-        }
-
-        public event EventMonitor ServiceCompleted;
-
-    }
-
-    /// <summary>
-    /// Interface IExecEvent is implemented by an internal class that keeps track of all of the key data
-    /// about an event that is to be served by the Executive.
-    /// </summary>
-    public interface IExecEvent {
-        /// <summary>
-        /// Gets the ExecEventReceiver (the delegate into which the event will be served.)
-        /// </summary>
-        /// <value>The execute event receiver.</value>
-        ExecEventReceiver ExecEventReceiver { get; }
-        /// <summary>
-        /// Gets the date &amp; time that the event is to be served.
-        /// </summary>
-        /// <value>The date &amp; time that the event is to be served.</value>
-        DateTime When { get; }
-        /// <summary>
-        /// Gets the priority of the event.
-        /// </summary>
-        /// <value>The priority.</value>
-        double Priority { get; }
-        /// <summary>
-        /// Gets the user data to be provided to the method into which the event will be served.).
-        /// </summary>
-        /// <value>The user data.</value>
-        object UserData { get; }
-        /// <summary>
-        /// Gets the <see cref="ExecEventType"/> of the event.
-        /// </summary>
-        /// <value>The type of the event.</value>
-        ExecEventType EventType { get; }
-        /// <summary>
-        /// Gets the key by which the event is known. This is useful when the event is being rescinded or logged.
-        /// </summary>
-        /// <value>The key.</value>
-        long Key { get; }
-
-        /// <summary>
-        /// Gets a value indicating whether this instance is a daemon event.
-        /// </summary>
-        /// <value><c>true</c> if this instance is daemon; otherwise, <c>false</c>.</value>
-        bool IsDaemon { get; }
-    
-        /// <summary>
-        /// Returns a <see cref="System.String" /> that represents this instance.
-        /// </summary>
-        /// <returns>A <see cref="System.String" /> that represents this instance.</returns>
-        string ToString();
-    }
-
-    internal class ExecEventComparer:IComparer {
-        public int Compare(object x, object y) {
-            ExecEvent ee1 = (ExecEvent)x;
-            ExecEvent ee2 = (ExecEvent)y;
-            /*if ( EE1.m_ticks < EE2.m_ticks) return -1;
-            if ( EE1.m_ticks > EE2.m_ticks ) return  1;
-            if ( EE1.m_priority < EE2.m_priority ) return  1;
-            if ( EE1.m_key == EE2.m_key ) return 0;
-            return -1;*/
-            if ( ee1.m_when < ee2.m_when) return -1;
-            if ( ee1.m_when > ee2.m_when ) return  1;
-            if ( ee1.m_priority < ee2.m_priority ) return  1;
-            if ( ee1.m_key == ee2.m_key ) return 0;
-            return -1;
-            /*
-            if ( ((ExecEvent)x).m_ticks < ((ExecEvent)y).m_ticks ) return -1;
-            if ( ((ExecEvent)x).m_ticks > ((ExecEvent)y).m_ticks ) return  1;
-            if ( ((ExecEvent)x).m_priority < ((ExecEvent)y).m_priority ) return  1;
-            if ( ((ExecEvent)x).m_key == ((ExecEvent)y).m_key ) return 0;
-            return -1;
-            */
-        }
-    }
-
-    internal delegate void FilterMethod( ref SortedList events );
-    
-    internal class ExecEventRemover {
-        private IExecEventSelector m_ees = null;
-        private long m_eventId;
-        private object m_target = null;
-        private FilterMethod m_filterMethod;
-        public ExecEventRemover(IExecEventSelector ees){
-            m_ees = ees;
-            m_filterMethod = new FilterMethod(FilterOnFullData);
-        }
-        public ExecEventRemover(long eventId){
-            m_eventId = eventId;
-            m_filterMethod = new FilterMethod(FilterOnEventId);
-        }
-
-        public ExecEventRemover(Delegate target){
-            m_target = target;
-            m_filterMethod = new FilterMethod(FilterOnDelegateAll);
-        }
-
-        public ExecEventRemover(object target){
-            m_target = target;
-            m_filterMethod = new FilterMethod(FilterOnTargetAll);
-        }
-
-        public void Filter( ref SortedList events ) { m_filterMethod(ref events); }
-
-        private void FilterOnFullData( ref SortedList events ) {
-
-            IList keyList = events.GetKeyList();
-                ExecEvent ee;
-            for( int i = keyList.Count-1 ; i >= 0 ;  i-- ) {
-                ee = (ExecEvent)keyList[i];
-                if ( m_ees.SelectThisEvent(ee.Eer,ee.m_when,ee.m_priority,ee.m_userData,ee.m_eventType ) ) {
-                    events.RemoveAt(i);
-                }
-            }
-        }
-
-        private void FilterOnEventId(ref SortedList events ) {
-            if ( events.ContainsValue(m_eventId) ) {
-                // Need to remove the entry that has the value of m_eventID.
-                events.RemoveAt(events.IndexOfValue(m_eventId));
-            } else {
-                throw new ApplicationException("Attempted to remove an event from the executive by its event ID (" + m_eventId + "), where that event ID was not in the event list.");
-            } 
-        }
-
-        private void FilterOnTarget(ref SortedList events ) {
-
-            object eventTarget = null;
-            foreach ( ExecEvent ee in events.Keys ) {
-                
-                if ( ee.Eer.Target is DetachableEvent ) {
-                    ExecEventReceiver eer = ((ExecEvent)((DetachableEvent)ee.Eer.Target).RootEvent).Eer;
-                    eventTarget = eer.Target;
-                } else {
-                    eventTarget = ee.Eer.Target;
-                }
-                    
-                // We're comparing at the object level - we can't compare any higher, since we
-                // have no control over what kinds of objects we may be comparing. To avoid an
-                // invalid cast exception, we treat them both as objects.
-                if ( Equals(eventTarget,m_target) ) {
-                    //_Debug.WriteLine("Sure would like to remove " + ee.ToString());
-                    int indexOfKey = events.IndexOfKey(ee);
-                    events.RemoveAt(indexOfKey);
-                    break;
-                }
-            }
-        }
-
-        private void FilterOnDelegate(ref SortedList events ) {
-
-            object eventTarget = null;
-            foreach ( ExecEvent ee in events.Keys ) {
-
-                if ( ee.Eer.Target is DetachableEvent ) {
-                    ExecEventReceiver eer = ((ExecEvent)((DetachableEvent)ee.Eer.Target).RootEvent).Eer;
-                    eventTarget = eer;
-                } else {
-                    eventTarget = ee.Eer;
-                }
-                    
-                if ( ((Delegate)eventTarget).Equals((Delegate)m_target) ) {
-                    //_Debug.WriteLine("Sure would like to remove " + ee.ToString());
-                    int indexOfKey = events.IndexOfKey(ee);
-                    events.RemoveAt(indexOfKey);
-                    break;
-                }
-            }
-        }
-
-        private void FilterOnTargetAll(ref SortedList events ) {
-
-            ArrayList eventsToDelete = new ArrayList();																// AEL
-            Type soughtTargetType = m_target.GetType();
-            Type eventTargetType = null;
-
-            IList keyList = events.GetKeyList();
-            for( int i = keyList.Count-1 ; i >= 0 ;  i-- ) {
-                ExecEvent ee = (ExecEvent)keyList[i];
-                
-                if ( ee.Eer.Target is DetachableEvent ) {
-                    ExecEventReceiver eer = ((ExecEvent)((DetachableEvent)ee.Eer.Target).RootEvent).Eer;
-                    eventTargetType = eer.Target.GetType();
-                } else {
-                    // The callback could be static, so if it is, then we need the targetType a different way.
-                    eventTargetType = ee.Eer.Target == null ? ee.Eer.Method.ReflectedType : ee.Eer.Target.GetType();
-                }
-
-                // We're comparing at the object level - we can't compare any higher, since we
-                // have no control over what kinds of objects we may be comparing. To avoid an
-                // invalid cast exception, we treat them both as objects.
-                //if ( object.Equals(eventTarget,m_target) ) {
-                if (eventTargetType.Equals(soughtTargetType)) {
-                    events.RemoveAt(i);
-                }
-            }
-        }
-
-        private void FilterOnDelegateAll(ref SortedList events ) {
-
-            object eventTarget = null;
-            ExecEvent ee;
-            DetachableEvent de;
-            IList keyList = events.GetKeyList();
-            for( int i = keyList.Count-1 ; i >= 0 ;  i-- ) {
-                ee = (ExecEvent)keyList[i];
-                de = ee.Eer.Target as DetachableEvent;
-                if (de != null) {
-                    eventTarget = de.RootEvent.ExecEventReceiver.Target;
-                } else {
-                    eventTarget = ee.Eer;
-                }
-                    
-                if ( ((Delegate)eventTarget).Equals((Delegate)m_target) ) {
-                    events.RemoveAt(i);
-                }
-            }
-        }
-    }
 }
