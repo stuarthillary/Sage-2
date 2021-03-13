@@ -1,25 +1,27 @@
 /* This source code licensed under the GNU Affero General Public License */
 
-using System;
 using Highpoint.Sage.SimCore;
+using System;
 
-namespace Highpoint.Sage.Graphs.PFC {
+namespace Highpoint.Sage.Graphs.PFC
+{
 
-    public abstract class PfcElement : IPfcElement {
+    public abstract class PfcElement : IPfcElement
+    {
 
         #region Private Fields
-        private IModel m_model;
-        private string m_name;
-        private string m_description;
-        private Guid m_guid;
-        private object m_userData;
-        private IProcedureFunctionChart m_parent = null;
-        private Guid m_seid;
+        private IModel _model;
+        private string _name;
+        private string _description;
+        private Guid _guid;
+        private object _userData;
+        private IProcedureFunctionChart _parent = null;
+        private Guid _seid;
         #endregion Private Fields
 
-        protected Predicate<PfcElement> StepsOnly = new Predicate<PfcElement>(delegate(PfcElement element) { return element.ElementType.Equals(PfcElementType.Step); });
-        protected Predicate<PfcElement> TransOnly = new Predicate<PfcElement>(delegate(PfcElement element) { return element.ElementType.Equals(PfcElementType.Transition); });
-        protected Predicate<PfcElement> LinksOnly = new Predicate<PfcElement>(delegate(PfcElement element) { return element.ElementType.Equals(PfcElementType.Link); });
+        protected Predicate<PfcElement> StepsOnly = new Predicate<PfcElement>(delegate (PfcElement element) { return element.ElementType.Equals(PfcElementType.Step); });
+        protected Predicate<PfcElement> TransOnly = new Predicate<PfcElement>(delegate (PfcElement element) { return element.ElementType.Equals(PfcElementType.Transition); });
+        protected Predicate<PfcElement> LinksOnly = new Predicate<PfcElement>(delegate (PfcElement element) { return element.ElementType.Equals(PfcElementType.Link); });
 
         #region Constructors
 
@@ -35,10 +37,11 @@ namespace Highpoint.Sage.Graphs.PFC {
         /// <param name="name">The name of this node.</param>
         /// <param name="description">The description for this node.</param>
         /// <param name="guid">The GUID of this node.</param>
-        public PfcElement(IProcedureFunctionChart parent, string name, string description, Guid guid) {
-            m_parent = parent;
+        public PfcElement(IProcedureFunctionChart parent, string name, string description, Guid guid)
+        {
+            _parent = parent;
             InitializeIdentity(parent.Model, name, description, guid);
-            m_userData = null;
+            _userData = null;
             IMOHelper.RegisterWithModel(this);
         }
 
@@ -55,24 +58,28 @@ namespace Highpoint.Sage.Graphs.PFC {
         /// Sets the name of this step node to the new value.
         /// </summary>
         /// <param name="newName">The new name.</param>
-        public void SetName(string newName) {
-            
-            if (m_name == newName) {
+        public void SetName(string newName)
+        {
+
+            if (_name == newName)
+            {
                 return;
             }
 
-            if (Parent.ParticipantDirectory.Contains(newName)) {
+            if (Parent.ParticipantDirectory.Contains(newName))
+            {
                 string msg = string.Format("Trying to set a {0} name from \"{1}\" to \"{2}\" - but the name \"{2}\" is already in use in this PFC.",
                     ElementType, Name, newName, Parent.ParticipantDirectory[newName].Type);
 
                 throw new ApplicationException(msg);
             }
 
-            string oldName = m_name;
-            m_name = newName;
+            string oldName = _name;
+            _name = newName;
 
-            if (Parent != null && Parent.ParticipantDirectory.Contains(m_guid)) {
-                oldName = ((Expressions.DualModeString)Parent.ParticipantDirectory[m_guid]).Name;
+            if (Parent != null && Parent.ParticipantDirectory.Contains(_guid))
+            {
+                oldName = ((Expressions.DualModeString)Parent.ParticipantDirectory[_guid]).Name;
                 Parent.ParticipantDirectory.ChangeName(oldName, newName);
             }
         }
@@ -89,12 +96,15 @@ namespace Highpoint.Sage.Graphs.PFC {
         /// The parent ProcedureFunctionChart of this node.
         /// </summary>
         /// <value></value>
-        public IProcedureFunctionChart Parent {
-            get {
-                return m_parent;
+        public IProcedureFunctionChart Parent
+        {
+            get
+            {
+                return _parent;
             }
-            set {
-                m_parent = value;
+            set
+            {
+                _parent = value;
             }
         }
 
@@ -104,16 +114,26 @@ namespace Highpoint.Sage.Graphs.PFC {
         /// in the source PFC that is semantically/structurally equivalent to this one.
         /// </summary>
         /// <value>The SEID.</value>
-        public Guid SEID {
-            get { return m_seid; }
-            internal set { m_seid = value; }
+        public Guid SEID
+        {
+            get
+            {
+                return _seid;
+            }
+            internal set
+            {
+                _seid = value;
+            }
         }
-     
+
         /// <summary>
         /// Gets the type of this element.
         /// </summary>
         /// <value>The type of the element.</value>
-        public abstract PfcElementType ElementType { get; }
+        public abstract PfcElementType ElementType
+        {
+            get;
+        }
 
         /// <summary>
         /// Updates the portion of the structure of the SFC that relates to this element.
@@ -126,7 +146,17 @@ namespace Highpoint.Sage.Graphs.PFC {
         /// Gets or sets some piece of arbitrary user data. This data is (currently) not serialized.
         /// </summary>
         /// <value>The user data.</value>
-        public object UserData { get { return m_userData; } set { m_userData = value; } }
+        public object UserData
+        {
+            get
+            {
+                return _userData;
+            }
+            set
+            {
+                _userData = value;
+            }
+        }
 
         #endregion
 
@@ -136,23 +166,51 @@ namespace Highpoint.Sage.Graphs.PFC {
         /// The model that owns this SfcStep, or from which it gets time, etc. data.
         /// </summary>
         /// <value></value>
-        public IModel Model { [System.Diagnostics.DebuggerStepThrough] get { return m_model; } }
+        public IModel Model
+        {
+            [System.Diagnostics.DebuggerStepThrough]
+            get
+            {
+                return _model;
+            }
+        }
         /// <summary>
         /// The user-friendly name for this SfcStep. Required to be unique if there is a Participant directory listing
         /// this element - which there will be, if the element is attached to a Pfc.
         /// </summary>
         /// <value></value>
-        public string Name { [System.Diagnostics.DebuggerStepThrough] get { return m_name; } }
+        public string Name
+        {
+            [System.Diagnostics.DebuggerStepThrough]
+            get
+            {
+                return _name;
+            }
+        }
         /// <summary>
         /// The Guid for this SfcStep. Typically required to be unique.
         /// </summary>
         /// <value></value>
-        public Guid Guid { [System.Diagnostics.DebuggerStepThrough] get { return m_guid; } }
+        public Guid Guid
+        {
+            [System.Diagnostics.DebuggerStepThrough]
+            get
+            {
+                return _guid;
+            }
+        }
         /// <summary>
         /// The description for this SfcStep. Typically used for human-readable representations.
         /// </summary>
         /// <value>The SfcStep's description.</value>
-        public string Description { [System.Diagnostics.DebuggerStepThrough] get { return m_description; } }
+        public string Description
+        {
+            [System.Diagnostics.DebuggerStepThrough]
+            get
+            {
+                return _description;
+            }
+        }
 
         /// <summary>
         /// Initialize the identity of this model object, once.
@@ -161,8 +219,9 @@ namespace Highpoint.Sage.Graphs.PFC {
         /// <param name="name">The name of the task.</param>
         /// <param name="description">The description of the task.</param>
         /// <param name="guid">The GUID of the task.</param>
-        public void InitializeIdentity(IModel model, string name, string description, Guid guid) {
-            IMOHelper.Initialize(ref m_model, model, ref m_name, name, ref m_description, description, ref m_guid, guid);
+        public void InitializeIdentity(IModel model, string name, string description, Guid guid)
+        {
+            IMOHelper.Initialize(ref _model, model, ref _name, name, ref _description, description, ref _guid, guid);
         }
 
         #endregion
@@ -173,7 +232,8 @@ namespace Highpoint.Sage.Graphs.PFC {
         /// <returns>
         /// A <see cref="T:System.String"></see> that represents the current <see cref="T:System.Object"></see>.
         /// </returns>
-        public override string ToString() {
+        public override string ToString()
+        {
             return GetType().Name + " : " + Name + " {" + Guid + "} ";
         }
 
@@ -183,8 +243,9 @@ namespace Highpoint.Sage.Graphs.PFC {
         /// <returns>
         /// A hash code for the current <see cref="T:System.Object"></see>.
         /// </returns>
-        public override int GetHashCode() {
-            return m_guid.GetHashCode();
+        public override int GetHashCode()
+        {
+            return _guid.GetHashCode();
         }
     }
 }
