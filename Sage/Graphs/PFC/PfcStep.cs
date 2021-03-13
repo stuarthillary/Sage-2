@@ -9,6 +9,13 @@ using System.Diagnostics;
 
 namespace Highpoint.Sage.Graphs.PFC
 {
+    /// <summary>
+    /// The signature of a method that a PFC Step can call as an action.
+    /// </summary>
+    /// <param name="pfcec">A PfcExecutionContext containing the parameters to be used by this call.</param>
+    /// <param name="ssm">The state machine controlling state of the step to which this action belongs.</param>
+    public delegate void PfcAction(PfcExecutionContext pfcec, StepStateMachine ssm);
+
 
     public class PfcStep : PfcNode, IPfcStepNode
     {
