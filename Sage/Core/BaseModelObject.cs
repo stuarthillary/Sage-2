@@ -12,34 +12,62 @@ namespace Highpoint.Sage.SimCore
         }
 
         #region Implementation of IModelObject
-        private string m_name = null;
-        private Guid m_guid = Guid.Empty;
-        private IModel m_model = null;
-        private string m_description = null;
+        private string _name = null;
+        private Guid _guid = Guid.Empty;
+        private IModel _model = null;
+        private string _description = null;
 
         /// <summary>
         /// The IModel to which this object belongs.
         /// </summary>
         /// <value>The object's Model.</value>
-        public IModel Model { [System.Diagnostics.DebuggerStepThrough] get { return m_model; } }
+        public IModel Model
+        {
+            [System.Diagnostics.DebuggerStepThrough]
+            get
+            {
+                return _model;
+            }
+        }
 
         /// <summary>
         /// The name by which this object is known. Typically not required to be unique in a pan-model context.
         /// </summary>
         /// <value>The object's name.</value>
-        public string Name { [System.Diagnostics.DebuggerStepThrough]get { return m_name; } }
+        public string Name
+        {
+            [System.Diagnostics.DebuggerStepThrough]
+            get
+            {
+                return _name;
+            }
+        }
 
         /// <summary>
         /// The description for this object. Typically used for human-readable representations.
         /// </summary>
         /// <value>The object's description.</value>
-        public string Description { [System.Diagnostics.DebuggerStepThrough] get { return (m_description ?? ("No description for " + m_name)); } }
+        public string Description
+        {
+            [System.Diagnostics.DebuggerStepThrough]
+            get
+            {
+                return (_description ?? ("No description for " + _name));
+            }
+        }
 
         /// <summary>
         /// The Guid for this object. Typically required to be unique in a pan-model context.
         /// </summary>
         /// <value>The object's Guid.</value>
-        public Guid Guid { [System.Diagnostics.DebuggerStepThrough] get { return m_guid; } }
+        public Guid Guid
+        {
+            [System.Diagnostics.DebuggerStepThrough]
+            get
+            {
+                return _guid;
+            }
+        }
 
         /// <summary>
         /// Initializes the fields that feed the properties of this IModelObject identity.
@@ -50,7 +78,7 @@ namespace Highpoint.Sage.SimCore
         /// <param name="guid">The IModelObject's new GUID value.</param>
         public void InitializeIdentity(IModel model, string name, string description, Guid guid)
         {
-            IMOHelper.Initialize(ref m_model, model, ref m_name, name, ref m_description, description, ref m_guid, guid);
+            IMOHelper.Initialize(ref _model, model, ref _name, name, ref _description, description, ref _guid, guid);
         }
         #endregion
 
