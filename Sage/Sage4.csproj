@@ -245,6 +245,7 @@
     <Compile Include="Graphs\PFC\AggregateLinkType.cs" />
     <Compile Include="Graphs\PFC\DualModeString.cs" />
     <Compile Include="Graphs\PFC\Execution\ExecutionEngineConfiguration.cs" />
+    <Compile Include="Graphs\PFC\Execution\IFacility.cs" />
     <Compile Include="Graphs\PFC\ExpressionElement.cs" />
     <Compile Include="Graphs\PFC\ExpressionType.cs" />
     <Compile Include="Graphs\PFC\IPfcBooleanExpression.cs" />
@@ -321,7 +322,7 @@
     <Compile Include="Graphs\PFC\Execution\Actions\Sequencer.cs" />
     <Compile Include="Graphs\PFC\Execution\Actions\SimpleDelay.cs" />
     <Compile Include="Graphs\PFC\Execution\ExecutionEngine.cs" />
-    <Compile Include="Graphs\PFC\Execution\ExecutionContext.cs" />
+    <Compile Include="Graphs\PFC\Execution\PfcExecutionContext.cs" />
     <Compile Include="Graphs\PFC\Execution\PfcActor.cs" />
     <Compile Include="Graphs\PFC\Execution\StateMachines.cs" />
     <Compile Include="Graphs\PFC\Expression.cs" />
