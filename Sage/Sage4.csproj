@@ -243,6 +243,7 @@
     <Compile Include="Graphs\IVertex.cs" />
     <Compile Include="Graphs\Ligature.cs" />
     <Compile Include="Graphs\PFC\PfcElementFactory.cs" />
+    <Compile Include="Graphs\PFC\PFCValidityException.cs" />
     <Compile Include="Graphs\PmData.cs" />
     <Compile Include="Graphs\PreEdgesSatisfiedKey.cs" />
     <Compile Include="Graphs\StructureChangeType.cs" />

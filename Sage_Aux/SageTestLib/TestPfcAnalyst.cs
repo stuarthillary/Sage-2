@@ -1260,7 +1260,7 @@ namespace PFCDemoMaterial {
 
             TextWriter tw = new StreamWriter("Results.txt", true);
 
-            PfcValidator.m_diagnostics = m_dumpStructure;
+            PfcValidator.Diagnostics = m_dumpStructure;
 
             int[] cases = new int[] { 2, 3, 4, 5, 98 };
             
@@ -1291,7 +1291,7 @@ namespace PFCDemoMaterial {
                                 i = nReps;
                                 break;
                             case 99:
-                                PfcValidator.m_diagnostics = m_dumpStructure = false;
+                                PfcValidator.Diagnostics = m_dumpStructure = false;
                                 nSteps = i / 50;
                                 if (nSteps < 8) nSteps = 8;
                                 //nSteps = 24;
@@ -1305,7 +1305,7 @@ namespace PFCDemoMaterial {
                         }
 
                         pfc.UpdateStructure();
-                        if (PfcValidator.m_diagnostics) {
+                        if (PfcValidator.Diagnostics) {
                             DumpStructure(pfc);
                         }
 
