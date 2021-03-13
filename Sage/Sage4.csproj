@@ -198,6 +198,9 @@
     <Compile Include="Core\IExecutive.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Core\IHasIdentity.cs" />
+    <Compile Include="Core\IHasName.cs" />
+    <Compile Include="Core\IHasParameters.cs" />
     <Compile Include="Core\IModel.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -205,6 +208,7 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Core\IModelService.cs" />
+    <Compile Include="Core\IMOHelper.cs" />
     <Compile Include="Core\InitializationManager.cs">
       <SubType>Code</SubType>
     </Compile>
