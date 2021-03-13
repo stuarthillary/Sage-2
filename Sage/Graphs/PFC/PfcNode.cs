@@ -3,31 +3,23 @@ using System;
 using System.Collections.Generic;
 using _Debug = System.Diagnostics.Debug;
 
-namespace Highpoint.Sage.Graphs.PFC {
-
-
-    /// <summary>
-    /// Enum NodeColor is used for various graph analysis algorithms. One such declares
-    /// Black, unvisited,  Gray, partially visited and White, fully visited.
-    /// </summary>
-    public enum NodeColor { White, Gray, Red, Black }            
-
-
-    public abstract class PfcNode : PfcElement, IPfcNode {
-
+namespace Highpoint.Sage.Graphs.PFC
+{
+    public abstract class PfcNode : PfcElement, IPfcNode
+    {
         #region Private Fields
 
-        private PfcLinkElementList m_predecessors;
-        private PfcLinkElementList m_successors;
+        private readonly PfcLinkElementList _predecessors;
+        private readonly PfcLinkElementList _successors;
 
-        private bool m_isResetting = false;
-        private bool m_isSimple = true;
-        private bool m_isNull = true;
-        private bool m_structureDirty = true;       
-        private int m_graphOrdinal = 0;
+        private bool _isResetting = false;
+        private readonly bool _isSimple = true;
+        private bool _isNull = true;
+        private bool _structureDirty = true;
+        private int _graphOrdinal = 0;
         internal object ScratchPad = null;
-        private Dictionary<string, string> m_graphicsData = null;
-        private DateTime? m_earliestStart = null;
+        private Dictionary<string, string> _graphicsData = null;
+        private DateTime? _earliestStart = null;
 
         #endregion Private Fields
 
@@ -46,24 +38,29 @@ namespace Highpoint.Sage.Graphs.PFC {
         /// <param name="description">The description for this step.</param>
         /// <param name="guid">The GUID of this step.</param>
         public PfcNode(IProcedureFunctionChart parent, string name, string description, Guid guid)
-            : base(parent, name, description, guid) {
+            : base(parent, name, description, guid)
+        {
 
-            m_predecessors = new PfcLinkElementList();
-            m_successors = new PfcLinkElementList();
+            _predecessors = new PfcLinkElementList();
+            _successors = new PfcLinkElementList();
         }
 
         #endregion Constructors
 
         #region IPfcNode Members
- 
+
         /// <summary>
         /// Gets a value indicating whether this instance is simple. A node is simple if it
         /// has one input and one output and performs no tasks beyond a pass-through. In the case
         /// of a Step, a Simple step is a Null step. This also facilitates graph reduction.
         /// </summary>
         /// <value><c>true</c> if this instance is simple; otherwise, <c>false</c>.</value>
-        public bool IsSimple {
-            get { return m_isSimple; }
+        public bool IsSimple
+        {
+            get
+            {
+                return _isSimple;
+            }
         }
 
         /// <summary>
@@ -71,24 +68,37 @@ namespace Highpoint.Sage.Graphs.PFC {
         /// eliminated when PFCs are combined.
         /// </summary>
         /// <value><c>true</c> if this instance is null; otherwise, <c>false</c>.</value>
-        public virtual bool IsNullNode {
-            get {
-                return m_isNull;
+        public virtual bool IsNullNode
+        {
+            get
+            {
+                return _isNull;
             }
-            set {
-                m_isNull = value;
+            set
+            {
+                _isNull = value;
             }
         }
 
-        public NodeColor NodeColor { get; set; }
+        public NodeColor NodeColor
+        {
+            get; set;
+        }
 
         /// <summary>
         /// Gets or sets the earliest time that this element can start.
         /// </summary>
         /// <value>The earliest start.</value>
-        public DateTime? EarliestStart {
-            get { return m_earliestStart; }
-            set { m_earliestStart = value; }
+        public DateTime? EarliestStart
+        {
+            get
+            {
+                return _earliestStart;
+            }
+            set
+            {
+                _earliestStart = value;
+            }
         }
 
         /// <summary>
@@ -97,7 +107,13 @@ namespace Highpoint.Sage.Graphs.PFC {
         /// <value>
         /// 	<c>true</c> if this instance is start node; otherwise, <c>false</c>.
         /// </value>
-        public bool IsStartNode { get { return (m_predecessors == null || m_predecessors.Count == 0); } }
+        public bool IsStartNode
+        {
+            get
+            {
+                return (_predecessors == null || _predecessors.Count == 0);
+            }
+        }
 
         /// <summary>
         /// Gets a value indicating whether this instance is finish node.
@@ -105,18 +121,27 @@ namespace Highpoint.Sage.Graphs.PFC {
         /// <value>
         /// 	<c>true</c> if this instance is finish node; otherwise, <c>false</c>.
         /// </value>
-        public bool IsFinishNode { get { return (m_successors == null || m_successors.Count == 0); } }
+        public bool IsFinishNode
+        {
+            get
+            {
+                return (_successors == null || _successors.Count == 0);
+            }
+        }
 
         /// <summary>
         /// A string dictionary containing name/value pairs that represent graphics &amp; layout-related values.
         /// </summary>
         /// <value></value>
-        public Dictionary<string, string> GraphicsData {
-            get {
-                if (m_graphicsData == null) {
-                    m_graphicsData = new Dictionary<string, string>();
+        public Dictionary<string, string> GraphicsData
+        {
+            get
+            {
+                if (_graphicsData == null)
+                {
+                    _graphicsData = new Dictionary<string, string>();
                 }
-                return m_graphicsData;
+                return _graphicsData;
             }
         }
 
@@ -127,7 +152,8 @@ namespace Highpoint.Sage.Graphs.PFC {
         /// <returns>
         /// 	<c>true</c> if this instance is connected; otherwise, <c>false</c>.
         /// </returns>
-        public override bool IsConnected() {
+        public override bool IsConnected()
+        {
             return PredecessorNodes.Count > 0 || SuccessorNodes.Count > 0;
         }
 
@@ -136,8 +162,9 @@ namespace Highpoint.Sage.Graphs.PFC {
         /// This is called after any structural changes in the Sfc, but before the resultant data
         /// are requested externally.
         /// </summary>
-        public override void UpdateStructure() {
-            m_successors.Sort(Parent.LinkComparer); 
+        public override void UpdateStructure()
+        {
+            _successors.Sort(Parent.LinkComparer);
         }
 
         /// <summary>
@@ -146,12 +173,15 @@ namespace Highpoint.Sage.Graphs.PFC {
         /// their place in the execution order as of their first execution.
         /// </summary>
         /// <value>The graph ordinal.</value>
-        public int GraphOrdinal {
-            get {
-                return m_graphOrdinal;
+        public int GraphOrdinal
+        {
+            get
+            {
+                return _graphOrdinal;
             }
-            set {
-                m_graphOrdinal = value;
+            set
+            {
+                _graphOrdinal = value;
             }
         }
 
@@ -160,9 +190,14 @@ namespace Highpoint.Sage.Graphs.PFC {
         /// </summary>
         /// <param name="successorNode">The successor.</param>
         /// <returns></returns>
-        public IPfcLinkElement GetLinkForSuccessorNode(IPfcNode successorNode) {
+        public IPfcLinkElement GetLinkForSuccessorNode(IPfcNode successorNode)
+        {
             IPfcLinkElement retval = null;
-            m_successors.ForEach(delegate(IPfcLinkElement le) { if (le.Successor == successorNode) retval = le; });
+            _successors.ForEach(delegate (IPfcLinkElement le)
+            {
+                if (le.Successor == successorNode)
+                    retval = le;
+            });
             return retval;
         }
 
@@ -171,9 +206,14 @@ namespace Highpoint.Sage.Graphs.PFC {
         /// </summary>
         /// <param name="predecessorNode">The predecessor.</param>
         /// <returns></returns>
-        public IPfcLinkElement GetLinkForPredecessorNode(IPfcNode predecessorNode) {
+        public IPfcLinkElement GetLinkForPredecessorNode(IPfcNode predecessorNode)
+        {
             IPfcLinkElement retval = null;
-            m_predecessors.ForEach(delegate(IPfcLinkElement le) { if (le.Predecessor == predecessorNode) retval = le; });
+            _predecessors.ForEach(delegate (IPfcLinkElement le)
+            {
+                if (le.Predecessor == predecessorNode)
+                    retval = le;
+            });
             return retval;
         }
 
@@ -185,24 +225,27 @@ namespace Highpoint.Sage.Graphs.PFC {
         /// <param name="outbound">The link, already in existence and an outbound link from this node, that
         /// is to be set to the highest priority of all links already outbound from this node.</param>
         /// <returns></returns>
-        public bool SetLinkHighestPriority(IPfcLinkElement outbound) {
-            if (!m_successors.Contains(outbound)) {
+        public bool SetLinkHighestPriority(IPfcLinkElement outbound)
+        {
+            if (!_successors.Contains(outbound))
+            {
                 return false;
             }
 
-            m_successors.Sort(Parent.LinkComparer);
-            m_successors.Remove(outbound);
-            m_successors.Add(outbound);
+            _successors.Sort(Parent.LinkComparer);
+            _successors.Remove(outbound);
+            _successors.Add(outbound);
 
-            List<IPfcLinkElement> links = new List<IPfcLinkElement>(m_successors);
-            for (int i = 0 ; i < links.Count ; i++) {
-                links[i].Priority = (int)( m_successors.Count - i );
+            List<IPfcLinkElement> links = new List<IPfcLinkElement>(_successors);
+            for (int i = 0; i < links.Count; i++)
+            {
+                links[i].Priority = (int)(_successors.Count - i);
             }
 
-            m_successors.Clear();
-            m_successors.AddRange(links);
+            _successors.Clear();
+            _successors.AddRange(links);
 
-            m_successors.Sort(Parent.LinkComparer);
+            _successors.Sort(Parent.LinkComparer);
 
             return true;
         }
@@ -214,24 +257,27 @@ namespace Highpoint.Sage.Graphs.PFC {
         /// <param name="outbound">The link, already in existence and an outbound link from this node, that
         /// is to be set to the lowest priority of all links already outbound from this node.</param>
         /// <returns></returns>
-        public bool SetLinkLowestPriority(IPfcLinkElement outbound) {
-            if (!m_successors.Contains(outbound)) {
+        public bool SetLinkLowestPriority(IPfcLinkElement outbound)
+        {
+            if (!_successors.Contains(outbound))
+            {
                 return false;
             }
 
-            m_successors.Sort(Parent.LinkComparer);
-            m_successors.Remove(outbound);
-            m_successors.Insert(0, outbound);
+            _successors.Sort(Parent.LinkComparer);
+            _successors.Remove(outbound);
+            _successors.Insert(0, outbound);
 
-            List<IPfcLinkElement> links = new List<IPfcLinkElement>(m_successors);
-            for (int i = 0 ; i < links.Count ; i++) {
-                links[i].Priority = (int)( m_successors.Count - i );
+            List<IPfcLinkElement> links = new List<IPfcLinkElement>(_successors);
+            for (int i = 0; i < links.Count; i++)
+            {
+                links[i].Priority = (int)(_successors.Count - i);
             }
 
-            m_successors.Clear();
-            m_successors.AddRange(links);
+            _successors.Clear();
+            _successors.AddRange(links);
 
-            m_successors.Sort(Parent.LinkComparer);
+            _successors.Sort(Parent.LinkComparer);
 
             return true;
         }
@@ -243,16 +289,20 @@ namespace Highpoint.Sage.Graphs.PFC {
         /// <summary>
         /// Resets this instance. Used at, or pertaining to, runtime execution.
         /// </summary>
-        public override void Reset() {
-            if (!m_isResetting) {
-                m_isResetting = true;
-                foreach (IPfcLinkElement linkNode in m_predecessors) {
+        public override void Reset()
+        {
+            if (!_isResetting)
+            {
+                _isResetting = true;
+                foreach (IPfcLinkElement linkNode in _predecessors)
+                {
                     linkNode.Reset();
                 }
-                foreach (IPfcLinkElement linkNode in m_successors) {
+                foreach (IPfcLinkElement linkNode in _successors)
+                {
                     linkNode.Reset();
                 }
-                m_isResetting = false;
+                _isResetting = false;
             }
         }
 
@@ -265,19 +315,26 @@ namespace Highpoint.Sage.Graphs.PFC {
         /// consolidation was last done.
         /// </summary>
         /// <value><c>true</c> if [structure dirty]; otherwise, <c>false</c>.</value>
-        public bool StructureDirty {
-            get {
-                return m_structureDirty;
+        public bool StructureDirty
+        {
+            get
+            {
+                return _structureDirty;
             }
-            set {
-                if (m_structureDirty) {
+            set
+            {
+                if (_structureDirty)
+                {
                     return;
                 } // TODO: This could be factored better to not use all of the casting.
-                m_structureDirty = value;
-                if (m_structureDirty && this is IPfcStepNode) {
-                    foreach (IProcedureFunctionChart childPfc in ((IPfcStepNode)this).Actions.Values) {
-                        foreach (IPfcElement child in childPfc.Nodes ) {
-                                ((IPfcNode)child).StructureDirty = true;
+                _structureDirty = value;
+                if (_structureDirty && this is IPfcStepNode)
+                {
+                    foreach (IProcedureFunctionChart childPfc in ((IPfcStepNode)this).Actions.Values)
+                    {
+                        foreach (IPfcElement child in childPfc.Nodes)
+                        {
+                            ((IPfcNode)child).StructureDirty = true;
                         }
                     }
                 }
@@ -288,30 +345,37 @@ namespace Highpoint.Sage.Graphs.PFC {
         /// Gets the predecessor list for this node.
         /// </summary>
         /// <value>The predecessor link.</value>
-        public PfcLinkElementList Predecessors {
-            get { return m_predecessors; }
+        public PfcLinkElementList Predecessors
+        {
+            get
+            {
+                return _predecessors;
+            }
         }
-        
+
         /// <summary>
         /// Adds the new predecessor link to this node's list of predecessors.
         /// </summary>
         /// <param name="newPredecessor">The new predecessor link.</param>
-        public void AddPredecessor(IPfcLinkElement newPredecessor) {
-            _Debug.Assert(newPredecessor.Successor != null );
-            m_predecessors.Add(newPredecessor);
+        public void AddPredecessor(IPfcLinkElement newPredecessor)
+        {
+            _Debug.Assert(newPredecessor.Successor != null);
+            _predecessors.Add(newPredecessor);
             StructureDirty = true;
         }
-        
+
         /// <summary>
         /// Removes the predecessor link from this node's list of predecessors.
         /// </summary>
         /// <param name="currentPredecessor">The current predecessor.</param>
         /// <returns></returns>
-        public bool RemovePredecessor(IPfcLinkElement currentPredecessor) {
-            if ( !m_predecessors.Contains(currentPredecessor) ) {
+        public bool RemovePredecessor(IPfcLinkElement currentPredecessor)
+        {
+            if (!_predecessors.Contains(currentPredecessor))
+            {
                 return false;
             }
-            m_predecessors.Remove(currentPredecessor);
+            _predecessors.Remove(currentPredecessor);
             StructureDirty = true;
             return true;
         }
@@ -320,9 +384,11 @@ namespace Highpoint.Sage.Graphs.PFC {
         /// Gets the successor list for this node. Do not modify this list.
         /// </summary>
         /// <value>A list of the successor links.</value>
-        public PfcLinkElementList Successors {
-            get {
-                return m_successors;
+        public PfcLinkElementList Successors
+        {
+            get
+            {
+                return _successors;
             }
         }
 
@@ -330,11 +396,15 @@ namespace Highpoint.Sage.Graphs.PFC {
         /// Gets the predecessor node list for this node.
         /// </summary>
         /// <value>A list of the nodes at the other end of this node's predecessors (which are all links).</value>
-        public PfcNodeList PredecessorNodes {
-            get {
+        public PfcNodeList PredecessorNodes
+        {
+            get
+            {
                 PfcNodeList retval = new PfcNodeList();
-                foreach (IPfcLinkElement link in m_predecessors) {
-                    if (link.Predecessor != null) {
+                foreach (IPfcLinkElement link in _predecessors)
+                {
+                    if (link.Predecessor != null)
+                    {
                         retval.Add(link.Predecessor);
                     }
                 }
@@ -347,11 +417,15 @@ namespace Highpoint.Sage.Graphs.PFC {
         /// Gets the successor list for this node. Do not modify this list.
         /// </summary>
         /// <value>A list of the nodes at the other end of this node's predecessors (which are all links).</value>
-        public PfcNodeList SuccessorNodes {
-            get {
+        public PfcNodeList SuccessorNodes
+        {
+            get
+            {
                 PfcNodeList retval = new PfcNodeList();
-                foreach (IPfcLinkElement link in m_successors) {
-                    if (link.Successor != null) {
+                foreach (IPfcLinkElement link in _successors)
+                {
+                    if (link.Successor != null)
+                    {
                         retval.Add(link.Successor);
                     }
                 }
@@ -363,11 +437,13 @@ namespace Highpoint.Sage.Graphs.PFC {
         /// Adds the new successor link to this node's list of successors.
         /// </summary>
         /// <param name="newSuccessor">The new successor link.</param>
-        public void AddSuccessor(IPfcLinkElement newSuccessor) {
-            _Debug.Assert(newSuccessor.Predecessor == this );
-            m_successors.Add(newSuccessor);
+        public void AddSuccessor(IPfcLinkElement newSuccessor)
+        {
+            _Debug.Assert(newSuccessor.Predecessor == this);
+            _successors.Add(newSuccessor);
 
-            if (!newSuccessor.Priority.HasValue) {
+            if (!newSuccessor.Priority.HasValue)
+            {
                 newSuccessor.Priority = 0;
             }
 
@@ -378,8 +454,9 @@ namespace Highpoint.Sage.Graphs.PFC {
         /// <summary>
         /// Resorts the successor links according to their priorities.
         /// </summary>
-        internal void ResortSuccessorLinks() {
-            m_successors.Sort(new PfcLink.LinkComparer());
+        internal void ResortSuccessorLinks()
+        {
+            _successors.Sort(new PfcLink.LinkComparer());
         }
 
         /// <summary>
@@ -387,21 +464,26 @@ namespace Highpoint.Sage.Graphs.PFC {
         /// </summary>
         /// <param name="currentSuccessor">The current successor.</param>
         /// <returns></returns>
-        public bool RemoveSuccessor(IPfcLinkElement currentSuccessor) {
-            if ( !m_successors.Contains(currentSuccessor) ) {
+        public bool RemoveSuccessor(IPfcLinkElement currentSuccessor)
+        {
+            if (!_successors.Contains(currentSuccessor))
+            {
                 return false;
             }
-            m_successors.Remove(currentSuccessor);
+            _successors.Remove(currentSuccessor);
             StructureDirty = true;
             return true;
         }
 
         #endregion
 
-        public class NodeComparer : IComparer<IPfcNode> {
-            public int Compare(IPfcNode x, IPfcNode y) {
+        public class NodeComparer : IComparer<IPfcNode>
+        {
+            public int Compare(IPfcNode x, IPfcNode y)
+            {
                 int retval = Comparer<int>.Default.Compare(x.GraphOrdinal, y.GraphOrdinal);
-                if (retval == 0) {
+                if (retval == 0)
+                {
                     retval = Utility.GuidOps.Compare(x.Guid, y.Guid);
                 }
                 return retval;

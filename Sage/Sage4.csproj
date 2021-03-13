@@ -242,6 +242,7 @@
     <Compile Include="Graphs\ISupportsPertAnalysis.cs" />
     <Compile Include="Graphs\IVertex.cs" />
     <Compile Include="Graphs\Ligature.cs" />
+    <Compile Include="Graphs\PFC\NodeColor.cs" />
     <Compile Include="Graphs\PFC\PfcElementFactory.cs" />
     <Compile Include="Graphs\PFC\PFCValidityException.cs" />
     <Compile Include="Graphs\PmData.cs" />
