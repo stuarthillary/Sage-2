@@ -3,16 +3,21 @@
 using System.Collections;
 using System.Text;
 
-namespace Highpoint.Sage.Graphs.PFC {
-    public class PfcDiagnostics {
-        private PfcDiagnostics() { } // Statics only.
+namespace Highpoint.Sage.Graphs.PFC
+{
+    public class PfcDiagnostics
+    {
+        private PfcDiagnostics()
+        {
+        } // Statics only.
 
         /// <summary>
         /// Gets the SFC's diagnostic report.
         /// </summary>
         /// <param name="pfc">The ProcedureFunctionChart to be reported on.</param>
         /// <returns></returns>
-        public string PfcDiagnosticReport(IProcedureFunctionChart pfc) {
+        public string PfcDiagnosticReport(IProcedureFunctionChart pfc)
+        {
             StringBuilder sb = new StringBuilder();
 
             sb.Append(PfcSummaryInfo(pfc));
@@ -26,7 +31,8 @@ namespace Highpoint.Sage.Graphs.PFC {
         /// </summary>
         /// <param name="pfc">The pfc.</param>
         /// <returns></returns>
-        public static string PfcSummaryInfo(IProcedureFunctionChart pfc) {
+        public static string PfcSummaryInfo(IProcedureFunctionChart pfc)
+        {
             StringBuilder sb = new StringBuilder();
             sb.Append(pfc.GetType().FullName + " : " + pfc.Name + "\r\n");
 
@@ -44,12 +50,17 @@ namespace Highpoint.Sage.Graphs.PFC {
             return sb.ToString();
         }
 
-        public static string GetStructure(IProcedureFunctionChart pfc) {
+        public static string GetStructure(IProcedureFunctionChart pfc)
+        {
             StringBuilder sb = new StringBuilder();
             PfcLinkElementList llist = pfc.Links;
-            llist.Sort(delegate(IPfcLinkElement le1, IPfcLinkElement le2) { return Comparer.Default.Compare(le1.Name,le2.Name); } );
+            llist.Sort(delegate (IPfcLinkElement le1, IPfcLinkElement le2)
+            {
+                return Comparer.Default.Compare(le1.Name, le2.Name);
+            });
 
-            foreach ( IPfcLinkElement linkElement in llist ) {
+            foreach (IPfcLinkElement linkElement in llist)
+            {
                 string predName = linkElement.Predecessor == null ? "<null>" : linkElement.Predecessor.Name;
                 string linkName = linkElement.Name;
                 string parentName = linkElement.Parent == null ? "<null>" : linkElement.Parent.Name;
@@ -61,18 +72,23 @@ namespace Highpoint.Sage.Graphs.PFC {
             return sb.ToString();
         }
 
-        public static string GetDeepStructure(IProcedureFunctionChart ipfc) {
+        public static string GetDeepStructure(IProcedureFunctionChart ipfc)
+        {
             StringBuilder sb = new StringBuilder();
             GetDeepStructure(ipfc, 0, ref sb);
             return sb.ToString();
         }
 
-        private static void GetDeepStructure(IProcedureFunctionChart ipfc, int indent, ref StringBuilder sb) {
-            string indents = Utility.StringOperations.Spaces(indent*3);
-            foreach (IPfcStepNode step in ipfc.Steps) {
+        private static void GetDeepStructure(IProcedureFunctionChart ipfc, int indent, ref StringBuilder sb)
+        {
+            string indents = Utility.StringOperations.Spaces(indent * 3);
+            foreach (IPfcStepNode step in ipfc.Steps)
+            {
                 sb.Append(indents + step.Name + "\r\n");
-                if (step.Actions != null) {
-                    foreach (string key in step.Actions.Keys) {
+                if (step.Actions != null)
+                {
+                    foreach (string key in step.Actions.Keys)
+                    {
                         sb.Append(indents + "[" + key + "]\r\n");
                         GetDeepStructure(step.Actions[key], indent + 1, ref sb);
                     }
@@ -80,27 +96,37 @@ namespace Highpoint.Sage.Graphs.PFC {
             }
         }
 
-        static void DumpElementContents(IProcedureFunctionChart pfc, StringBuilder sb, int indent) {
-            foreach (IPfcElement element in pfc.Elements) {
+        static void DumpElementContents(IProcedureFunctionChart pfc, StringBuilder sb, int indent)
+        {
+            foreach (IPfcElement element in pfc.Elements)
+            {
                 DumpElementContents(element, sb, indent);
             }
         }
 
-        static void DumpElementContents(IPfcElement element, StringBuilder sb, int indent) {
+        static void DumpElementContents(IPfcElement element, StringBuilder sb, int indent)
+        {
             sb.Append("\r\n");
 
-            for ( int i = 0 ; i < indent ; i++ ) {
+            for (int i = 0; i < indent; i++)
+            {
                 sb.Append("\t");
             }
-            if (element == null) {
+            if (element == null)
+            {
                 sb.Append("<null>");
-            } else {
+            }
+            else
+            {
                 sb.Append(element.Name);
-                if (element is IPfcStepNode) {
+                if (element is IPfcStepNode)
+                {
                     IPfcStepNode node = (IPfcStepNode)element;
                     sb.Append(" [ " + node.Predecessors.Count + ", " + node.Successors.Count + " ]");
-                    foreach (IProcedureFunctionChart childPfc in node.Actions.Values) {
-                        foreach (IPfcElement child in childPfc.Elements) {
+                    foreach (IProcedureFunctionChart childPfc in node.Actions.Values)
+                    {
+                        foreach (IPfcElement child in childPfc.Elements)
+                        {
                             DumpElementContents(child, sb, indent + 1);
                         }
                     }
