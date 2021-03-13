@@ -221,6 +221,7 @@
     <Compile Include="Core\Synchronizers.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Dependencies\GraphCycleException.cs" />
     <Compile Include="Dependencies\GraphSequencer.cs">
       <SubType>Code</SubType>
     </Compile>
