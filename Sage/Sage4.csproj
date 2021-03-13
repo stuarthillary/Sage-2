@@ -177,6 +177,7 @@
     <Compile Include="Core\ExecFactory.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Core\ExecType.cs" />
     <Compile Include="Core\Executive.cs">
       <SubType>Code</SubType>
     </Compile>
