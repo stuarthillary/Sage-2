@@ -246,6 +246,9 @@
     <Compile Include="Graphs\PFC\DualModeString.cs" />
     <Compile Include="Graphs\PFC\Execution\ExecutionEngineConfiguration.cs" />
     <Compile Include="Graphs\PFC\Execution\IFacility.cs" />
+    <Compile Include="Graphs\PFC\Execution\StepState.cs" />
+    <Compile Include="Graphs\PFC\Execution\StepStateMachine.cs" />
+    <Compile Include="Graphs\PFC\Execution\TransitionState.cs" />
     <Compile Include="Graphs\PFC\ExpressionElement.cs" />
     <Compile Include="Graphs\PFC\ExpressionType.cs" />
     <Compile Include="Graphs\PFC\IPfcBooleanExpression.cs" />
@@ -324,7 +327,7 @@
     <Compile Include="Graphs\PFC\Execution\ExecutionEngine.cs" />
     <Compile Include="Graphs\PFC\Execution\PfcExecutionContext.cs" />
     <Compile Include="Graphs\PFC\Execution\PfcActor.cs" />
-    <Compile Include="Graphs\PFC\Execution\StateMachines.cs" />
+    <Compile Include="Graphs\PFC\Execution\TransitionStateMachine.cs" />
     <Compile Include="Graphs\PFC\Expression.cs" />
     <Compile Include="Graphs\PFC\IPfcElementFactory.cs" />
     <Compile Include="Graphs\PFC\PfcLink.cs" />
