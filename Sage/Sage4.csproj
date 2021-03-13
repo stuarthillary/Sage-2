@@ -179,17 +179,22 @@
     <Compile Include="Core\ExecEvent.cs" />
     <Compile Include="Core\ExecEventComparer.cs" />
     <Compile Include="Core\ExecEventRemover.cs" />
+    <Compile Include="Core\ExecEventType.cs" />
     <Compile Include="Core\ExecFactory.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Core\ExecState.cs" />
     <Compile Include="Core\ExecType.cs" />
     <Compile Include="Core\Executive.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Core\ExecutiveException.cs" />
     <Compile Include="Core\ExecutiveFastLight.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Core\IDetachableEventController.cs" />
     <Compile Include="Core\IExecEvent.cs" />
+    <Compile Include="Core\IExecEventSelector.cs" />
     <Compile Include="Core\IExecutive.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -229,6 +234,8 @@
     <Compile Include="Core\Synchronizers.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Core\TaskGraphVolatileAttribute.cs" />
+    <Compile Include="Core\VolatileKey.cs" />
     <Compile Include="Dependencies\GraphCycleException.cs" />
     <Compile Include="Dependencies\GraphSequencer.cs">
       <SubType>Code</SubType>
