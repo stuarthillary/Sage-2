@@ -1,7 +1,8 @@
 ﻿/* This source code licensed under the GNU Affero General Public License */
 using System;
 
-namespace Highpoint.Sage.SimCore {
+namespace Highpoint.Sage.SimCore
+{
 
     /// <summary>
     /// Delegate ExceptionHandler is implemented by anything that can handle an exception.

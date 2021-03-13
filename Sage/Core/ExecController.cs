@@ -1,11 +1,12 @@
 /* This source code licensed under the GNU Affero General Public License */
 using System;
-using System.Threading;
 using System.Collections;
+using System.Threading;
 using _Debug = System.Diagnostics.Debug;
 // ReSharper disable UnusedParameter.Global
 
-namespace Highpoint.Sage.SimCore {
+namespace Highpoint.Sage.SimCore
+{
 
     /// <summary>
     /// This object will govern the real-time frequency at which the Render event fires, and will also govern
@@ -13,20 +14,21 @@ namespace Highpoint.Sage.SimCore {
     /// will be 20 Render events fired per second. With a scale of 2, 10^2, or 100 times that 1/20th of a
     /// second (therefore 2 seconds of simulation time) will be allowed to transpire between render events.
     /// </summary>
-    public class ExecController : IDisposable {
+    public class ExecController : IDisposable
+    {
 
         #region Private Fields
-        private IExecutive m_executive;
-        private double m_logScale;
-        private double m_linearScale;
-        private int m_frameRate;
-        private readonly object m_userData;
-        private KickoffMgr m_kickoffManager;
-        private readonly ExecutiveEvent m_doThrottle;
-        private TimeSpan m_maxNap;
-        private DateTime m_realWorldStartTime;
-        private DateTime m_simWorldStartTime;
-        private Thread m_renderThread;
+        private IExecutive _executive;
+        private double _logScale;
+        private double _linearScale;
+        private int _frameRate;
+        private readonly object _userData;
+        private KickoffMgr _kickoffManager;
+        private readonly ExecutiveEvent _doThrottle;
+        private TimeSpan _maxNap;
+        private DateTime _realWorldStartTime;
+        private DateTime _simWorldStartTime;
+        private Thread _renderThread;
         #endregion
 
         /// <summary>
@@ -36,7 +38,7 @@ namespace Highpoint.Sage.SimCore {
         /// <param name="model">The model.</param>
         /// <param name="scale">The (logarithmic) run time scale.</param>
         /// <param name="frameRate">The frame rate in render events per second. If zero, execution is unconstrained.</param>
-        public ExecController(IModel model, double scale, int frameRate) : this(model.Executive, scale, frameRate, model)  {}
+        public ExecController(IModel model, double scale, int frameRate) : this(model.Executive, scale, frameRate, model) { }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ExecController"/> class. The caller may specify userData.
@@ -50,13 +52,13 @@ namespace Highpoint.Sage.SimCore {
         {
             if (!Disable)
             {
-                m_userData = userData;
-                m_executive = exec;
-                m_executive.ExecutiveStarted += m_executive_ExecutiveStarted;
+                _userData = userData;
+                _executive = exec;
+                _executive.ExecutiveStarted += executive_ExecutiveStarted;
                 Scale = scale;
                 FrameRate = frameRate;
-                m_kickoffManager = new KickoffMgr(this, m_executive);
-                m_doThrottle = ThrottleExecution;
+                _kickoffManager = new KickoffMgr(this, _executive);
+                _doThrottle = ThrottleExecution;
             }
         }
 
@@ -72,10 +74,10 @@ namespace Highpoint.Sage.SimCore {
         {
             if (!Disable)
             {
-                m_userData = userData;
+                _userData = userData;
                 Scale = scale;
                 FrameRate = frameRate;
-                m_doThrottle = ThrottleExecution;
+                _doThrottle = ThrottleExecution;
             }
         }
 
@@ -86,36 +88,44 @@ namespace Highpoint.Sage.SimCore {
         /// <param name="exec">The executive on which this controller will operate.</param>
         public void SetExecutive(IExecutive exec)
         {
-            if (m_executive == exec) return;
-            if ( m_executive != null ) throw new InvalidOperationException("Calling SetExecutive on an ExecController that's already attached to a different executive is illegal.");
-            m_executive = exec;
-            m_executive.ExecutiveStarted += m_executive_ExecutiveStarted;
-            m_kickoffManager = new KickoffMgr(this, m_executive);
+            if (_executive == exec)
+                return;
+            if (_executive != null)
+                throw new InvalidOperationException("Calling SetExecutive on an ExecController that's already attached to a different executive is illegal.");
+            _executive = exec;
+            _executive.ExecutiveStarted += executive_ExecutiveStarted;
+            _kickoffManager = new KickoffMgr(this, _executive);
         }
 
-        public bool Disable { get; set; }
+        public bool Disable
+        {
+            get; set;
+        }
 
         /// <summary>
         /// Gets or sets the logarithmic scale of run speed to sim speed. For example, for a sim that runs 
         /// 100 x faster than a real-world clock, use a scale of 2.0.
         /// </summary>
         /// <value>The scale.</value>
-        public double Scale {
-            get {
-                return m_logScale;
+        public double Scale
+        {
+            get
+            {
+                return _logScale;
             }
-            set {
+            set
+            {
                 if (Math.Abs(value - double.MinValue) < double.Epsilon)
                 {
-                    m_linearScale = 0;
-                    m_logScale = double.MinValue;
+                    _linearScale = 0;
+                    _logScale = double.MinValue;
                     FrameRate = 0;
                 }
                 else
                 {
-                    m_linearScale = Math.Pow(10.0, value);
-                    m_logScale = value;
-                    m_maxNap = FrameRate > 0 ? TimeSpan.FromSeconds(1.0/FrameRate) : TimeSpan.MaxValue;
+                    _linearScale = Math.Pow(10.0, value);
+                    _logScale = value;
+                    _maxNap = FrameRate > 0 ? TimeSpan.FromSeconds(1.0 / FrameRate) : TimeSpan.MaxValue;
                 }
             }
         }
@@ -125,62 +135,93 @@ namespace Highpoint.Sage.SimCore {
         /// 100 x faster than a real-world clock, the linear scale would be 100.
         /// </summary>
         /// <value>The scale.</value>
-        public double LinearScale => m_linearScale;
+        public double LinearScale => _linearScale;
 
         /// <summary>
         /// Gets or sets the frame rate - an integer that represents the preferred number of rendering callbacks received per second.
         /// </summary>
         /// <value>The frame rate.</value>
-        public int FrameRate { 
-            get { return m_frameRate; } 
-            set {
-                if (value > 25) {
+        public int FrameRate
+        {
+            get
+            {
+                return _frameRate;
+            }
+            set
+            {
+                if (value > 25)
+                {
                     throw new ArgumentException("Frame rate cannot be more than 25 frames per second.");
                 }
-                m_frameRate = value;
-                m_maxNap = m_frameRate > 0 ? TimeSpan.FromSeconds(1.0 / m_frameRate) : TimeSpan.MaxValue;
-            } 
+                _frameRate = value;
+                _maxNap = _frameRate > 0 ? TimeSpan.FromSeconds(1.0 / _frameRate) : TimeSpan.MaxValue;
+            }
         }
 
         /// <summary>
         /// A user-friendly representation of the simulation speed.
         /// </summary>
         /// <value>The rate string.</value>
-        public string RateString { 
-            get {
-                try {
-                    TimeSpan ts = TimeSpan.FromSeconds(m_logScale >= 0 ? Math.Pow(10, m_logScale) : Math.Pow(10, -m_logScale));
+        public string RateString
+        {
+            get
+            {
+                try
+                {
+                    TimeSpan ts = TimeSpan.FromSeconds(_logScale >= 0 ? Math.Pow(10, _logScale) : Math.Pow(10, -_logScale));
                     double num;
-                        string units;
-                        if (( num = ( ts.TotalDays / 365247.7 ) ) > 1.0) {
-                            units = "millennia";
-                        } else if (( num = ( ts.TotalDays / 36524.77 ) ) > 1.0) {
-                            units = "centuries";
-                        } else if (( num = ( ts.TotalDays / 365.2477 ) ) > 1.0) {
-                            units = "years";
-                        } else if (( num = ts.TotalDays ) > 1.0) {
-                            units = "days";
-                        } else if (( num = ts.TotalHours ) >= 1.0) {
-                            units = "hours";
-                        } else if (( num = ts.TotalMinutes ) >= 1.0) {
-                            units = "minutes";
-                        } else if (( num = ts.TotalSeconds ) >= 1.0) {
-                            units = "seconds";
-                        } else if (( num = ts.TotalMilliseconds ) >= 1.0) {
-                            units = "milliseconds";
-                        } else {
-                            units = "milliseconds";
-                        }
+                    string units;
+                    if ((num = (ts.TotalDays / 365247.7)) > 1.0)
+                    {
+                        units = "millennia";
+                    }
+                    else if ((num = (ts.TotalDays / 36524.77)) > 1.0)
+                    {
+                        units = "centuries";
+                    }
+                    else if ((num = (ts.TotalDays / 365.2477)) > 1.0)
+                    {
+                        units = "years";
+                    }
+                    else if ((num = ts.TotalDays) > 1.0)
+                    {
+                        units = "days";
+                    }
+                    else if ((num = ts.TotalHours) >= 1.0)
+                    {
+                        units = "hours";
+                    }
+                    else if ((num = ts.TotalMinutes) >= 1.0)
+                    {
+                        units = "minutes";
+                    }
+                    else if ((num = ts.TotalSeconds) >= 1.0)
+                    {
+                        units = "seconds";
+                    }
+                    else if ((num = ts.TotalMilliseconds) >= 1.0)
+                    {
+                        units = "milliseconds";
+                    }
+                    else
+                    {
+                        units = "milliseconds";
+                    }
 
-                    if ( m_logScale >= 0 ) {
+                    if (_logScale >= 0)
+                    {
                         return string.Format("Up to {0:f2} {1} of simulation time per second of user time.", num, units);
-                    } else {
+                    }
+                    else
+                    {
                         return string.Format("Up to {0:f2} {1} of user time per second of simulation time.", num, units);
                     }
-                } catch {
-                    return string.Format("{0}.", (m_logScale < 0 ? "Controller scale is out of range low" : "Simulation speed is unconstrained"));
                 }
-            } 
+                catch
+                {
+                    return string.Format("{0}.", (_logScale < 0 ? "Controller scale is out of range low" : "Simulation speed is unconstrained"));
+                }
+            }
         }
 
         /// <summary>
@@ -190,46 +231,51 @@ namespace Highpoint.Sage.SimCore {
 
         public void Dispose()
         {
-            m_renderThread?.Abort();
+            _renderThread?.Abort();
         }
 
-        internal void Begin(IExecutive iExecutive, object userData) {
-            if ( iExecutive != m_executive ) throw new InvalidOperationException("ExecController is starting within a model whose executive is not the same one to which it was initialized.");
-            m_executive.ClockAboutToChange -= m_doThrottle; // In case we were listening from an earlier run.
-            m_executive.ClockAboutToChange += m_doThrottle;
-            if (m_renderThread != null && m_renderThread.ThreadState == ThreadState.Running)
+        internal void Begin(IExecutive iExecutive, object userData)
+        {
+            if (iExecutive != _executive)
+                throw new InvalidOperationException("ExecController is starting within a model whose executive is not the same one to which it was initialized.");
+            _executive.ClockAboutToChange -= _doThrottle; // In case we were listening from an earlier run.
+            _executive.ClockAboutToChange += _doThrottle;
+            if (_renderThread != null && _renderThread.ThreadState == ThreadState.Running)
             {
-                m_abortRendering = true;
+                _abortRendering = true;
                 // ReSharper disable once EmptyEmbeddedStatement
-                while (m_renderThread.IsAlive);
-                m_abortRendering = false;
+                while (_renderThread.IsAlive)
+                    ;
+                _abortRendering = false;
             }
-            m_renderThread = new Thread(RunRendering)
+            _renderThread = new Thread(RunRendering)
             {
                 IsBackground = true,
                 Name = "Rendering Thread"
             };
-            m_realWorldStartTime = DateTime.Now;
-            m_simWorldStartTime = iExecutive.Now;
-            m_renderThread.Start();
+            _realWorldStartTime = DateTime.Now;
+            _simWorldStartTime = iExecutive.Now;
+            _renderThread.Start();
         }
 
-        private void ThrottleExecution(IExecutive exec) {
-            if (Math.Abs(m_linearScale) > double.Epsilon){
-                IList events = m_executive.EventList;
+        private void ThrottleExecution(IExecutive exec)
+        {
+            if (Math.Abs(_linearScale) > double.Epsilon)
+            {
+                IList events = _executive.EventList;
                 if (events.Count > 0)
                 {
-                    long realWorldElapsedTicks = DateTime.Now.Ticks - m_realWorldStartTime.Ticks;
-                    DateTime timeOfNextEvent = ((IExecEvent) events[0]).When;
-                    long simElapsedTicks = timeOfNextEvent.Ticks - m_simWorldStartTime.Ticks;
-                    long targetRealWorldElapsedTicks = simElapsedTicks/(long) m_linearScale;
+                    long realWorldElapsedTicks = DateTime.Now.Ticks - _realWorldStartTime.Ticks;
+                    DateTime timeOfNextEvent = ((IExecEvent)events[0]).When;
+                    long simElapsedTicks = timeOfNextEvent.Ticks - _simWorldStartTime.Ticks;
+                    long targetRealWorldElapsedTicks = simElapsedTicks / (long)_linearScale;
 
                     if (realWorldElapsedTicks < targetRealWorldElapsedTicks)
                     {
-                        TimeSpan realWorldNap = Utility.TimeSpanOperations.Min(m_maxNap,
+                        TimeSpan realWorldNap = Utility.TimeSpanOperations.Min(_maxNap,
                             TimeSpan.FromTicks(targetRealWorldElapsedTicks - realWorldElapsedTicks));
-                        TimeSpan simNap = TimeSpan.FromTicks((long) (realWorldNap.Ticks*m_linearScale));
-                        m_executive.RequestDaemonEvent(RetardExecution, m_executive.Now + simNap,
+                        TimeSpan simNap = TimeSpan.FromTicks((long)(realWorldNap.Ticks * _linearScale));
+                        _executive.RequestDaemonEvent(RetardExecution, _executive.Now + simNap,
                             0.0, realWorldNap);
                     }
                 }
@@ -241,76 +287,93 @@ namespace Highpoint.Sage.SimCore {
         /// </summary>
         /// <param name="exec"></param>
         /// <param name="userData"></param>
-        private void RetardExecution(IExecutive exec, object userData) {
-            if ( Math.Abs(m_linearScale) > double.Epsilon ) Thread.Sleep((TimeSpan)userData);
+        private void RetardExecution(IExecutive exec, object userData)
+        {
+            if (Math.Abs(_linearScale) > double.Epsilon)
+                Thread.Sleep((TimeSpan)userData);
         }
 
 
-        private bool m_renderPending;
-        private bool m_abortRendering = false;
-        private void RunRendering() {
-            _Debug.Assert(Thread.CurrentThread.Equals(m_renderThread));
+        private bool _renderPending;
+        private bool _abortRendering = false;
+        private void RunRendering()
+        {
+            _Debug.Assert(Thread.CurrentThread.Equals(_renderThread));
 
-            while (!m_abortRendering) {
-                if (m_executive.State.Equals(ExecState.Running)) {
+            while (!_abortRendering)
+            {
+                if (_executive.State.Equals(ExecState.Running))
+                {
                     int nTicksToSleep = 500; // Check to see if we've changed frame rate from zero, every half-second.
-                    if (m_frameRate > 0)
+                    if (_frameRate > 0)
                     {
 
-                        nTicksToSleep = (int) TimeSpan.FromSeconds(1.0/m_frameRate).TotalMilliseconds;
+                        nTicksToSleep = (int)TimeSpan.FromSeconds(1.0 / _frameRate).TotalMilliseconds;
                         Thread.Sleep(nTicksToSleep);
 
-                        if (!m_renderPending)
+                        if (!_renderPending)
                         {
                             // If there's already one pending, we skip it and wait for the next one.
-                            if (m_frameRate > 0 && m_executive.State.Equals(ExecState.Running))
+                            if (_frameRate > 0 && _executive.State.Equals(ExecState.Running))
                             {
                                 // Race condition? Yes, race condition. Could complete between this and the next.
-                                m_executive.RequestImmediateEvent(DoRender, null,
+                                _executive.RequestImmediateEvent(DoRender, null,
                                     ExecEventType.Synchronous);
                             }
-                            m_renderPending = true;
+                            _renderPending = true;
                         }
                     }
                     else
                     {
                         Thread.Sleep(nTicksToSleep);
                     }
-                } else if (m_executive.State.Equals(ExecState.Paused)) {
+                }
+                else if (_executive.State.Equals(ExecState.Paused))
+                {
                     Thread.Sleep(500);
-                    m_realWorldStartTime = DateTime.Now;
-                    m_simWorldStartTime = m_executive.Now;
-                } else if (m_executive.State.Equals(ExecState.Stopped)) {
+                    _realWorldStartTime = DateTime.Now;
+                    _simWorldStartTime = _executive.Now;
+                }
+                else if (_executive.State.Equals(ExecState.Stopped))
+                {
                     break;
-                } else if (m_executive.State.Equals(ExecState.Finished)) {
+                }
+                else if (_executive.State.Equals(ExecState.Finished))
+                {
                     break;
                 }
             }
         }
 
-        private void DoRender(IExecutive exec, object userData) {
-            if (m_frameRate > 0) Render?.Invoke(exec, userData);
-            m_renderPending = false;
+        private void DoRender(IExecutive exec, object userData)
+        {
+            if (_frameRate > 0)
+                Render?.Invoke(exec, userData);
+            _renderPending = false;
         }
 
         #region (Private) Kickoff support.
-        private void m_executive_ExecutiveStarted(IExecutive exec) {
-            exec.EventAboutToFire += m_kickoffManager.Kickoff;
+        private void executive_ExecutiveStarted(IExecutive exec)
+        {
+            exec.EventAboutToFire += _kickoffManager.Kickoff;
         }
 
         #endregion
 
-        private class KickoffMgr {
-            private readonly IExecutive m_exec;
-            private readonly ExecController m_parent;
-            public KickoffMgr(ExecController parent, IExecutive exec) {
-                m_exec = exec;
-                m_parent = parent;
+        private class KickoffMgr
+        {
+            private readonly IExecutive _exec;
+            private readonly ExecController _parent;
+            public KickoffMgr(ExecController parent, IExecutive exec)
+            {
+                _exec = exec;
+                _parent = parent;
             }
 
-            public void Kickoff(long key, ExecEventReceiver eer, double priority, DateTime when, object userData, ExecEventType eventType) {
-                m_exec.EventAboutToFire -= Kickoff;
-                m_parent.Begin(m_parent.m_executive, m_parent.m_userData);
+            public void Kickoff(long key, ExecEventReceiver eer, double priority, DateTime when, object userData, ExecEventType eventType)
+            {
+                _exec.EventAboutToFire -= Kickoff;
+                _parent.Begin(_parent._executive, _parent._userData);
             }
         }
     }
