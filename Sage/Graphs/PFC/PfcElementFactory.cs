@@ -1,9 +1,8 @@
 ﻿/* COPYRIGHT_NOTICE */
+using Highpoint.Sage.Utility;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using Highpoint.Sage.Utility;
-using System.Linq;
 
 namespace Highpoint.Sage.Graphs.PFC
 {
@@ -19,98 +18,98 @@ namespace Highpoint.Sage.Graphs.PFC
 
         #region Private Members
 
-        private CanonicalityTest m_linkCanonicality = new CanonicalityTest(delegate (string s) { int x; return (s.StartsWith("L_") && int.TryParse(s.Substring(2), out x)); });
+        private readonly CanonicalityTest _linkCanonicality = new CanonicalityTest(delegate (string s) { int x; return (s.StartsWith("L_") && int.TryParse(s.Substring(2), out x)); });
         private static string _linkTemplate = "{0:D3}";
         private static string _linkPrefix = "L_";
 
-        private CanonicalityTest m_stepCanonicality = new CanonicalityTest(delegate (string s) { int x; return (s.StartsWith("S_") && int.TryParse(s.Substring(2), out x)); });
+        private readonly CanonicalityTest _stepCanonicality = new CanonicalityTest(delegate (string s) { int x; return (s.StartsWith("S_") && int.TryParse(s.Substring(2), out x)); });
         private static string _stepTemplate = "{0:D3}";
         private static string _stepPrefix = "S_";
 
-        private CanonicalityTest m_transCanonicality = new CanonicalityTest(delegate (string s) { int x; return ((s.StartsWith("T_") && int.TryParse(s.Substring(2), out x)) || (s.StartsWith("T") && int.TryParse(s.Substring(1), out x))); });
+        private readonly CanonicalityTest _transCanonicality = new CanonicalityTest(delegate (string s) { int x; return ((s.StartsWith("T_") && int.TryParse(s.Substring(2), out x)) || (s.StartsWith("T") && int.TryParse(s.Substring(1), out x))); });
         private static string _transitionTemplate = "{0:D3}";
-        private static string _transitionPrefix = "T_";
+        private static readonly string _transitionPrefix = "T_";
 
-        private int m_nextLinkNumber = 0;
-        private int m_nextStepNumber = 0;
-        private int m_nextTransitionNumber = 0;
-        private IProcedureFunctionChart m_hostPfc = null;
-        private Guid m_seedGuid = Guid.Empty;
-        private Guid m_maskGuid = Guid.Empty;
-        private bool m_repeatable = false;
-        private GuidGenerator m_guidGenerator = null;
+        private int _nextLinkNumber = 0;
+        private int _nextStepNumber = 0;
+        private int _nextTransitionNumber = 0;
+        private IProcedureFunctionChart _hostPfc = null;
+        private Guid _seedGuid = Guid.Empty;
+        private Guid _maskGuid = Guid.Empty;
+        private bool _repeatable = false;
+        private GuidGenerator _guidGenerator = null;
         #endregion Private Members
 
         #region Private Helper Methods
 
         private string NextLinkName()
         {
-            if (m_nextLinkNumber == 1000)
+            if (_nextLinkNumber == 1000)
             {
                 _linkTemplate = "{0:D4}";
             }
 
-            if (m_nextLinkNumber == 10000)
+            if (_nextLinkNumber == 10000)
             {
                 _linkTemplate = "{0:D5}";
             }
 
-            if (m_nextLinkNumber == 100000)
+            if (_nextLinkNumber == 100000)
             {
                 _linkTemplate = "{0:D6}";
             }
 
-            return _linkPrefix + string.Format(_linkTemplate, m_nextLinkNumber++);
+            return _linkPrefix + string.Format(_linkTemplate, _nextLinkNumber++);
         }
 
         private string NextStepName()
         {
-            if (m_nextStepNumber == 1000)
+            if (_nextStepNumber == 1000)
             {
                 _stepTemplate = "{0:D4}";
             }
 
-            if (m_nextStepNumber == 10000)
+            if (_nextStepNumber == 10000)
             {
                 _stepTemplate = "{0:D5}";
             }
 
-            if (m_nextStepNumber == 100000)
+            if (_nextStepNumber == 100000)
             {
                 _stepTemplate = "{0:D6}";
             }
 
-            return _stepPrefix + string.Format(_stepTemplate, m_nextStepNumber++);
+            return _stepPrefix + string.Format(_stepTemplate, _nextStepNumber++);
         }
 
         private string NextTransitionName()
         {
-            if (m_nextTransitionNumber == 1000)
+            if (_nextTransitionNumber == 1000)
             {
                 _transitionTemplate = "{0:D4}";
             }
 
-            if (m_nextTransitionNumber == 10000)
+            if (_nextTransitionNumber == 10000)
             {
                 _transitionTemplate = "{0:D5}";
             }
 
-            if (m_nextTransitionNumber == 100000)
+            if (_nextTransitionNumber == 100000)
             {
                 _transitionTemplate = "{0:D6}";
             }
 
-            return _transitionPrefix + string.Format(_transitionTemplate, m_nextTransitionNumber++);
+            return _transitionPrefix + string.Format(_transitionTemplate, _nextTransitionNumber++);
         }
 
         private Guid NextGuid()
         {
-            if (m_repeatable)
+            if (_repeatable)
             {
-                m_seedGuid = GuidOps.Increment(m_seedGuid);
-                m_seedGuid = GuidOps.Rotate(m_seedGuid, -1); // right-shift with wrap.
-                m_seedGuid = GuidOps.XOR(m_seedGuid, m_maskGuid);
-                return m_seedGuid;
+                _seedGuid = GuidOps.Increment(_seedGuid);
+                _seedGuid = GuidOps.Rotate(_seedGuid, -1); // right-shift with wrap.
+                _seedGuid = GuidOps.XOR(_seedGuid, _maskGuid);
+                return _seedGuid;
             }
             else
             {
@@ -125,7 +124,7 @@ namespace Highpoint.Sage.Graphs.PFC
         /// </summary>
         public PfcElementFactory()
         {
-            m_guidGenerator = new GuidGenerator(Guid.Empty, Guid.Empty, 0);
+            _guidGenerator = new GuidGenerator(Guid.Empty, Guid.Empty, 0);
         }
 
         /// <summary>
@@ -133,7 +132,7 @@ namespace Highpoint.Sage.Graphs.PFC
         /// </summary>
         public PfcElementFactory(GuidGenerator guidGenerator)
         {
-            m_guidGenerator = guidGenerator;
+            _guidGenerator = guidGenerator;
         }
 
         ///// <summary>
@@ -170,10 +169,10 @@ namespace Highpoint.Sage.Graphs.PFC
         /// bit, and then the resulting Guid is XOR'ed against this mask guid before being returned.</param>
         public void SetRepeatable(Guid maskGuid)
         {
-            m_repeatable = true;
-            m_maskGuid = maskGuid;
-            m_guidGenerator = new GuidGenerator(Guid.Empty, maskGuid, 1);
-            m_guidGenerator.Passthrough = true;
+            _repeatable = true;
+            _maskGuid = maskGuid;
+            _guidGenerator = new GuidGenerator(Guid.Empty, maskGuid, 1);
+            _guidGenerator.Passthrough = true;
         }
 
         #region IPfcElementFactory Members
@@ -182,13 +181,29 @@ namespace Highpoint.Sage.Graphs.PFC
         /// Gets the Procedure Function Chart for which this factory is creating elements.
         /// </summary>
         /// <value>The host PFC.</value>
-        public IProcedureFunctionChart HostPfc { get { return m_hostPfc; } set { m_hostPfc = value; } }
+        public IProcedureFunctionChart HostPfc
+        {
+            get
+            {
+                return _hostPfc;
+            }
+            set
+            {
+                _hostPfc = value;
+            }
+        }
 
         /// <summary>
         /// Gets the GUID generator in use by this element factory.
         /// </summary>
         /// <value>The GUID generator.</value>
-        public GuidGenerator GuidGenerator { get { return m_guidGenerator; } }
+        public GuidGenerator GuidGenerator
+        {
+            get
+            {
+                return _guidGenerator;
+            }
+        }
 
         /// <summary>
         /// Creates a step node with the provided characteristics. Calls NewStepNode(...) to instantiate the new node.
@@ -212,14 +227,14 @@ namespace Highpoint.Sage.Graphs.PFC
                 guid = NextGuid();
             }
 
-            IPfcStepNode node = NewStepNode(m_hostPfc, name, guid, description);
+            IPfcStepNode node = NewStepNode(_hostPfc, name, guid, description);
 
             return node;
         }
 
         public virtual IPfcStepNode NewStepNode(IProcedureFunctionChart parent, string name, Guid guid, string description)
         {
-            Debug.Assert(parent.Equals(m_hostPfc));
+            Debug.Assert(parent.Equals(_hostPfc));
             return new PfcStep(parent, name, description, guid);
         }
 
@@ -245,14 +260,14 @@ namespace Highpoint.Sage.Graphs.PFC
                 guid = NextGuid();
             }
 
-            IPfcTransitionNode node = NewTransitionNode(m_hostPfc, name, guid, description);
+            IPfcTransitionNode node = NewTransitionNode(_hostPfc, name, guid, description);
 
             return node;
         }
 
         public virtual IPfcTransitionNode NewTransitionNode(IProcedureFunctionChart parent, string name, Guid guid, string description)
         {
-            Debug.Assert(parent.Equals(m_hostPfc));
+            Debug.Assert(parent.Equals(_hostPfc));
             return new PfcTransition(parent, name, description, guid);
         }
 
@@ -277,20 +292,26 @@ namespace Highpoint.Sage.Graphs.PFC
             {
                 guid = NextGuid();
             }
-            return NewLinkElement(m_hostPfc, name, guid, description);
+            return NewLinkElement(_hostPfc, name, guid, description);
         }
 
         public virtual IPfcLinkElement NewLinkElement(IProcedureFunctionChart parent, string name, Guid guid, string description)
         {
-            Debug.Assert(parent.Equals(m_hostPfc));
+            Debug.Assert(parent.Equals(_hostPfc));
             return new PfcLink(parent, name, description, guid);
         }
 
-        public virtual void Initialize(IPfcStepNode stepNode) { }
+        public virtual void Initialize(IPfcStepNode stepNode)
+        {
+        }
 
-        public virtual void Initialize(IPfcTransitionNode transitionNode) { }
+        public virtual void Initialize(IPfcTransitionNode transitionNode)
+        {
+        }
 
-        public virtual void Initialize(IPfcLinkElement linkElement) { }
+        public virtual void Initialize(IPfcLinkElement linkElement)
+        {
+        }
 
         /// <summary>
         /// Called when the loading of a new PFC has been completed.
@@ -305,9 +326,9 @@ namespace Highpoint.Sage.Graphs.PFC
                     int linkNum;
                     if (int.TryParse(link.Name.Substring(_linkPrefix.Length), out linkNum))
                     {
-                        if (linkNum > m_nextLinkNumber)
+                        if (linkNum > _nextLinkNumber)
                         {
-                            m_nextLinkNumber = linkNum + 1;
+                            _nextLinkNumber = linkNum + 1;
                         }
                     }
                 }
@@ -320,9 +341,9 @@ namespace Highpoint.Sage.Graphs.PFC
                     int stepNum;
                     if (int.TryParse(step.Name.Substring(_stepPrefix.Length), out stepNum))
                     {
-                        if (stepNum > m_nextStepNumber)
+                        if (stepNum > _nextStepNumber)
                         {
-                            m_nextStepNumber = stepNum + 1;
+                            _nextStepNumber = stepNum + 1;
                         }
                     }
                 }
@@ -335,9 +356,9 @@ namespace Highpoint.Sage.Graphs.PFC
                     int transitionNum;
                     if (int.TryParse(transition.Name.Substring(_transitionPrefix.Length), out transitionNum))
                     {
-                        if (transitionNum > m_nextTransitionNumber)
+                        if (transitionNum > _nextTransitionNumber)
                         {
-                            m_nextTransitionNumber = transitionNum + 1;
+                            _nextTransitionNumber = transitionNum + 1;
                         }
                     }
                 }
@@ -355,11 +376,11 @@ namespace Highpoint.Sage.Graphs.PFC
             switch (element.ElementType)
             {
                 case PfcElementType.Link:
-                    return m_linkCanonicality(element.Name);
+                    return _linkCanonicality(element.Name);
                 case PfcElementType.Transition:
-                    return m_transCanonicality(element.Name);
+                    return _transCanonicality(element.Name);
                 case PfcElementType.Step:
-                    return m_stepCanonicality(element.Name);
+                    return _stepCanonicality(element.Name);
                 default:
                     throw new ApplicationException("Element of type " + element.ElementType + " encountered but unknown.");
             }
@@ -377,11 +398,14 @@ namespace Highpoint.Sage.Graphs.PFC
 
             #region Retract Link Name
             List<string> linkNames = new List<string>();
-            m_hostPfc.Links.ForEach(delegate (IPfcLinkElement le) { linkNames.Add(le.Name); });
-            while (m_nextLinkNumber > 0 && !linkNames.Contains(_linkPrefix + string.Format(_linkTemplate, m_nextLinkNumber - 1)))
+            _hostPfc.Links.ForEach(delegate (IPfcLinkElement le)
             {
-                m_nextLinkNumber -= 1;
-                switch (m_nextLinkNumber)
+                linkNames.Add(le.Name);
+            });
+            while (_nextLinkNumber > 0 && !linkNames.Contains(_linkPrefix + string.Format(_linkTemplate, _nextLinkNumber - 1)))
+            {
+                _nextLinkNumber -= 1;
+                switch (_nextLinkNumber)
                 {
                     case 999:
                         _linkTemplate = "{0:D3}";
@@ -400,11 +424,14 @@ namespace Highpoint.Sage.Graphs.PFC
 
             #region Retract Step Name
             List<string> stepNames = new List<string>();
-            m_hostPfc.Steps.ForEach(delegate (IPfcStepNode sn) { stepNames.Add(sn.Name); });
-            while (m_nextStepNumber > 0 && !stepNames.Contains(_stepPrefix + string.Format(_stepTemplate, m_nextStepNumber - 1)))
+            _hostPfc.Steps.ForEach(delegate (IPfcStepNode sn)
             {
-                m_nextStepNumber -= 1;
-                switch (m_nextStepNumber)
+                stepNames.Add(sn.Name);
+            });
+            while (_nextStepNumber > 0 && !stepNames.Contains(_stepPrefix + string.Format(_stepTemplate, _nextStepNumber - 1)))
+            {
+                _nextStepNumber -= 1;
+                switch (_nextStepNumber)
                 {
                     case 999:
                         _stepTemplate = "{0:D3}";
@@ -423,11 +450,14 @@ namespace Highpoint.Sage.Graphs.PFC
 
             #region Retract Transition Name
             List<string> transitionNames = new List<string>();
-            m_hostPfc.Transitions.ForEach(delegate (IPfcTransitionNode tn) { transitionNames.Add(tn.Name); });
-            while (m_nextTransitionNumber > 0 && !transitionNames.Contains(_transitionPrefix + string.Format(_transitionTemplate, m_nextTransitionNumber - 1)))
+            _hostPfc.Transitions.ForEach(delegate (IPfcTransitionNode tn)
             {
-                m_nextTransitionNumber -= 1;
-                switch (m_nextTransitionNumber)
+                transitionNames.Add(tn.Name);
+            });
+            while (_nextTransitionNumber > 0 && !transitionNames.Contains(_transitionPrefix + string.Format(_transitionTemplate, _nextTransitionNumber - 1)))
+            {
+                _nextTransitionNumber -= 1;
+                switch (_nextTransitionNumber)
                 {
                     case 999:
                         _transitionTemplate = "{0:D3}";
