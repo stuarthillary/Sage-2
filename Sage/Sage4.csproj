@@ -397,6 +397,9 @@
     <Compile Include="Materials\Thermodynamics\ITemperatureController.cs" />
     <Compile Include="Materials\Thermodynamics\TemperatureControllerMode.cs" />
     <Compile Include="Materials\Thermodynamics\TemperatureRampRate.cs" />
+    <Compile Include="Materials\VaporPressure\IAntoinesCoefficients.cs" />
+    <Compile Include="Materials\VaporPressure\IAntoinesCoefficients3.cs" />
+    <Compile Include="Materials\VaporPressure\IAntoinesCoefficientsExt.cs" />
     <Compile Include="Materials\Vessel.cs" />
     <Compile Include="Graphs\CPMAnalyst.cs">
       <SubType>Code</SubType>
@@ -612,7 +615,7 @@
     <Compile Include="Materials\Thermodynamics\TemperatureController.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Materials\VaporPressure\IVaporPressureCoefficients.cs">
+    <Compile Include="Materials\VaporPressure\IEmissionCoefficients.cs">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Materials\VaporPressure\VaporPressureCalculator.cs">
