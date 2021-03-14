@@ -333,7 +333,14 @@
     <Compile Include="ItemBased\Connectors\BasicNonBufferedConnector.cs" />
     <Compile Include="ItemBased\Connectors\ConnectorType.cs" />
     <Compile Include="ItemBased\Connectors\IConnector.cs" />
-    <Compile Include="ItemBased\Interfaces.cs" />
+    <Compile Include="ItemBased\IInputPort.cs" />
+    <Compile Include="ItemBased\IPortOwner.cs" />
+    <Compile Include="ItemBased\IOutputPort.cs" />
+    <Compile Include="ItemBased\IPort.cs" />
+    <Compile Include="ItemBased\IPortChannelInfo.cs" />
+    <Compile Include="ItemBased\IPortEvents.cs" />
+    <Compile Include="ItemBased\IPortSelector.cs" />
+    <Compile Include="ItemBased\IPortSet.cs" />
     <Compile Include="ItemBased\Queues\ISelectionStrategy.cs" />
     <Compile Include="ItemBased\Queues\MultiQueueHead.cs" />
     <Compile Include="ItemBased\Queues\OldestShortestQueueStrategy.cs" />
