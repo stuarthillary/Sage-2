@@ -480,7 +480,7 @@
     <Compile Include="ItemBased\SourcesAndSinks\ItemSource.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="ItemBased\SplittersAndJoiners\BranchBlock.cs">
+    <Compile Include="ItemBased\SplittersAndJoiners\SimpleBranchBlock.cs">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="ItemBased\SplittersAndJoiners\Joiners.cs">
