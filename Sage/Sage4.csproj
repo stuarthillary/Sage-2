@@ -339,6 +339,8 @@
     <Compile Include="ItemBased\Queues\OldestShortestQueueStrategy.cs" />
     <Compile Include="ItemBased\Queues\ShortestQueueStrategy.cs" />
     <Compile Include="ItemBased\Servers\IServiceObject.cs" />
+    <Compile Include="ItemBased\SplittersAndJoiners\IJoiner.cs" />
+    <Compile Include="ItemBased\SplittersAndJoiners\PushJoiner.cs" />
     <Compile Include="ItemBased\SplittersAndJoiners\SimpleDelegatedTwoChoiceBranchBlock.cs" />
     <Compile Include="ItemBased\SplittersAndJoiners\SimpleStochasticTwoChoiceBranchBlock.cs" />
     <Compile Include="ItemBased\SplittersAndJoiners\SimpleTwoChoiceBranchBlock.cs" />
@@ -483,7 +485,7 @@
     <Compile Include="ItemBased\SplittersAndJoiners\SimpleBranchBlock.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="ItemBased\SplittersAndJoiners\Joiners.cs">
+    <Compile Include="ItemBased\SplittersAndJoiners\Joiner.cs">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="ItemBased\SplittersAndJoiners\Splitters.cs">
