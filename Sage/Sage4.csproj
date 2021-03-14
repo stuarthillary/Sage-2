@@ -394,6 +394,9 @@
     <Compile Include="Materials\Emissions\VacuumDistillationModel.cs" />
     <Compile Include="Materials\Emissions\VacuumDistillationWScrubberModel.cs" />
     <Compile Include="Materials\Emissions\VacuumDryModel.cs" />
+    <Compile Include="Materials\Thermodynamics\ITemperatureController.cs" />
+    <Compile Include="Materials\Thermodynamics\TemperatureControllerMode.cs" />
+    <Compile Include="Materials\Thermodynamics\TemperatureRampRate.cs" />
     <Compile Include="Materials\Vessel.cs" />
     <Compile Include="Graphs\CPMAnalyst.cs">
       <SubType>Code</SubType>
