@@ -175,6 +175,7 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Core\DetachableEvent.cs" />
+    <Compile Include="Core\DetachableEventSynchronizer.cs" />
     <Compile Include="Core\EnumStateMachine.cs" />
     <Compile Include="Core\ExceptionHandler.cs" />
     <Compile Include="Core\ExecController.cs" />
@@ -228,6 +229,7 @@
     <Compile Include="Core\INotification.cs" />
     <Compile Include="Core\InvalidTransitionHandler.cs" />
     <Compile Include="Core\IResettable.cs" />
+    <Compile Include="Core\ISynchChannel.cs" />
     <Compile Include="Core\ITransitionFailureReason.cs" />
     <Compile Include="Core\ITransitionHandler.cs" />
     <Compile Include="Core\MergedTransitionHandler.cs" />
@@ -254,7 +256,7 @@
     <Compile Include="Core\StateMachine.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Core\Synchronizers.cs">
+    <Compile Include="Core\ISynchronizer.cs">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Core\TaskGraphVolatileAttribute.cs" />
