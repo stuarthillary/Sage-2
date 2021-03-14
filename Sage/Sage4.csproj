@@ -400,6 +400,7 @@
     <Compile Include="Materials\VaporPressure\IAntoinesCoefficients.cs" />
     <Compile Include="Materials\VaporPressure\IAntoinesCoefficients3.cs" />
     <Compile Include="Materials\VaporPressure\IAntoinesCoefficientsExt.cs" />
+    <Compile Include="Materials\VaporPressure\VaporPressureException.cs" />
     <Compile Include="Materials\Vessel.cs" />
     <Compile Include="Graphs\CPMAnalyst.cs">
       <SubType>Code</SubType>
