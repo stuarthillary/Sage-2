@@ -201,6 +201,7 @@
     <Compile Include="Core\IHasIdentity.cs" />
     <Compile Include="Core\IHasName.cs" />
     <Compile Include="Core\IHasParameters.cs" />
+    <Compile Include="Core\IInitializationManager.cs" />
     <Compile Include="Core\IModel.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -209,12 +210,14 @@
     </Compile>
     <Compile Include="Core\IModelService.cs" />
     <Compile Include="Core\IMOHelper.cs" />
+    <Compile Include="Core\InitializationException.cs" />
     <Compile Include="Core\InitializationManager.cs">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Core\InitializerArgAttribute.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Core\InitializerAttribute.cs" />
     <Compile Include="Core\IResettable.cs" />
     <Compile Include="Core\Metronomes.cs">
       <SubType>Code</SubType>
