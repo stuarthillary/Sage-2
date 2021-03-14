@@ -333,7 +333,11 @@
     <Compile Include="ItemBased\Connectors\BasicNonBufferedConnector.cs" />
     <Compile Include="ItemBased\Connectors\ConnectorType.cs" />
     <Compile Include="ItemBased\Connectors\IConnector.cs" />
+    <Compile Include="ItemBased\GeneralPortChannelInfo.cs" />
+    <Compile Include="ItemBased\GenericPort.cs" />
     <Compile Include="ItemBased\IInputPort.cs" />
+    <Compile Include="ItemBased\InputPortManager.cs" />
+    <Compile Include="ItemBased\InputPortProxy.cs" />
     <Compile Include="ItemBased\IPeriodicity.cs" />
     <Compile Include="ItemBased\IPortOwner.cs" />
     <Compile Include="ItemBased\IOutputPort.cs" />
@@ -342,11 +346,19 @@
     <Compile Include="ItemBased\IPortEvents.cs" />
     <Compile Include="ItemBased\IPortSelector.cs" />
     <Compile Include="ItemBased\IPortSet.cs" />
+    <Compile Include="ItemBased\OutputPortManager.cs" />
+    <Compile Include="ItemBased\OutputPortProxy.cs" />
+    <Compile Include="ItemBased\PortDirection.cs" />
+    <Compile Include="ItemBased\PortManagementFacade.cs" />
+    <Compile Include="ItemBased\PortManager.cs" />
+    <Compile Include="ItemBased\PortOwnerProxy.cs" />
     <Compile Include="ItemBased\Queues\ISelectionStrategy.cs" />
     <Compile Include="ItemBased\Queues\MultiQueueHead.cs" />
     <Compile Include="ItemBased\Queues\OldestShortestQueueStrategy.cs" />
     <Compile Include="ItemBased\Queues\ShortestQueueStrategy.cs" />
     <Compile Include="ItemBased\Servers\IServiceObject.cs" />
+    <Compile Include="ItemBased\SimpleInputPort.cs" />
+    <Compile Include="ItemBased\SimpleOutputPort.cs" />
     <Compile Include="ItemBased\SplittersAndJoiners\IJoiner.cs" />
     <Compile Include="ItemBased\SplittersAndJoiners\ISplitter.cs" />
     <Compile Include="ItemBased\SplittersAndJoiners\PushJoiner.cs" />
@@ -447,7 +459,7 @@
     <Compile Include="ItemBased\Periodicity.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="ItemBased\Ports.cs">
+    <Compile Include="ItemBased\PortSet.cs">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="ItemBased\Pulses.cs">
