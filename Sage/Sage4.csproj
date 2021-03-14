@@ -220,9 +220,10 @@
     </Compile>
     <Compile Include="Core\InitializerAttribute.cs" />
     <Compile Include="Core\IResettable.cs" />
-    <Compile Include="Core\Metronomes.cs">
+    <Compile Include="Core\MetronomeBase.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Core\SimpleMetronome.cs" />
     <Compile Include="Core\Model.cs">
       <SubType>Code</SubType>
     </Compile>

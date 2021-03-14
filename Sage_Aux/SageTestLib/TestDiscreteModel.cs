@@ -30,7 +30,7 @@ namespace Highpoint.Sage.SimCore {
 		public void TestDiscreteModel(){
             Model model = new Model();
 
-			Metronome_Simple sm = Metronome_Simple.CreateMetronome(model.Executive,DateTime.Now, DateTime.Now+TimeSpan.FromHours(5),_timedifference);
+			SimpleMetronome sm = SimpleMetronome.CreateMetronome(model.Executive,DateTime.Now, DateTime.Now+TimeSpan.FromHours(5),_timedifference);
 			sm.TickEvent += new ExecEventReceiver(sm_TickEvent);
 
 			model.Start();

@@ -623,7 +623,7 @@ metronome to it with a period of 9000 minutes. Every 9000 minutes, the
                 DateTime startAt = DateTime.Parse("Thu, 10 Jul 2003 03:51:21");
                 DateTime finishAfter = DateTime.Parse("Wed 15 Dec 2004 19:22:47");
                 TimeSpan period = TimeSpan.FromMinutes(9000.0);
-                Metronome_Simple metronome = Metronome_Simple.CreateMetronome(exec, startAt, finishAfter, period);
+                SimpleMetronome metronome = SimpleMetronome.CreateMetronome(exec, startAt, finishAfter, period);
 
                 metronome.TickEvent += WriteIt;
 
@@ -649,7 +649,7 @@ for example, be tied to a button-press in the GUI.")]
                 DateTime startAt = DateTime.Parse("Fri, 15 Jul 2016 00:00:00");
                 DateTime finishAfter = DateTime.Parse("Fri, 15 Jul 2016 23:59:59");
                 TimeSpan period = TimeSpan.FromMinutes(60);
-                Metronome_Simple metronome = Metronome_Simple.CreateMetronome(exec, startAt, finishAfter, period);
+                SimpleMetronome metronome = SimpleMetronome.CreateMetronome(exec, startAt, finishAfter, period);
 
                 metronome.TickEvent += WriteIt;
 
@@ -698,7 +698,7 @@ state every five milliseconds of simulation time and firese a ""Render"" event
                 DateTime startAt = DateTime.Parse("Fri, 15 Jul 2016 00:00:00");
                 DateTime finishAfter = DateTime.Parse("Fri, 15 Jul 2016 00:09:59");
                 TimeSpan period = TimeSpan.FromSeconds(.005);
-                Metronome_Simple metronome = Metronome_Simple.CreateMetronome(exec, startAt, finishAfter, period);
+                SimpleMetronome metronome = SimpleMetronome.CreateMetronome(exec, startAt, finishAfter, period);
                 metronome.TickEvent += UpdateState;
 
                 #endregion
