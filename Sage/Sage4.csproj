@@ -334,6 +334,7 @@
     <Compile Include="ItemBased\Connectors\ConnectorType.cs" />
     <Compile Include="ItemBased\Connectors\IConnector.cs" />
     <Compile Include="ItemBased\IInputPort.cs" />
+    <Compile Include="ItemBased\IPeriodicity.cs" />
     <Compile Include="ItemBased\IPortOwner.cs" />
     <Compile Include="ItemBased\IOutputPort.cs" />
     <Compile Include="ItemBased\IPort.cs" />
@@ -443,7 +444,7 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="ItemBased\IServiceItem.cs" />
-    <Compile Include="ItemBased\Periodicities.cs">
+    <Compile Include="ItemBased\Periodicity.cs">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="ItemBased\Ports.cs">

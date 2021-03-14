@@ -22,8 +22,13 @@ using Highpoint.Sage.SimCore;
 /// means you have at your disposal for communicating information between participants in
 /// your simulation.
 /// </summary>
-namespace Highpoint.Sage.ItemBased {
-    interface IServiceItem {
-        SmartPropertyBag Properties { get; }
+namespace Highpoint.Sage.ItemBased
+{
+    interface IServiceItem
+    {
+        SmartPropertyBag Properties
+        {
+            get;
+        }
     }
 }
