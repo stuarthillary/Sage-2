@@ -335,6 +335,8 @@
     <Compile Include="ItemBased\Connectors\IConnector.cs" />
     <Compile Include="ItemBased\GeneralPortChannelInfo.cs" />
     <Compile Include="ItemBased\GenericPort.cs" />
+    <Compile Include="ItemBased\IAddsTagsToServiceObjects.cs" />
+    <Compile Include="ItemBased\IChangesTagsOnServiceObjects.cs" />
     <Compile Include="ItemBased\IInputPort.cs" />
     <Compile Include="ItemBased\InputPortManager.cs" />
     <Compile Include="ItemBased\InputPortProxy.cs" />
@@ -347,6 +349,10 @@
     <Compile Include="ItemBased\IPortSelector.cs" />
     <Compile Include="ItemBased\IPortSet.cs" />
     <Compile Include="ItemBased\IPulseSource.cs" />
+    <Compile Include="ItemBased\IReadOnlyTag.cs" />
+    <Compile Include="ItemBased\ITag.cs" />
+    <Compile Include="ItemBased\ITagHolder.cs" />
+    <Compile Include="ItemBased\ITagType.cs" />
     <Compile Include="ItemBased\OutputPortManager.cs" />
     <Compile Include="ItemBased\OutputPortProxy.cs" />
     <Compile Include="ItemBased\PortDirection.cs" />
@@ -367,6 +373,9 @@
     <Compile Include="ItemBased\SplittersAndJoiners\SimpleStochasticTwoChoiceBranchBlock.cs" />
     <Compile Include="ItemBased\SplittersAndJoiners\SimpleTwoChoiceBranchBlock.cs" />
     <Compile Include="ItemBased\SplittersAndJoiners\SimultaneousPushSplitter.cs" />
+    <Compile Include="ItemBased\TagComparers.cs" />
+    <Compile Include="ItemBased\TagList.cs" />
+    <Compile Include="ItemBased\TagType.cs" />
     <Compile Include="Materials\Vessel.cs" />
     <Compile Include="Graphs\CPMAnalyst.cs">
       <SubType>Code</SubType>
@@ -514,7 +523,7 @@
     <Compile Include="ItemBased\SplittersAndJoiners\Splitter.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="ItemBased\Tags.cs" />
+    <Compile Include="ItemBased\Tag.cs" />
     <Compile Include="ItemBased\Ticker.cs">
       <SubType>Code</SubType>
     </Compile>
