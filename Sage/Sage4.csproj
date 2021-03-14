@@ -339,6 +339,9 @@
     <Compile Include="ItemBased\Queues\OldestShortestQueueStrategy.cs" />
     <Compile Include="ItemBased\Queues\ShortestQueueStrategy.cs" />
     <Compile Include="ItemBased\Servers\IServiceObject.cs" />
+    <Compile Include="ItemBased\SplittersAndJoiners\SimpleDelegatedTwoChoiceBranchBlock.cs" />
+    <Compile Include="ItemBased\SplittersAndJoiners\SimpleStochasticTwoChoiceBranchBlock.cs" />
+    <Compile Include="ItemBased\SplittersAndJoiners\SimpleTwoChoiceBranchBlock.cs" />
     <Compile Include="Materials\Vessel.cs" />
     <Compile Include="Graphs\CPMAnalyst.cs">
       <SubType>Code</SubType>
