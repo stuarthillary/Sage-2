@@ -170,6 +170,7 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Core\CausalityException.cs" />
+    <Compile Include="Core\DefaultModelStates.cs" />
     <Compile Include="Core\DefaultValueAttribute.cs">
       <SubType>Code</SubType>
     </Compile>
