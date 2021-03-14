@@ -1,10 +1,11 @@
 /* This source code licensed under the GNU Affero General Public License */
-using System;
-using System.Collections.Generic;
 using Highpoint.Sage.Materials.Chemistry;
 using Highpoint.Sage.SimCore;
+using System;
+using System.Collections.Generic;
 
-namespace Highpoint.Sage.Materials {
+namespace Highpoint.Sage.Materials
+{
 
     /// <summary>
     /// A Dispensary holds a Mixture that supports infusion of materials (i.e. mixtures or substances) and
@@ -16,7 +17,8 @@ namespace Highpoint.Sage.Materials {
     /// unblocked later when there *are* 100 kg. If there are never 100 kg, though, the consumer will never
     /// unblock.
     /// </summary>
-    public class Dispensary {
+    public class Dispensary
+    {
 
 
         /// <summary>
@@ -24,94 +26,147 @@ namespace Highpoint.Sage.Materials {
         /// The dummy idec, though, acts as though (if there isn't actually a real one) the waiting getter or putter
         /// has, or needs, zero kilograms.
         /// </summary>
-        private class DummyIdec : IDetachableEventController {
+        private class DummyIdec : IDetachableEventController
+        {
 
             #region IDetachableEventController Members
 
-            public void Suspend() {}
+            public void Suspend()
+            {
+            }
 
-            public void Resume() {}
+            public void Resume()
+            {
+            }
 
-            public void Resume(double overridePriority) { throw new Exception("The method or operation is not implemented."); }
-
-            public void SuspendUntil(DateTime when) { throw new Exception("The method or operation is not implemented."); }
-
-            public System.Diagnostics.StackTrace SuspendedStackTrace { get { throw new Exception("The method or operation is not implemented."); } }
-
-            public bool IsWaiting() { throw new Exception("The method or operation is not implemented."); }
-
-            public IExecEvent RootEvent { get { throw new Exception("The method or operation is not implemented."); } }
-
-            public void SetAbortHandler(DetachableEventAbortHandler handler, params object[] args) {
+            public void Resume(double overridePriority)
+            {
                 throw new Exception("The method or operation is not implemented.");
             }
 
-            public void ClearAbortHandler() { throw new Exception("The method or operation is not implemented."); }
+            public void SuspendUntil(DateTime when)
+            {
+                throw new Exception("The method or operation is not implemented.");
+            }
 
-            public void FireAbortHandler() { throw new Exception("The method or operation is not implemented."); }
+            public System.Diagnostics.StackTrace SuspendedStackTrace
+            {
+                get
+                {
+                    throw new Exception("The method or operation is not implemented.");
+                }
+            }
 
-            public void SuspendFor(TimeSpan howLong) { throw new Exception("The method or operation is not implemented."); }
+            public bool IsWaiting()
+            {
+                throw new Exception("The method or operation is not implemented.");
+            }
+
+            public IExecEvent RootEvent
+            {
+                get
+                {
+                    throw new Exception("The method or operation is not implemented.");
+                }
+            }
+
+            public void SetAbortHandler(DetachableEventAbortHandler handler, params object[] args)
+            {
+                throw new Exception("The method or operation is not implemented.");
+            }
+
+            public void ClearAbortHandler()
+            {
+                throw new Exception("The method or operation is not implemented.");
+            }
+
+            public void FireAbortHandler()
+            {
+                throw new Exception("The method or operation is not implemented.");
+            }
+
+            public void SuspendFor(TimeSpan howLong)
+            {
+                throw new Exception("The method or operation is not implemented.");
+            }
 
             #endregion
         }
 
         #region Private Fields
-        private static readonly IDetachableEventController s_dummyIdec = new DummyIdec();
-        private IDetachableEventController m_getProcessor;
-        private readonly List<IDetachableEventController> m_waiters;
-        private readonly IExecutive m_executive;
-        private long m_getFlushEventId = -1;
+        private static readonly IDetachableEventController dummyIdec = new DummyIdec();
+        private IDetachableEventController _getProcessor;
+        private readonly List<IDetachableEventController> _waiters;
+        private readonly IExecutive _executive;
+        private long _getFlushEventId = -1;
         #endregion Private Fields
 
         public Dispensary(IExecutive executive) : this(executive, new Mixture()) { }
 
-        public Dispensary(IExecutive executive, Mixture mixture) {
-            m_executive = executive;
-            m_getProcessor = s_dummyIdec;
-            m_waiters = new List<IDetachableEventController>();
+        public Dispensary(IExecutive executive, Mixture mixture)
+        {
+            _executive = executive;
+            _getProcessor = dummyIdec;
+            _waiters = new List<IDetachableEventController>();
             PeekMixture = mixture;
-            executive.ExecutiveStarted += delegate { m_waiters.Clear(); PeekMixture.Clear(); };
+            executive.ExecutiveStarted += delegate
+            {
+                _waiters.Clear();
+                PeekMixture.Clear();
+            };
         }
 
-        public void Put(IMaterial material) {
+        public void Put(IMaterial material)
+        {
             PeekMixture.AddMaterial(material);
             //m_executive.CurrentEventController.SuspendUntil(m_executive.Now + duration);
-            if (m_waiters.Count > 0) {
+            if (_waiters.Count > 0)
+            {
                 ScheduleProcessingOfGetters();
             }
         }
 
-        private void ScheduleProcessingOfGetters() {
-            if (m_getFlushEventId == -1) {
-                m_getFlushEventId = m_executive.RequestEvent(ProcessGetters, m_executive.Now, 0.0, null,ExecEventType.Detachable);
+        private void ScheduleProcessingOfGetters()
+        {
+            if (_getFlushEventId == -1)
+            {
+                _getFlushEventId = _executive.RequestEvent(ProcessGetters, _executive.Now, 0.0, null, ExecEventType.Detachable);
             }
         }
 
-        private void ProcessGetters(IExecutive exec, object userData) {
-            m_getProcessor = exec.CurrentEventController;
+        private void ProcessGetters(IExecutive exec, object userData)
+        {
+            _getProcessor = exec.CurrentEventController;
             IDetachableEventController waiter = null;
-            while (m_waiters.Count > 0 && m_waiters[0] != waiter) {
-                waiter = m_waiters[0];
+            while (_waiters.Count > 0 && _waiters[0] != waiter)
+            {
+                waiter = _waiters[0];
                 waiter.Resume();
-                m_getProcessor.Suspend();
+                _getProcessor.Suspend();
             }
-            m_getFlushEventId = -1;
-            m_getProcessor = s_dummyIdec;
+            _getFlushEventId = -1;
+            _getProcessor = dummyIdec;
         }
 
-        public Mixture Get(double kilograms) {
-            if (m_waiters.Count > 0 || PeekMixture.Mass < kilograms ) {
-                m_waiters.Add(m_executive.CurrentEventController);
-                do {
-                    m_getProcessor.Resume();
-                    m_executive.CurrentEventController.Suspend();
+        public Mixture Get(double kilograms)
+        {
+            if (_waiters.Count > 0 || PeekMixture.Mass < kilograms)
+            {
+                _waiters.Add(_executive.CurrentEventController);
+                do
+                {
+                    _getProcessor.Resume();
+                    _executive.CurrentEventController.Suspend();
                 } while (PeekMixture.Mass < kilograms);
-                m_waiters.RemoveAt(0);
-                m_getProcessor.Resume();
+                _waiters.RemoveAt(0);
+                _getProcessor.Resume();
             }
             return (Mixture)PeekMixture.RemoveMaterial(kilograms);
         }
 
-        public Mixture PeekMixture { get; }
+        public Mixture PeekMixture
+        {
+            get;
+        }
     }
 }
