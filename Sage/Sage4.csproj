@@ -193,7 +193,10 @@
     <Compile Include="Core\ExecutiveFastLight.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Core\GenericModelError.cs" />
+    <Compile Include="Core\GenericModelWarning.cs" />
     <Compile Include="Core\IDetachableEventController.cs" />
+    <Compile Include="Core\IErrorHandler.cs" />
     <Compile Include="Core\IExecEvent.cs" />
     <Compile Include="Core\IExecEventSelector.cs" />
     <Compile Include="Core\IExecutive.cs">
@@ -210,6 +213,7 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Core\IModelService.cs" />
+    <Compile Include="Core\IModelWarning.cs" />
     <Compile Include="Core\IMOHelper.cs" />
     <Compile Include="Core\InitializationException.cs" />
     <Compile Include="Core\InitializationManager.cs">
@@ -220,10 +224,12 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Core\InitializerAttribute.cs" />
+    <Compile Include="Core\INotification.cs" />
     <Compile Include="Core\IResettable.cs" />
     <Compile Include="Core\MetronomeBase.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Core\ModelExceptionError.cs" />
     <Compile Include="Core\SimpleMetronome.cs" />
     <Compile Include="Core\Model.cs">
       <SubType>Code</SubType>
@@ -231,7 +237,7 @@
     <Compile Include="Core\ModelConfig.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Core\ModelError.cs">
+    <Compile Include="Core\IModelError.cs">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Core\ModelObjectDictionary.cs">
