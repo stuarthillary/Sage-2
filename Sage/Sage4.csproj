@@ -330,6 +330,9 @@
     <Compile Include="Graphs\UtilityReferenceInUseException.cs" />
     <Compile Include="Graphs\Validity.cs" />
     <Compile Include="Graphs\VertexSynchronizer.cs" />
+    <Compile Include="ItemBased\Connectors\BasicNonBufferedConnector.cs" />
+    <Compile Include="ItemBased\Connectors\ConnectorType.cs" />
+    <Compile Include="ItemBased\Connectors\IConnector.cs" />
     <Compile Include="ItemBased\Interfaces.cs" />
     <Compile Include="Materials\Vessel.cs" />
     <Compile Include="Graphs\CPMAnalyst.cs">
