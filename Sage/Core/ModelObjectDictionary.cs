@@ -1,11 +1,12 @@
 /* This source code licensed under the GNU Affero General Public License */
+using Highpoint.Sage.Utility;
 using System;
 using System.Collections;
-using _Debug = System.Diagnostics.Debug;
-using Highpoint.Sage.Utility;
 using System.Collections.Generic;
+using _Debug = System.Diagnostics.Debug;
 
-namespace Highpoint.Sage.SimCore {
+namespace Highpoint.Sage.SimCore
+{
 
     /// <summary>
     /// An event that notifies listeners of something happening to an IModelObject.
@@ -30,10 +31,11 @@ namespace Highpoint.Sage.SimCore {
     /// to track the object. Thus, as soon as no one else has a reference to the object, it 
     /// will be cleaned out of this dictionary as soon as the next Garbage Collection sweep.
     /// </summary>
-    public class ModelObjectDictionary : IDictionary {
+    public class ModelObjectDictionary : IDictionary
+    {
 
         #region private fields
-        private IDictionary m_dictionary;
+        private readonly IDictionary _dictionary;
         private static bool _bDumpedBanner = false;
         private static Guid _dumpGuid = Guid.Empty;
         #endregion
@@ -55,11 +57,15 @@ namespace Highpoint.Sage.SimCore {
         /// to maintain connections to the objects it contains, but it also means that the
         /// developer is responsible for explicitly removing objects from this dictionaary if
         /// they are no longer desired.</param>
-        public ModelObjectDictionary(bool retainHardReference) {
-            if (retainHardReference) {
-                m_dictionary = new Hashtable();
-            } else {
-                m_dictionary = new WeakHashtable();
+        public ModelObjectDictionary(bool retainHardReference)
+        {
+            if (retainHardReference)
+            {
+                _dictionary = new Hashtable();
+            }
+            else
+            {
+                _dictionary = new WeakHashtable();
             }
         }
 
@@ -69,20 +75,22 @@ namespace Highpoint.Sage.SimCore {
         /// </summary>
         /// <param name="keyForCurrentEntry">The key for current entry.</param>
         /// <param name="newEntryToReplaceIt">The new entry to replace it.</param>
-        private void Delete(Guid keyForCurrentEntry, IModelObject newEntryToReplaceIt) {
-            IHasIdentity imo = (IHasIdentity)m_dictionary[keyForCurrentEntry];
-            m_dictionary.Remove(keyForCurrentEntry);
+        private void Delete(Guid keyForCurrentEntry, IModelObject newEntryToReplaceIt)
+        {
+            IHasIdentity imo = (IHasIdentity)_dictionary[keyForCurrentEntry];
+            _dictionary.Remove(keyForCurrentEntry);
             string oldOne = imo.Name;
-            string newOne = ( (IHasIdentity)newEntryToReplaceIt ).Name;
+            string newOne = ((IHasIdentity)newEntryToReplaceIt).Name;
             // TODO: Add this to an Errors & Warnings collection instead of dumping it to Trace.
-            if (!_bDumpedBanner || imo.Guid.Equals(_dumpGuid)) {
+            if (!_bDumpedBanner || imo.Guid.Equals(_dumpGuid))
+            {
                 _dumpGuid = imo.Guid;
                 _Debug.WriteLine(s_banner_Message);
                 Exception e = new Exception();
                 System.Diagnostics.StackTrace st = new System.Diagnostics.StackTrace(true);
                 _Debug.WriteLine("ModelObjectDictionary just removed " + oldOne + ", under Guid "
                     + keyForCurrentEntry + " to make way for " + newOne + " under Guid "
-                    + ( (IHasIdentity)newEntryToReplaceIt ).Guid + ".\r\n"
+                    + ((IHasIdentity)newEntryToReplaceIt).Guid + ".\r\n"
                     + "\tThe offending code was at:" + st);
                 _bDumpedBanner = true;
             }
@@ -93,9 +101,12 @@ namespace Highpoint.Sage.SimCore {
         /// </summary>
         /// <param name="predicate">The predicate.</param>
         /// <returns></returns>
-        public IEnumerable<IModelObject> FindAll(Predicate<IModelObject> predicate) {
-            foreach (IModelObject obj in m_dictionary.Values) {
-                if (predicate(obj)) {
+        public IEnumerable<IModelObject> FindAll(Predicate<IModelObject> predicate)
+        {
+            foreach (IModelObject obj in _dictionary.Values)
+            {
+                if (predicate(obj))
+                {
                     yield return obj;
                 }
             }
@@ -106,9 +117,12 @@ namespace Highpoint.Sage.SimCore {
         /// </summary>
         /// <param name="mustbeExactTypeMatch">if set to <c>true</c>, a returned IModelObject mustbe exact type match to the provided type.</param>
         /// <returns></returns>
-        public IEnumerable<T> FindByType<T>(bool mustbeExactTypeMatch) {
-            foreach (IModelObject obj in m_dictionary.Values) {
-                if (( mustbeExactTypeMatch && typeof(T).Equals(obj.GetType()) ) || typeof(T).IsAssignableFrom(obj.GetType())) {
+        public IEnumerable<T> FindByType<T>(bool mustbeExactTypeMatch)
+        {
+            foreach (IModelObject obj in _dictionary.Values)
+            {
+                if ((mustbeExactTypeMatch && typeof(T).Equals(obj.GetType())) || typeof(T).IsAssignableFrom(obj.GetType()))
+                {
                     yield return (T)obj;
                 }
             }
@@ -137,9 +151,11 @@ namespace Highpoint.Sage.SimCore {
         /// </summary>
         /// <value></value>
         /// <returns>true if the <see cref="T:Highpoint.Sage.SimCore.ModelObjectDictionary"></see> object is read-only; otherwise, false.</returns>
-        public bool IsReadOnly {
-            get {
-                return m_dictionary.IsReadOnly;
+        public bool IsReadOnly
+        {
+            get
+            {
+                return _dictionary.IsReadOnly;
             }
         }
 
@@ -149,8 +165,9 @@ namespace Highpoint.Sage.SimCore {
         /// <returns>
         /// An <see cref="T:Highpoint.Sage.SimCore.ModelObjectDictionaryEnumerator"></see> object for the <see cref="T:Highpoint.Sage.SimCore.ModelObjectDictionary"></see> object.
         /// </returns>
-        public IDictionaryEnumerator GetEnumerator() {
-            return m_dictionary.GetEnumerator();
+        public IDictionaryEnumerator GetEnumerator()
+        {
+            return _dictionary.GetEnumerator();
         }
 
         /// <summary>
@@ -159,16 +176,20 @@ namespace Highpoint.Sage.SimCore {
         /// key is considered illegal. All other Guids, if not contained in the dictionary, will
         /// result in the firing of the UnknownModelObjectRequested event.
         /// </summary>
-        public IModelObject this[Guid key] {
-            get {
-                object obj = m_dictionary[key];
-                if (obj == null && !( (Guid)key ).Equals(Guid.Empty) && UnknownModelObjectRequested != null) {
+        public IModelObject this[Guid key]
+        {
+            get
+            {
+                object obj = _dictionary[key];
+                if (obj == null && !((Guid)key).Equals(Guid.Empty) && UnknownModelObjectRequested != null)
+                {
                     UnknownModelObjectRequested((Guid)key);
                 }
                 return (IModelObject)obj;
             }
-            set {
-                if (m_dictionary.Contains(key))
+            set
+            {
+                if (_dictionary.Contains(key))
                     Delete(key, value);
                 Add(key, value);
             }
@@ -180,12 +201,15 @@ namespace Highpoint.Sage.SimCore {
         /// key is considered illegal. All other Guids, if not contained in the dictionary, will
         /// result in the firing of the UnknownModelObjectRequested event.
         /// </summary>
-        public object this[object key] {
-            get {
+        public object this[object key]
+        {
+            get
+            {
                 _Debug.Assert(key is Guid);
                 return this[(Guid)key];
             }
-            set {
+            set
+            {
                 _Debug.Assert(key is Guid);
                 _Debug.Assert(value is IModelObject);
                 this[(Guid)key] = (IModelObject)value;
@@ -198,11 +222,14 @@ namespace Highpoint.Sage.SimCore {
         /// <param name="key">The key of the element to remove.</param>
         /// <exception cref="T:System.NotSupportedException">The <see cref="T:Highpoint.Sage.SimCore.ModelObjectDictionary"></see> object is read-only.-or- The <see cref="T:Highpoint.Sage.SimCore.ModelObjectDictionary"></see> has a fixed size. </exception>
         /// <exception cref="T:System.ArgumentNullException">key is null. </exception>
-        public void Remove(Guid key) {
-            if (m_dictionary.Contains(key)) {
-                IModelObject imo = (IModelObject)m_dictionary[key];
-                m_dictionary.Remove(key);
-                if (ExistingModelObjectRemoved != null) {
+        public void Remove(Guid key)
+        {
+            if (_dictionary.Contains(key))
+            {
+                IModelObject imo = (IModelObject)_dictionary[key];
+                _dictionary.Remove(key);
+                if (ExistingModelObjectRemoved != null)
+                {
                     ExistingModelObjectRemoved(imo);
                 }
             }
@@ -214,7 +241,8 @@ namespace Highpoint.Sage.SimCore {
         /// <param name="key">The key of the element to remove.</param>
         /// <exception cref="T:System.NotSupportedException">The <see cref="T:Highpoint.Sage.SimCore.ModelObjectDictionary"></see> object is read-only.-or- The <see cref="T:Highpoint.Sage.SimCore.ModelObjectDictionary"></see> has a fixed size. </exception>
         /// <exception cref="T:System.ArgumentNullException">key is null. </exception>
-        public void Remove(object key) {
+        public void Remove(object key)
+        {
             _Debug.Assert(key is Guid);
             Remove((Guid)key);
         }
@@ -227,8 +255,9 @@ namespace Highpoint.Sage.SimCore {
         /// true if the <see cref="T:Highpoint.Sage.SimCore.ModelObjectDictionary"></see> contains an element with the key; otherwise, false.
         /// </returns>
         /// <exception cref="T:System.ArgumentNullException">key is null. </exception>
-        public bool Contains(Guid key) {
-            return m_dictionary.Contains(key);
+        public bool Contains(Guid key)
+        {
+            return _dictionary.Contains(key);
         }
 
         /// <summary>
@@ -239,7 +268,8 @@ namespace Highpoint.Sage.SimCore {
         /// true if the <see cref="T:Highpoint.Sage.SimCore.ModelObjectDictionary"></see> contains an element with the key; otherwise, false.
         /// </returns>
         /// <exception cref="T:System.ArgumentNullException">key is null. </exception>
-        public bool Contains(object key) {
+        public bool Contains(object key)
+        {
             _Debug.Assert(key is Guid);
             return Contains((Guid)key);
         }
@@ -248,8 +278,9 @@ namespace Highpoint.Sage.SimCore {
         /// Removes all elements from the <see cref="T:Highpoint.Sage.SimCore.ModelObjectDictionary"></see> object.
         /// </summary>
         /// <exception cref="T:System.NotSupportedException">The <see cref="T:Highpoint.Sage.SimCore.ModelObjectDictionary"></see> object is read-only. </exception>
-        public void Clear() {
-            m_dictionary.Clear();
+        public void Clear()
+        {
+            _dictionary.Clear();
         }
 
         /// <summary>
@@ -257,9 +288,11 @@ namespace Highpoint.Sage.SimCore {
         /// </summary>
         /// <value></value>
         /// <returns>An <see cref="T:Highpoint.Sage.SimCore.ModelObjectDictionary"></see> object containing the values in the <see cref="T:Highpoint.Sage.SimCore.ModelObjectDictionary"></see> object.</returns>
-        public ICollection Values {
-            get {
-                return m_dictionary.Values;
+        public ICollection Values
+        {
+            get
+            {
+                return _dictionary.Values;
             }
         }
 
@@ -271,11 +304,13 @@ namespace Highpoint.Sage.SimCore {
         /// <exception cref="T:System.ArgumentException">An element with the same key already exists in the <see cref="T:Highpoint.Sage.SimCore.ModelObjectDictionary"></see> object. </exception>
         /// <exception cref="T:System.ArgumentNullException">key is null. </exception>
         /// <exception cref="T:System.NotSupportedException">The <see cref="T:Highpoint.Sage.SimCore.ModelObjectDictionary"></see> is read-only.-or- The <see cref="T:Highpoint.Sage.SimCore.ModelObjectDictionary"></see> has a fixed size. </exception>
-        public void Add(Guid key, IModelObject value) {
-            if (m_dictionary.Contains(key)) {
+        public void Add(Guid key, IModelObject value)
+        {
+            if (_dictionary.Contains(key))
+            {
                 Delete(key, value);
             }
-            m_dictionary.Add(key, value);
+            _dictionary.Add(key, value);
             if (NewModelObjectAdded != null)
                 NewModelObjectAdded((IModelObject)value);
         }
@@ -288,7 +323,8 @@ namespace Highpoint.Sage.SimCore {
         /// <exception cref="T:System.ArgumentException">An element with the same key already exists in the <see cref="T:Highpoint.Sage.SimCore.ModelObjectDictionary"></see> object. </exception>
         /// <exception cref="T:System.ArgumentNullException">key is null. </exception>
         /// <exception cref="T:System.NotSupportedException">The <see cref="T:Highpoint.Sage.SimCore.ModelObjectDictionary"></see> is read-only.-or- The <see cref="T:Highpoint.Sage.SimCore.ModelObjectDictionary"></see> has a fixed size. </exception>
-        public void Add(object key, object value) {
+        public void Add(object key, object value)
+        {
             _Debug.Assert(key is Guid);
             _Debug.Assert(value is IModelObject);
             Add((Guid)key, (IModelObject)value);
@@ -300,9 +336,11 @@ namespace Highpoint.Sage.SimCore {
         /// </summary>
         /// <value></value>
         /// <returns>An <see cref="T:Highpoint.Sage.SimCore.ModelObjectDictionary"></see> object containing the keys of the <see cref="T:Highpoint.Sage.SimCore.ModelObjectDictionary"></see> object.</returns>
-        public ICollection Keys {
-            get {
-                return m_dictionary.Keys;
+        public ICollection Keys
+        {
+            get
+            {
+                return _dictionary.Keys;
             }
         }
 
@@ -311,9 +349,11 @@ namespace Highpoint.Sage.SimCore {
         /// </summary>
         /// <value></value>
         /// <returns>true if the <see cref="T:Highpoint.Sage.SimCore.ModelObjectDictionary"></see> object has a fixed size; otherwise, false.</returns>
-        public bool IsFixedSize {
-            get {
-                return m_dictionary.IsFixedSize;
+        public bool IsFixedSize
+        {
+            get
+            {
+                return _dictionary.IsFixedSize;
             }
         }
 
@@ -326,14 +366,26 @@ namespace Highpoint.Sage.SimCore {
         /// </summary>
         /// <value></value>
         /// <returns>true if access to the <see cref="T:Highpoint.Sage.SimCore.ModelObjectDictionary"></see> is synchronized (thread safe); otherwise, false.</returns>
-        public bool IsSynchronized { get { return m_dictionary.IsSynchronized; } }
+        public bool IsSynchronized
+        {
+            get
+            {
+                return _dictionary.IsSynchronized;
+            }
+        }
 
         /// <summary>
         /// Gets the number of elements contained in the <see cref="T:Highpoint.Sage.SimCore.ModelObjectDictionary"></see>.
         /// </summary>
         /// <value></value>
         /// <returns>The number of elements contained in the <see cref="T:Highpoint.Sage.SimCore.ModelObjectDictionary"></see>.</returns>
-        public int Count { get { return m_dictionary.Count; } }
+        public int Count
+        {
+            get
+            {
+                return _dictionary.Count;
+            }
+        }
 
         /// <summary>
         /// Copies the elements of the <see cref="T:Highpoint.Sage.SimCore.ModelObjectDictionary"></see> to an <see cref="T:System.Array"></see>, starting at a particular <see cref="T:System.Array"></see> index.
@@ -344,14 +396,23 @@ namespace Highpoint.Sage.SimCore {
         /// <exception cref="T:System.ArgumentOutOfRangeException">index is less than zero. </exception>
         /// <exception cref="T:System.ArgumentException">array is multidimensional.-or- index is equal to or greater than the length of array.-or- The number of elements in the source <see cref="T:Highpoint.Sage.SimCore.ModelObjectDictionary"></see> is greater than the available space from index to the end of the destination array. </exception>
         /// <exception cref="T:System.InvalidCastException">The type of the source <see cref="T:Highpoint.Sage.SimCore.ModelObjectDictionary"></see> cannot be cast automatically to the type of the destination array. </exception>
-        public void CopyTo(Array array, int index) { m_dictionary.CopyTo(array, index); }
+        public void CopyTo(Array array, int index)
+        {
+            _dictionary.CopyTo(array, index);
+        }
 
         /// <summary>
         /// Gets an object that can be used to synchronize access to the <see cref="T:Highpoint.Sage.SimCore.ModelObjectDictionary"></see>.
         /// </summary>
         /// <value></value>
         /// <returns>An object that can be used to synchronize access to the <see cref="T:Highpoint.Sage.SimCore.ModelObjectDictionary"></see>.</returns>
-        public object SyncRoot { get { return m_dictionary.SyncRoot; } }
+        public object SyncRoot
+        {
+            get
+            {
+                return _dictionary.SyncRoot;
+            }
+        }
 
         #endregion
 
@@ -363,8 +424,9 @@ namespace Highpoint.Sage.SimCore {
         /// <returns>
         /// An <see cref="Highpoint.Sage.SimCore.ModelObjectDictionary"></see> object that can be used to iterate through the collection.
         /// </returns>
-        IEnumerator IEnumerable.GetEnumerator() {
-            return m_dictionary.GetEnumerator();
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return _dictionary.GetEnumerator();
         }
 
         #endregion
