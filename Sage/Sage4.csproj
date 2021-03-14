@@ -335,6 +335,9 @@
     <Compile Include="ItemBased\Connectors\IConnector.cs" />
     <Compile Include="ItemBased\Interfaces.cs" />
     <Compile Include="ItemBased\Queues\ISelectionStrategy.cs" />
+    <Compile Include="ItemBased\Queues\MultiQueueHead.cs" />
+    <Compile Include="ItemBased\Queues\OldestShortestQueueStrategy.cs" />
+    <Compile Include="ItemBased\Queues\ShortestQueueStrategy.cs" />
     <Compile Include="Materials\Vessel.cs" />
     <Compile Include="Graphs\CPMAnalyst.cs">
       <SubType>Code</SubType>
@@ -440,7 +443,7 @@
     <Compile Include="ItemBased\Queues\IQueue.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="ItemBased\Queues\ObjectQueue.cs">
+    <Compile Include="ItemBased\Queues\Queue.cs">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="ItemBased\Servers\BufferedServer.cs">
