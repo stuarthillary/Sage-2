@@ -376,6 +376,7 @@
     <Compile Include="ItemBased\TagComparers.cs" />
     <Compile Include="ItemBased\TagList.cs" />
     <Compile Include="ItemBased\TagType.cs" />
+    <Compile Include="Materials\Chemistry\ReactionDefinitionException.cs" />
     <Compile Include="Materials\Vessel.cs" />
     <Compile Include="Graphs\CPMAnalyst.cs">
       <SubType>Code</SubType>
