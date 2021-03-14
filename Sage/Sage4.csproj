@@ -380,6 +380,20 @@
     <Compile Include="Materials\Chemistry\IHasMaterials.cs" />
     <Compile Include="Materials\Chemistry\ISupportsReactions.cs" />
     <Compile Include="Materials\Chemistry\ReactionDefinitionException.cs" />
+    <Compile Include="Materials\Emissions\AirDryModel.cs" />
+    <Compile Include="Materials\Emissions\EmissionParam.cs" />
+    <Compile Include="Materials\Emissions\EvacuateModel.cs" />
+    <Compile Include="Materials\Emissions\FillModel.cs" />
+    <Compile Include="Materials\Emissions\GasEvolutionModel.cs" />
+    <Compile Include="Materials\Emissions\GasSweepModel.cs" />
+    <Compile Include="Materials\Emissions\HeatModel.cs" />
+    <Compile Include="Materials\Emissions\IEmissionModel.cs" />
+    <Compile Include="Materials\Emissions\MassBalanceModel.cs" />
+    <Compile Include="Materials\Emissions\NoEmissionModel.cs" />
+    <Compile Include="Materials\Emissions\PressureTransferModel.cs" />
+    <Compile Include="Materials\Emissions\VacuumDistillationModel.cs" />
+    <Compile Include="Materials\Emissions\VacuumDistillationWScrubberModel.cs" />
+    <Compile Include="Materials\Emissions\VacuumDryModel.cs" />
     <Compile Include="Materials\Vessel.cs" />
     <Compile Include="Graphs\CPMAnalyst.cs">
       <SubType>Code</SubType>
@@ -545,7 +559,7 @@
     </Compile>
     <Compile Include="Materials\MaterialTransferrer.cs" />
     <Compile Include="Materials\Dispensary.cs" />
-    <Compile Include="Materials\Emissions\EmissionModels.cs">
+    <Compile Include="Materials\Emissions\EmissionModel.cs">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Materials\Emissions\EmissionsClassificationCatalog.cs">
