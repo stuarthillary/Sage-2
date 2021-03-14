@@ -1,10 +1,11 @@
 /* This source code licensed under the GNU Affero General Public License */
 
+using Highpoint.Sage.Persistence;
 using Highpoint.Sage.SimCore;
 using Highpoint.Sage.Utility.Mementos;
-using Highpoint.Sage.Persistence;
 
-namespace Highpoint.Sage.Materials.Chemistry {
+namespace Highpoint.Sage.Materials.Chemistry
+{
 
     /// <summary>
     /// Fired after a change in mass, constituents or temperature has taken place in this mixture. 
@@ -12,47 +13,46 @@ namespace Highpoint.Sage.Materials.Chemistry {
     public delegate void MaterialChangeListener(IMaterial material, MaterialChangeType type);
 
     /// <summary>
-    /// An enumeration that describes the kind of change that has taken place in a material.
-    /// </summary>
-    public enum MaterialChangeType {
-        /// <summary>
-        /// The contents of the mixture changed.
-        /// </summary>
-        Contents,
-        /// <summary>
-        /// The temperature of the mixture changed.
-        /// </summary>
-        Temperature
-    }
-
-    /// <summary>
     /// Implemented by anything that is a material - Substances and Mixtures are current examples.
     /// </summary>
-    public interface IMaterial : ISupportsMementos, IHasWriteLock, IXmlPersistable {
+    public interface IMaterial : ISupportsMementos, IHasWriteLock, IXmlPersistable
+    {
 
         /// <summary>
         /// Gets the type of the material.
         /// </summary>
         /// <value>The type of the material.</value>
-        MaterialType MaterialType { get; }
+        MaterialType MaterialType
+        {
+            get;
+        }
 
         /// <summary>
         /// Gets the mass of the material in kilograms.
         /// </summary>
         /// <value>The mass of the material in kilograms.</value>
-        double Mass { get; }
+        double Mass
+        {
+            get;
+        }
 
         /// <summary>
         /// Gets the volume of the material in liters.
         /// </summary>
         /// <value>The volume.</value>
-        double Volume { get; }
+        double Volume
+        {
+            get;
+        }
 
         /// <summary>
         /// Gets the density of the material in kilograms per liter.
         /// </summary>
         /// <value>The density.</value>
-		double Density { get; }
+		double Density
+        {
+            get;
+        }
 
         /// <summary>
         /// Adds the specified number of joules of energy to the mixture.
@@ -64,18 +64,27 @@ namespace Highpoint.Sage.Materials.Chemistry {
         /// Gets the specific heat of the mixture, in Joules per kilogram degree-K.
         /// </summary>
         /// <value>The specific heat.</value>
-		double SpecificHeat { get; }
-		
+		double SpecificHeat
+        {
+            get;
+        }
+
         /// <summary>
-		/// Latent heat of vaporization - the heat energy required to vaporize one kilogram of this material. (J/kg)
-		/// </summary>
-		double LatentHeatOfVaporization { get; }
-        
+        /// Latent heat of vaporization - the heat energy required to vaporize one kilogram of this material. (J/kg)
+        /// </summary>
+        double LatentHeatOfVaporization
+        {
+            get;
+        }
+
         /// <summary>
         /// Gets or sets the temperature in degrees Celsius (internally, temperatures are stored in degrees Kelvin.)
         /// </summary>
         /// <value>The temperature.</value>
-		double Temperature { get; set; }   // Assumption - degrees Celsius (internally stored as degrees Kelvin).
+        double Temperature
+        {
+            get; set;
+        }   // Assumption - degrees Celsius (internally stored as degrees Kelvin).
 
         /// <summary>
         /// Gets the estimated boiling point at the specified pressure in pascals.
@@ -109,12 +118,15 @@ namespace Highpoint.Sage.Materials.Chemistry {
         /// </summary>
         /// <returns></returns>
         IMaterial Clone();
-        
+
         /// <summary>
         /// Gets or sets the tag, which is a user-supplied data element.
         /// </summary>
         /// <value>The tag.</value>
-        object Tag { get; set; }
+        object Tag
+        {
+            get; set;
+        }
 
         /// <summary>
         /// Returns a <see cref="T:System.String"></see> that represents the current <see cref="T:Highpoint.Sage.Materials.Chemistry.IMaterial"></see>.
@@ -132,7 +144,7 @@ namespace Highpoint.Sage.Materials.Chemistry {
         /// A <see cref="T:System.String"></see> that represents the current <see cref="T:Highpoint.Sage.Materials.Chemistry.IMaterial"></see>.
         /// </returns>
         string ToStringWithoutTemperature();
-        
+
         /// <summary>
         /// Returns a <see cref="T:System.String"></see> that represents the current <see cref="T:Highpoint.Sage.Materials.Chemistry.IMaterial"></see>.
         /// </summary>
