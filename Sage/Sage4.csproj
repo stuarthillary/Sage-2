@@ -397,9 +397,12 @@
     <Compile Include="Materials\Thermodynamics\ITemperatureController.cs" />
     <Compile Include="Materials\Thermodynamics\TemperatureControllerMode.cs" />
     <Compile Include="Materials\Thermodynamics\TemperatureRampRate.cs" />
+    <Compile Include="Materials\VaporPressure\AntoinesCoefficients3Impl.cs" />
     <Compile Include="Materials\VaporPressure\IAntoinesCoefficients.cs" />
     <Compile Include="Materials\VaporPressure\IAntoinesCoefficients3.cs" />
     <Compile Include="Materials\VaporPressure\IAntoinesCoefficientsExt.cs" />
+    <Compile Include="Materials\VaporPressure\PressureUnits.cs" />
+    <Compile Include="Materials\VaporPressure\TemperatureUnits.cs" />
     <Compile Include="Materials\VaporPressure\VaporPressureException.cs" />
     <Compile Include="Materials\Vessel.cs" />
     <Compile Include="Graphs\CPMAnalyst.cs">
@@ -622,7 +625,7 @@
     <Compile Include="Materials\VaporPressure\VaporPressureCalculator.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Materials\VaporPressure\VaporPressureCoefficientsImpl.cs">
+    <Compile Include="Materials\VaporPressure\AntoinesCoefficientsExt.cs">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Mathematics\Distributions.cs">
