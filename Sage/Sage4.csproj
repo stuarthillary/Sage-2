@@ -234,6 +234,7 @@
     <Compile Include="Core\ModelObjectDictionary.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Core\RefType.cs" />
     <Compile Include="Core\RuntimeException.cs" />
     <Compile Include="Core\StateMachine.cs">
       <SubType>Code</SubType>
