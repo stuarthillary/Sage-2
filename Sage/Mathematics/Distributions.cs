@@ -178,7 +178,7 @@ namespace Highpoint.Sage.Mathematics {
         /// <param name="guid">The GUID of this TimeSpanDistribution.</param>
         /// <param name="distribution">The GUID of the underlying double distribution which drives this TimeSpanDistribution.</param>
         /// <param name="units">The units (minutes, seconds, etc) that are applied to the underlying double distribution in deriving this TimeSpanDistribution's timespans.</param>
-        [Initializer(InitializerAttribute.InitializationType.PreRun)]
+        [Initializer(InitializationType.PreRun)]
         public void Initialize(IModel model, string name, string description, Guid guid,
             [InitializerArg(0, "Base distribution", RefType.Owned, typeof(IDoubleDistribution), "The double distribution that provides the profile of this TimeSpan distribution.")]
 			Guid distribution,
@@ -374,7 +374,7 @@ namespace Highpoint.Sage.Mathematics {
         /// <param name="description">The description of this ConstantDoubleDistribution.</param>
         /// <param name="guid">The GUID of this ConstantDoubleDistribution.</param>
         /// <param name="val">The value that this ConstantDoubleDistribution always returns.</param>
-        [Initializer(InitializerAttribute.InitializationType.PreRun)]
+        [Initializer(InitializationType.PreRun)]
         public void Initialize(IModel model, string name, string description, Guid guid,
             [InitializerArg(0, "Value", RefType.Owned, typeof(double), "The constant value for this distribution.")]
 			double val) {
@@ -590,7 +590,7 @@ namespace Highpoint.Sage.Mathematics {
         /// <param name="guid">The GUID of this NormalDistribution.</param>
         /// <param name="mean">The mean of this NormalDistribution.</param>
         /// <param name="stdev">The standard deviation of this NormalDistribution.</param>
-        [Initializer(InitializerAttribute.InitializationType.PreRun)]
+        [Initializer(InitializationType.PreRun)]
         public void Initialize(IModel model, string name, string description, Guid guid,
             [InitializerArg(0, "Mean", RefType.Owned, typeof(double), "Mean value for this distribution.")]
 			double mean,
@@ -721,7 +721,7 @@ namespace Highpoint.Sage.Mathematics {
         /// <param name="guid">The GUID of this LognormalDistribution.</param>
         /// <param name="mean">The mean of this LognormalDistribution.</param>
         /// <param name="stdev">The standard deviation of this LognormalDistribution.</param>
-        [Initializer(InitializerAttribute.InitializationType.PreRun, "_Initialize_LogNormal")]
+        [Initializer(InitializationType.PreRun, "_Initialize_LogNormal")]
         public new void Initialize(IModel model, string name, string description, Guid guid,
             [InitializerArg(0, "Mean", RefType.Owned, typeof(double), "Mean value for this distribution.")]
 			double mean,
@@ -857,7 +857,7 @@ namespace Highpoint.Sage.Mathematics {
         /// <param name="lowBound">The low bound of the TriangularDistribution.</param>
         /// <param name="mean">The mean of the TriangularDistribution.</param>
         /// <param name="highBound">The high bound of the TriangularDistribution.</param>
-        [Initializer(InitializerAttribute.InitializationType.PreRun)]
+        [Initializer(InitializationType.PreRun)]
         public void Initialize(IModel model, string name, string description, Guid guid,
             [InitializerArg(0, "Low Bound", RefType.Owned, typeof(double), "The low boundary of this triangular distribution.")]
 			double lowBound,
@@ -1033,7 +1033,7 @@ namespace Highpoint.Sage.Mathematics {
         /// <param name="guid">The GUID of this BinomialDistribution.</param>
         /// <param name="probability">The probability of any one opportunity embodied by this BinomialDistribution.</param>
         /// <param name="numberOfOpps">The number of opportunities in a trial.</param>
-        [Initializer(InitializerAttribute.InitializationType.PreRun)]
+        [Initializer(InitializationType.PreRun)]
         public void Initialize(IModel model, string name, string description, Guid guid,
             [InitializerArg(0, "Probability", RefType.Owned, typeof(double), "The probability of success in any one opportunity.")]
 			double probability,
@@ -1204,7 +1204,7 @@ namespace Highpoint.Sage.Mathematics {
         /// <param name="guid">The GUID of this ExponentialDistribution.</param>
         /// <param name="location">The location (i.e. center) of the ExponentialDistribution.</param>
         /// <param name="scale">The scale (i.e. shape) of the ExponentialDistribution.</param>
-        [Initializer(InitializerAttribute.InitializationType.PreRun)]
+        [Initializer(InitializationType.PreRun)]
         public void Initialize(IModel model, string name, string description, Guid guid,
             [InitializerArg(0, "Location", RefType.Owned, typeof(double), "The mean of the Exponential distribution.")]
 			double location,
@@ -1374,7 +1374,7 @@ namespace Highpoint.Sage.Mathematics {
         /// <param name="description">The description of this PoissonDistribution.</param>
         /// <param name="guid">The GUID of this PoissonDistribution.</param>
         /// <param name="mean">The mean of the PoissonDistribution.</param>
-        [Initializer(InitializerAttribute.InitializationType.PreRun)]
+        [Initializer(InitializationType.PreRun)]
         public void Initialize(IModel model, string name, string description, Guid guid,
             [InitializerArg(0, "Mean", RefType.Owned, typeof(double), "The Mean Value of the Poisson Distribution.")]
 			double mean) {
@@ -1566,7 +1566,7 @@ namespace Highpoint.Sage.Mathematics {
         /// <param name="guid">The GUID of this UniformDistribution.</param>
         /// <param name="minimum">The minimum value in this UniformDistribution.</param>
         /// <param name="maximum">The maximum value in this UniformDistribution.</param>
-        [Initializer(InitializerAttribute.InitializationType.PreRun)]
+        [Initializer(InitializationType.PreRun)]
         public void Initialize(IModel model, string name, string description, Guid guid,
             [InitializerArg(0, "Minimum", RefType.Owned, typeof(double), "The minimum of the distribution.")]
 			double minimum,
@@ -1745,7 +1745,7 @@ namespace Highpoint.Sage.Mathematics {
         /// <param name="guid">The GUID of this CauchyDistribution.</param>
         /// <param name="location">The location of this CauchyDistribution.</param>
         /// <param name="shape">The shape of this CauchyDistribution.</param>
-        [Initializer(InitializerAttribute.InitializationType.PreRun)]
+        [Initializer(InitializationType.PreRun)]
         public void Initialize(IModel model, string name, string description, Guid guid,
             [InitializerArg(0, "Location", RefType.Owned, typeof(double), "The location (center) of the distribution.")]
 			double location,
@@ -1927,7 +1927,7 @@ namespace Highpoint.Sage.Mathematics {
         /// <param name="shape">The shape of this WeibullDistribution.</param>
         /// <param name="location">The location of this WeibullDistribution.</param>
         /// <param name="scale">The scale of this WeibullDistribution.</param>
-        [Initializer(InitializerAttribute.InitializationType.PreRun)]
+        [Initializer(InitializationType.PreRun)]
         public void Initialize(IModel model, string name, string description, Guid guid,
             [InitializerArg(0, "Shape", RefType.Owned, typeof(double), "The shape parameter. Must be > 0. <1 looks like an L, ~1 looks like a '/', and > 1 looks like a '/\\_'")]
 			double shape,
@@ -2123,7 +2123,7 @@ namespace Highpoint.Sage.Mathematics {
         /// <param name="xVals">The x values that make up the Cumulative Density Function of this EmpiricalDistribution.</param>
         /// <param name="yVals">The y values that make up the Cumulative Density Function of this EmpiricalDistribution.</param>
         /// <param name="interpolatorType">The type of the interpolator that this EmpiricalDistribution should use.</param>
-        [Initializer(InitializerAttribute.InitializationType.PreRun)]
+        [Initializer(InitializationType.PreRun)]
         public void Initialize(IModel model, string name, string description, Guid guid,
             [InitializerArg(0, "XValues", RefType.Owned, typeof(double[]), "The X values that form the empirical data inflection points.")]
 			double[] xVals,
@@ -2150,7 +2150,7 @@ namespace Highpoint.Sage.Mathematics {
         /// <param name="guid">The GUID of this EmpiricalDistribution.</param>
         /// <param name="xVals">The x values that make up the Cumulative Density Function of this EmpiricalDistribution.</param>
         /// <param name="yVals">The y values that make up the Cumulative Density Function of this EmpiricalDistribution.</param>
-        [Initializer(InitializerAttribute.InitializationType.PreRun)]
+        [Initializer(InitializationType.PreRun)]
         public void Initialize(IModel model, string name, string description, Guid guid,
             [InitializerArg(0, "XValues", RefType.Owned, typeof(double[]), "The X values that form the empirical data inflection points.")]
 			double[] xVals,
@@ -2319,7 +2319,7 @@ namespace Highpoint.Sage.Mathematics {
       /// <param name="description">The description of this UniversalDistribution.</param>
       /// <param name="guid">The GUID of this UniversalDistribution.</param>
       /// <param name="cdfGuid">The Cumulative Density Function of this UniversalDistribution.</param>
-      [Initializer(InitializerAttribute.InitializationType.PreRun)]
+      [Initializer(InitializationType.PreRun)]
       public void Initialize(IModel model, string name, string description, Guid guid,
           [InitializerArg(0, "CumulativeDensityFunction", RefType.Owned, typeof(ICDF), "The Cumulative Density Function that will drive this Universal Distribution.")]
       Guid cdfGuid) {

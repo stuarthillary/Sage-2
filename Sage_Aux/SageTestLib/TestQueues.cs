@@ -349,7 +349,7 @@ namespace Highpoint.Sage.ItemBased.Queues {
                 PopulatePrivateFields();
             }
 
-            [Initializer(InitializerAttribute.InitializationType.PreRun, "_Initialize")]
+            [Initializer(InitializationType.PreRun, "_Initialize")]
             public void Initialize(IModel model, string name, string description, Guid guid,
                 [InitializerArg(0, "Random Seed", RefType.Owned, typeof(ulong), "The random seed to be used by this model.")]
 			ulong randomSeed,

@@ -214,6 +214,7 @@
     <Compile Include="Core\InitializationManager.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Core\InitializationType.cs" />
     <Compile Include="Core\InitializerArgAttribute.cs">
       <SubType>Code</SubType>
     </Compile>

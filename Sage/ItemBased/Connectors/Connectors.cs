@@ -307,7 +307,7 @@ namespace Highpoint.Sage.ItemBased.Connectors {
         //TODO: If this class is derived from another that implements IModelObject, remove the m_model, m_name, and m_guid declarations.
         //TODO: Make sure that what happens in any other ctors also happens in the Initialize method.
         
-        [Initializer(InitializerAttribute.InitializationType.PreRun, "_Initialize")]
+        [Initializer(InitializationType.PreRun, "_Initialize")]
         public void Initialize(IModel model, string name, string description, Guid guid,
             [InitializerArg(0, "inputPortOwner", RefType.Owned, typeof(IPortOwner), "The upstream port owner attached to this connector")]
             Guid inputPortOwner,

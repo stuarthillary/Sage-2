@@ -91,7 +91,7 @@ namespace Highpoint.Sage.ItemBased.Queues {
         /// <param name="description">The description of this queue.</param>
         /// <param name="guid">The GUID of this queue.</param>
         /// <param name="max">The maximum number of items that can be held in this queue.</param>
-        [Initializer(InitializerAttribute.InitializationType.PreRun, "_Initialize")]
+        [Initializer(InitializationType.PreRun, "_Initialize")]
         public void Initialize(IModel model, string name, string description, Guid guid,
             [InitializerArg(0, "max", RefType.Owned, typeof(int), "The largest number of objects the queue can hold.")]
 			int max) {
