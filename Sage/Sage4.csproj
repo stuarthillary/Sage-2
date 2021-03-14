@@ -346,6 +346,7 @@
     <Compile Include="ItemBased\IPortEvents.cs" />
     <Compile Include="ItemBased\IPortSelector.cs" />
     <Compile Include="ItemBased\IPortSet.cs" />
+    <Compile Include="ItemBased\IPulseSource.cs" />
     <Compile Include="ItemBased\OutputPortManager.cs" />
     <Compile Include="ItemBased\OutputPortProxy.cs" />
     <Compile Include="ItemBased\PortDirection.cs" />
@@ -462,7 +463,7 @@
     <Compile Include="ItemBased\PortSet.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="ItemBased\Pulses.cs">
+    <Compile Include="ItemBased\PulseSource.cs">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="ItemBased\Queues\DataCollectors\WaitingTime.cs">
