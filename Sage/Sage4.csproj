@@ -338,6 +338,7 @@
     <Compile Include="ItemBased\Queues\MultiQueueHead.cs" />
     <Compile Include="ItemBased\Queues\OldestShortestQueueStrategy.cs" />
     <Compile Include="ItemBased\Queues\ShortestQueueStrategy.cs" />
+    <Compile Include="ItemBased\Servers\IServiceObject.cs" />
     <Compile Include="Materials\Vessel.cs" />
     <Compile Include="Graphs\CPMAnalyst.cs">
       <SubType>Code</SubType>
