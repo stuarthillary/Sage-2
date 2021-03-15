@@ -932,6 +932,7 @@
     <Compile Include="Utility\Mementos\MementoHelper.cs" />
     <Compile Include="Utility\MouseUtilities.cs" />
     <Compile Include="Utility\MultiArrayListEnumerator.cs" />
+    <Compile Include="Utility\MyWeakReference.cs" />
     <Compile Include="Utility\NameComparer.cs" />
     <Compile Include="Utility\Heap.cs">
       <SubType>Code</SubType>
@@ -1009,6 +1010,7 @@
     <Compile Include="Utility\WeakList.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Utility\WeakListEnumerator.cs" />
     <Compile Include="Utility\XmlTimeSpan.cs" />
     <Compile Include="Utility\XmlTransform.cs" />
     <Compile Include="Utility\XmlConvert.cs">
