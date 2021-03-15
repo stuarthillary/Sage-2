@@ -721,9 +721,11 @@
     <Compile Include="Randoms\RandomServer.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Resources\AccessControl.cs">
+    <Compile Include="Resources\MultiKeyAccessRegulator.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Resources\IAccessManager.cs" />
+    <Compile Include="Resources\IAccessRegulator.cs" />
     <Compile Include="Resources\IResource.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -751,6 +753,8 @@
     <Compile Include="Resources\SelfManagingResource.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Resources\SimpleAccessManager.cs" />
+    <Compile Include="Resources\SingleKeyAccessRegulator.cs" />
     <Compile Include="Resources\Tracking.cs">
       <SubType>Code</SubType>
     </Compile>
