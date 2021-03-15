@@ -699,13 +699,17 @@
     <Compile Include="Mathematics\UniversalDistribution.cs" />
     <Compile Include="Mathematics\WeibullCDF.cs" />
     <Compile Include="Mathematics\WeibullDistribution.cs" />
+    <Compile Include="Persistence\DeserializationContext.cs" />
     <Compile Include="Persistence\DynamicConstruction.cs">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Persistence\IDirtyable.cs" />
-    <Compile Include="Persistence\Persistence.cs">
+    <Compile Include="Persistence\ISerializer.cs" />
+    <Compile Include="Persistence\IXmlPersistable.cs" />
+    <Compile Include="Persistence\IXElementSerializable.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Persistence\XmlSerializationContext.cs" />
     <Compile Include="Presentation\Converters\Converters.cs" />
     <Compile Include="Randoms\MersenneTwister.cs">
       <SubType>Code</SubType>
