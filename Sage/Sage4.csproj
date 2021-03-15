@@ -796,6 +796,11 @@
     <Compile Include="Scheduling\MilestoneRelationship.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Scheduling\MilestoneRelationship_GTE.cs" />
+    <Compile Include="Scheduling\MilestoneRelationship_LTE.cs" />
+    <Compile Include="Scheduling\MilestoneRelationship_Pin.cs" />
+    <Compile Include="Scheduling\MilestoneRelationship_Strut.cs" />
+    <Compile Include="Scheduling\RelationshipType.cs" />
     <Compile Include="Scheduling\TimeAdjustmentMode.cs">
       <SubType>Code</SubType>
     </Compile>
