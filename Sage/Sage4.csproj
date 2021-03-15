@@ -777,6 +777,8 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Scheduling\Cost.cs" />
+    <Compile Include="Scheduling\CostCategory.cs" />
+    <Compile Include="Scheduling\IHasCost.cs" />
     <Compile Include="Scheduling\IHasTimePeriodAspects.cs">
       <SubType>Code</SubType>
     </Compile>
