@@ -13,7 +13,10 @@ namespace Highpoint.Sage.Utility
                 .Any(a => a.FullName.StartsWith(testAssemblyName));
         }
 
-        public static bool IsInUnitTest { get; private set; }
+        public static bool IsInUnitTest
+        {
+            get; private set;
+        }
     }
 
 

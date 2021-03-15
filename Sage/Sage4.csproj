@@ -925,6 +925,9 @@
     <Compile Include="Utility\ITreeNodeEventController.cs" />
     <Compile Include="Utility\ITreeNodeProxy.cs" />
     <Compile Include="Utility\ITupleSpace.cs" />
+    <Compile Include="Utility\IVisitableT.cs" />
+    <Compile Include="Utility\IVisitable.cs" />
+    <Compile Include="Utility\IVisitorT.cs" />
     <Compile Include="Utility\Mementos\ISupportsMementos.cs" />
     <Compile Include="Utility\Mementos\MementoHelper.cs" />
     <Compile Include="Utility\MouseUtilities.cs" />
@@ -997,7 +1000,7 @@
     </Compile>
     <Compile Include="Utility\UniqueNameGenerator.cs" />
     <Compile Include="Utility\UnitTestDetector.cs" />
-    <Compile Include="Utility\Visitors.cs">
+    <Compile Include="Utility\IVisitor.cs">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Utility\WeakHashTable.cs">
