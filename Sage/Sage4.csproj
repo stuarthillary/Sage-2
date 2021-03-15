@@ -637,9 +637,18 @@
     <Compile Include="Materials\VaporPressure\AntoinesCoefficientsExt.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Mathematics\Distributions.cs">
+    <Compile Include="Mathematics\BinomialCDF.cs" />
+    <Compile Include="Mathematics\BinomialDistribution.cs" />
+    <Compile Include="Mathematics\CauchyCDF.cs" />
+    <Compile Include="Mathematics\CauchyDistribution.cs" />
+    <Compile Include="Mathematics\ConstantDoubleDistribution.cs" />
+    <Compile Include="Mathematics\TimeSpanDistribution.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Mathematics\EmpiricalCDF.cs" />
+    <Compile Include="Mathematics\EmpiricalDistribution.cs" />
+    <Compile Include="Mathematics\ExponentialCDF.cs" />
+    <Compile Include="Mathematics\ExponentialDistribution.cs" />
     <Compile Include="Mathematics\Extensions.cs" />
     <Compile Include="Mathematics\Histogram1D_Base.cs">
       <SubType>Code</SubType>
@@ -653,14 +662,31 @@
     <Compile Include="Mathematics\Histogram1D_TimeSpan.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Mathematics\ICDF.cs" />
+    <Compile Include="Mathematics\IDoubleDistribution.cs" />
     <Compile Include="Mathematics\IHistogram.cs">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Mathematics\Interpolations.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Mathematics\ITimeSpanDistribution.cs" />
+    <Compile Include="Mathematics\Linear.cs" />
     <Compile Include="Mathematics\LinearRegression.cs" />
+    <Compile Include="Mathematics\LognormalDistribution.cs" />
+    <Compile Include="Mathematics\NormalDistribution.cs" />
+    <Compile Include="Mathematics\PoissonCDF.cs" />
+    <Compile Include="Mathematics\PoissonCDFLookupTable.cs" />
+    <Compile Include="Mathematics\PoissonDistribution.cs" />
     <Compile Include="Mathematics\RMSErrorCalculator.cs" />
+    <Compile Include="Mathematics\SupportsDistributionsAttribute.cs" />
+    <Compile Include="Mathematics\TriangularCDF.cs" />
+    <Compile Include="Mathematics\TriangularDistribution.cs" />
+    <Compile Include="Mathematics\UniformCDF.cs" />
+    <Compile Include="Mathematics\UniformDistribution.cs" />
+    <Compile Include="Mathematics\UniversalDistribution.cs" />
+    <Compile Include="Mathematics\WeibullCDF.cs" />
+    <Compile Include="Mathematics\WeibullDistribution.cs" />
     <Compile Include="Persistence\DynamicConstruction.cs">
       <SubType>Code</SubType>
     </Compile>
