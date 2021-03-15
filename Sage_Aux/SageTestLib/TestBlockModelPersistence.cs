@@ -1,31 +1,38 @@
 /* This source code licensed under the GNU Affero General Public License */
 
 
-using System.Diagnostics;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Highpoint.Sage.SimCore;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System.Diagnostics;
 
-namespace Highpoint.Sage.ItemBased.Blocks {
+namespace Highpoint.Sage.ItemBased.Blocks
+{
 
     /// <summary>BlockModelPersistence.
     /// </summary>
     [TestClass]
-    public class BlockModelTester {
+    public class BlockModelTester
+    {
 
         #region MSTest Goo
         [TestInitialize]
-        public void Init() {
+        public void Init()
+        {
         }
         [TestCleanup]
-        public void destroy() {
+        public void destroy()
+        {
             Debug.WriteLine("Done.");
         }
         #endregion
 
-        public BlockModelTester() { }
+        public BlockModelTester()
+        {
+        }
 
         [TestMethod]
-        public void TestBlockModelPersistence() {
+        public void TestBlockModelPersistence()
+        {
 
             Model model = new Model();
 
