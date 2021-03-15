@@ -913,6 +913,8 @@
     <Compile Include="Utility\HashtableOfLists.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Utility\Mementos\ISupportsMementos.cs" />
+    <Compile Include="Utility\Mementos\MementoHelper.cs" />
     <Compile Include="Utility\MouseUtilities.cs" />
     <Compile Include="Utility\NameComparer.cs" />
     <Compile Include="Utility\Heap.cs">
