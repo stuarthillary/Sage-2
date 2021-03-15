@@ -60,7 +60,8 @@ using Highpoint.Sage.SimCore;
 /// <para/>ResourceTrackers are used to track the levels and events associated with a specific resource. A ResourceTrackerAggregator
 /// collects the data from more than one resource.
 /// </summary>
-namespace Highpoint.Sage.Resources {
+namespace Highpoint.Sage.Resources
+{
 
     /// <summary>
     /// A delegate implemented by an event that is fired by a resource.
@@ -74,14 +75,14 @@ namespace Highpoint.Sage.Resources {
     /// <param name="irr">The resource request within whose scope the event is taking place.</param>
     /// <param name="resource">The resource, typically, to whom the event is taking place.</param>
     public delegate void ResourceStatusEvent(IResourceRequest irr, IResource resource);
-    
+
     /// <summary>
     /// A delegate implemented by an event that is fired, usually, by a resource manager.
     /// </summary>
     /// <param name="irm">The resource manager within whose scope the event is taking place.</param>
     /// <param name="resource">The resource, typically, to whom the event is taking place.</param>
     public delegate void ResourceManagerEvent(IResourceManager irm, IResource resource);
-	
+
     /// <summary>
     /// Implemented by a method that can generate or return a Resource Request.
     /// </summary>
@@ -89,93 +90,46 @@ namespace Highpoint.Sage.Resources {
     public delegate IResourceRequest ResourceRequestSource();
 
     /// <summary>
-    /// Implemented by a class (usually a resource) that has a quantity that can be considered
-    /// capacity.
-    /// </summary>
-	public interface IHasCapacity {
-
-		/// <summary>
-		/// The capacity of this resource that will be in effect if the resource experiences a reset.
-		/// </summary>
-		double InitialCapacity { get; }
-
-		/// <summary>
-		/// The current capacity of this resource - how much 'Available' can be, at its highest value.
-		/// </summary>
-		double Capacity { get; }
-
-		/// <summary>
-		/// The amount of a resource that can be acquired over and above the amount that is actually there.
-		/// It is illegal to set PermissibleOverbook quantity on an atomic resource, since atomicity implies
-		/// that all or none are granted anyway.
-		/// </summary>
-		double PermissibleOverbook { get; }
-
-		/// <summary>
-		/// The quantity of this resource that will be available if the resource experiences a reset.
-		/// </summary>
-		double InitialAvailable { get; }
-
-		/// <summary>
-		/// How much of this resource is currently available to service requests.
-		/// </summary>
-		double Available { get; }
-	}
-
-    /// <summary>
-    /// Implemented by a class (usually a resource) that has a quantity that can be considered
-    /// capacity. In the case of IHasControllableCapacity, though, the current capacity (Available)
-    /// and maximum capacity (Capacity) can be overridden.
-    /// and 
-    /// </summary>
-    public interface IHasControllableCapacity {
-
-		/// <summary>
-		/// The current capacity of this resource - how much 'Available' can be at its highest value.
-		/// </summary>
-		double Capacity { get; set; }
-
-		/// <summary>
-		/// The amount of a resource that can be acquired over and above the amount that is actually there.
-		/// It is illegal to set PermissibleOverbook quantity on an atomic resource, since atomicity implies
-		/// that all or none are granted anyway.
-		/// </summary>
-		double PermissibleOverbook { get; set; }
-
-		/// <summary>
-		/// How much of this resource is currently available to service requests.
-		/// </summary>
-		double Available { get; set; }
-	}
-
-    /// <summary>
     /// An implementer of IResource is an object that can act as a resource.
     /// </summary>
-	public interface IResource : IModelObject, IHasCapacity {
+	public interface IResource : IModelObject, IHasCapacity
+    {
 
         /// <summary>
         /// Gets or sets the manager of the resource.
         /// </summary>
         /// <value>The manager.</value>
-        IResourceManager Manager { get; set; }
+        IResourceManager Manager
+        {
+            get; set;
+        }
 
         /// <summary>
         /// Gets a value indicating whether this instance is discrete. A discrete resource is allocated in integral amounts, such as cartons or drums.
         /// </summary>
         /// <value><c>true</c> if this instance is discrete; otherwise, <c>false</c>.</value>
-        bool IsDiscrete { get; }
+        bool IsDiscrete
+        {
+            get;
+        }
 
         /// <summary>
         /// Gets a value indicating whether this instance is persistent. A persistent resource is returned to the pool after it is used.
         /// </summary>
         /// <value><c>true</c> if this instance is persistent; otherwise, <c>false</c>.</value>
-        bool IsPersistent { get; }
+        bool IsPersistent
+        {
+            get;
+        }
 
         /// <summary>
         /// Gets a value indicating whether this instance is atomic. And atomic resource is allocated all-or-none, such as a vehicle.
         /// </summary>
         /// <value><c>true</c> if this instance is atomic; otherwise, <c>false</c>.</value>
-        bool IsAtomic { get; }
+        bool IsAtomic
+        {
+            get;
+        }
 
         /// <summary>
         /// Resets this instance, returning it to its initial capacity and availability.
@@ -187,26 +141,26 @@ namespace Highpoint.Sage.Resources {
         /// </summary>
         /// <param name="request">The request.</param>
         /// <returns><c>true</c> if the resource was successfully reserved, <c>false</c> otherwise.</returns>
-        bool Reserve ( IResourceRequest request );
+        bool Reserve(IResourceRequest request);
 
         /// <summary>
         /// Unreserves the specified request. Returns it to availability.
         /// </summary>
         /// <param name="request">The request.</param>
-        void Unreserve ( IResourceRequest request );
+        void Unreserve(IResourceRequest request);
 
         /// <summary>
         /// Acquires the specified request. Removes it from availability and from the resource pool.
         /// </summary>
         /// <param name="request">The request.</param>
         /// <returns><c>true</c> if if the resource was successfully acquired, <c>false</c> otherwise.</returns>
-        bool Acquire ( IResourceRequest request );
+        bool Acquire(IResourceRequest request);
 
         /// <summary>
         /// Releases the specified request. Returns it to availability and the resource pool.
         /// </summary>
         /// <param name="request">The request.</param>
-        void Release ( IResourceRequest request );
+        void Release(IResourceRequest request);
 
         /// <summary>
         /// Occurs when this resource has been requested.
@@ -233,22 +187,5 @@ namespace Highpoint.Sage.Resources {
         /// </summary>
 		event ResourceStatusEvent ReleasedEvent;
 
-	}
-
-    /// <summary>
-    /// Implemented by a model that manages resources.
-    /// </summary>
-    public interface IModelWithResources {
-
-        /// <summary>
-        /// Must be called by the creator when a new resource is created.
-        /// </summary>
-        /// <param name="resource">The resource.</param>
-        void OnNewResourceCreated(IResource resource);
-
-        /// <summary>
-        /// Event that is fired when a new resource has been created.
-        /// </summary>
-        event ResourceEvent ResourceCreatedEvent;
     }
 }
