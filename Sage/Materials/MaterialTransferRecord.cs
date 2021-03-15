@@ -1,108 +1,110 @@
 /* This source code licensed under the GNU Affero General Public License */
+using Highpoint.Sage.SimCore;
 using System;
 using System.Collections;
-using Highpoint.Sage.SimCore;
 
 namespace Highpoint.Sage.Materials
 {
 
-	/// <summary>
-	/// A class that holds the details of a material charge, transfer or discharge.
-	/// </summary>
-	public class MaterialTransferRecord : Utility.IHasSerialNumber {
-		/// <summary>
-		/// A MaterialTransferRecord is a class that holds data representing a transfer of material
-		/// from one place to another in the SOM.
-		/// </summary>
-		public MaterialTransferRecord(){
-			MaterialTypeGuid = Guid.Empty;
-			MaterialMass = Double.NaN;
-			SourceGuid = Guid.Empty;
-			DestinationGuid = Guid.Empty;
-			SourcePortGuid = Guid.Empty;
-			DestinationPortGuid = Guid.Empty;
-			BatchGuid = Guid.Empty;
-			StartTime = Double.NaN;
-			Duration = Double.NaN;
-			MaterialTransferType = TransferType.Uninitialized;
-			ConcurrencyGuid = Guid.Empty;
-			ParentMaterialTypeGuid = Guid.Empty;
+    /// <summary>
+    /// A class that holds the details of a material charge, transfer or discharge.
+    /// </summary>
+    public class MaterialTransferRecord : Utility.IHasSerialNumber
+    {
+        /// <summary>
+        /// A MaterialTransferRecord is a class that holds data representing a transfer of material
+        /// from one place to another in the SOM.
+        /// </summary>
+        public MaterialTransferRecord()
+        {
+            MaterialTypeGuid = Guid.Empty;
+            MaterialMass = Double.NaN;
+            SourceGuid = Guid.Empty;
+            DestinationGuid = Guid.Empty;
+            SourcePortGuid = Guid.Empty;
+            DestinationPortGuid = Guid.Empty;
+            BatchGuid = Guid.Empty;
+            StartTime = Double.NaN;
+            Duration = Double.NaN;
+            MaterialTransferType = TransferType.Uninitialized;
+            ConcurrencyGuid = Guid.Empty;
+            ParentMaterialTypeGuid = Guid.Empty;
             ParentMaterialTypeSpecGuid = Guid.Empty;
-			MaterialTemperature = double.NaN;
-			MaterialSpecificationGuid = Guid.Empty;
-			m_serialNumber = Utility.SerialNumberService.GetNext();
-		}
+            MaterialTemperature = double.NaN;
+            MaterialSpecificationGuid = Guid.Empty;
+            _serialNumber = Utility.SerialNumberService.GetNext();
+        }
 
-		/// <summary>
-		/// The Guid associated with the material that was transferred.
-		/// </summary>
-		public Guid BatchGuid;
+        /// <summary>
+        /// The Guid associated with the material that was transferred.
+        /// </summary>
+        public Guid BatchGuid;
 
-		/// <summary>
-		/// The Guid associated with the material that was transferred.
-		/// </summary>
-		public Guid MaterialTypeGuid;
+        /// <summary>
+        /// The Guid associated with the material that was transferred.
+        /// </summary>
+        public Guid MaterialTypeGuid;
 
-		/// <summary>
-		/// The mass of the material that was transferred.
-		/// </summary>
-		public double MaterialMass;
-		
-		/// <summary>
-		/// The temperature of the material that was transferred.
-		/// </summary>
-		public double MaterialTemperature;
-		
-		/// <summary>
-		/// The GUID of the source (supplying) entity. This will be a SOMOperation if an internal transfer 
-		/// or a discharge, and a SOMService if a charge.
-		/// </summary>
-		public Guid SourceGuid;
-		
-		/// <summary>
-		/// The GUID of the destination (receiving) entity. This will be a SOMOperation if an internal transfer
-		///  or a charge, and a SOMService if a discharge.
-		/// </summary>
-		public Guid DestinationGuid;
-		
-		/// <summary>
-		/// The key of the Source's Port through which the material is being charged or discharged.
-		/// </summary>
-		public Guid SourcePortGuid;
+        /// <summary>
+        /// The mass of the material that was transferred.
+        /// </summary>
+        public double MaterialMass;
 
-		/// <summary>
-		/// The key of the Destination's Port through which the material is being charged or discharged.
-		/// </summary>
-		public Guid DestinationPortGuid;
-		
-		/// <summary>
-		/// The start time of the transfer, measured in minutes after the commencement of execution of this batch.
-		/// </summary>
-		public double StartTime; // Minutes from batch start.
-		
-		/// <summary>
-		/// The duration, in minutes, of the transfer.
-		/// </summary>
-		public double Duration; // Minutes of transfer time.
-		
-		/// <summary>
-		/// Enumeration to declare whether this transferRecord refers to a charge, a discharge, 
-		/// or an internal (i.e. between units) transfer.
-		/// </summary>
-		public TransferType MaterialTransferType;
+        /// <summary>
+        /// The temperature of the material that was transferred.
+        /// </summary>
+        public double MaterialTemperature;
 
-		/// <summary>
-		/// Identifies substance transfers that occurred at the same time through the same connection.
-		/// </summary>
-		public Guid ConcurrencyGuid;
+        /// <summary>
+        /// The GUID of the source (supplying) entity. This will be a SOMOperation if an internal transfer 
+        /// or a discharge, and a SOMService if a charge.
+        /// </summary>
+        public Guid SourceGuid;
 
-		/// <summary>
-		/// The guid of a materialType that is to be considered the parent type of this transfer. Applies only to charges.
-		/// For example, if this transfer has a mixture with 100 kg of water, and 4 kg of salt, and the parent material
-		/// type guid refers to the substance 'Saline', then the actual charge came from the 'saline' inventory, not the
-		/// 'water' and 'salt' inventories.
-		/// </summary>
-		public Guid ParentMaterialTypeGuid;
+        /// <summary>
+        /// The GUID of the destination (receiving) entity. This will be a SOMOperation if an internal transfer
+        ///  or a charge, and a SOMService if a discharge.
+        /// </summary>
+        public Guid DestinationGuid;
+
+        /// <summary>
+        /// The key of the Source's Port through which the material is being charged or discharged.
+        /// </summary>
+        public Guid SourcePortGuid;
+
+        /// <summary>
+        /// The key of the Destination's Port through which the material is being charged or discharged.
+        /// </summary>
+        public Guid DestinationPortGuid;
+
+        /// <summary>
+        /// The start time of the transfer, measured in minutes after the commencement of execution of this batch.
+        /// </summary>
+        public double StartTime; // Minutes from batch start.
+
+        /// <summary>
+        /// The duration, in minutes, of the transfer.
+        /// </summary>
+        public double Duration; // Minutes of transfer time.
+
+        /// <summary>
+        /// Enumeration to declare whether this transferRecord refers to a charge, a discharge, 
+        /// or an internal (i.e. between units) transfer.
+        /// </summary>
+        public TransferType MaterialTransferType;
+
+        /// <summary>
+        /// Identifies substance transfers that occurred at the same time through the same connection.
+        /// </summary>
+        public Guid ConcurrencyGuid;
+
+        /// <summary>
+        /// The guid of a materialType that is to be considered the parent type of this transfer. Applies only to charges.
+        /// For example, if this transfer has a mixture with 100 kg of water, and 4 kg of salt, and the parent material
+        /// type guid refers to the substance 'Saline', then the actual charge came from the 'saline' inventory, not the
+        /// 'water' and 'salt' inventories.
+        /// </summary>
+        public Guid ParentMaterialTypeGuid;
 
         /// <summary>
         /// Refer to the commentary for 'ParentMaterialTypeGuid'. In that case, the ParentMaterialTypeSpecGuid might be
@@ -110,124 +112,173 @@ namespace Highpoint.Sage.Materials
         /// </summary>
         public Guid ParentMaterialTypeSpecGuid;
 
-		/// <summary>
-		/// The MaterialSpecificationGuid of the substance in this transfer. If Guid.Empty, the material specification is &lt;nothing&gt;.
-		/// </summary>
-		public Guid MaterialSpecificationGuid;
+        /// <summary>
+        /// The MaterialSpecificationGuid of the substance in this transfer. If Guid.Empty, the material specification is &lt;nothing&gt;.
+        /// </summary>
+        public Guid MaterialSpecificationGuid;
 
-		/// <summary>
-		/// True if the material in this transfer is a part of the product stream
-		/// </summary>
-		public bool IsProduct;
+        /// <summary>
+        /// True if the material in this transfer is a part of the product stream
+        /// </summary>
+        public bool IsProduct;
 
-		private long m_serialNumber = 0;
-		/// <summary>
-		/// The serial number of this MTR.
-		/// </summary>
-		public long SerialNumber { get { return m_serialNumber; } set { m_serialNumber = value; } }
-		
-		private string m_note="";
-		public string Note { get { return m_note; } set { m_note = value; } }
-		/// <summary>
-		/// Represents this transfer as a string, with additional details provided by the model.
-		/// </summary>
-		/// 
-		/// <returns>A string that describes this transfer.</returns>
-		public string Detail(Model model){
-			string type;
-			switch ( MaterialTransferType ) {
-				case TransferType.Charge: type = "charged"; break;
-				case TransferType.Discharge: type = "discharged"; break;
-				case TransferType.Internal: type = "transferred"; break;
-				case TransferType.Emission: type = "emitted"; break;
-				default: throw new ApplicationException("Unknown TransferType encountered.");
-			}
+        private long _serialNumber = 0;
+        /// <summary>
+        /// The serial number of this MTR.
+        /// </summary>
+        public long SerialNumber
+        {
+            get
+            {
+                return _serialNumber;
+            }
+            set
+            {
+                _serialNumber = value;
+            }
+        }
 
-			string parent = GetModelObjectName(model,ParentMaterialTypeGuid,"no parent material.");
+        private string _note = "";
+        public string Note
+        {
+            get
+            {
+                return _note;
+            }
+            set
+            {
+                _note = value;
+            }
+        }
+        /// <summary>
+        /// Represents this transfer as a string, with additional details provided by the model.
+        /// </summary>
+        /// 
+        /// <returns>A string that describes this transfer.</returns>
+        public string Detail(Model model)
+        {
+            string type;
+            switch (MaterialTransferType)
+            {
+                case TransferType.Charge:
+                    type = "charged";
+                    break;
+                case TransferType.Discharge:
+                    type = "discharged";
+                    break;
+                case TransferType.Internal:
+                    type = "transferred";
+                    break;
+                case TransferType.Emission:
+                    type = "emitted";
+                    break;
+                default:
+                    throw new ApplicationException("Unknown TransferType encountered.");
+            }
 
-			string material = GetModelObjectName(model,MaterialTypeGuid,"material [{0}]");
+            string parent = GetModelObjectName(model, ParentMaterialTypeGuid, "no parent material.");
 
-			string source = GetModelObjectName(model,SourceGuid,"an unknown source [{0}]");
+            string material = GetModelObjectName(model, MaterialTypeGuid, "material [{0}]");
 
-			string destination = GetModelObjectName(model,DestinationGuid,"an unknown destination [{0}]");
+            string source = GetModelObjectName(model, SourceGuid, "an unknown source [{0}]");
 
-			string note = (m_note.Length == 0?".":". Note : " + m_note);
+            string destination = GetModelObjectName(model, DestinationGuid, "an unknown destination [{0}]");
 
-			return string.Format(s_mtr_Report_String,StartTime,MaterialMass,MaterialTypeGuid,MaterialTemperature,type,SourceGuid,DestinationGuid,Duration,parent,note);
-		}
+            string note = (_note.Length == 0 ? "." : ". Note : " + _note);
 
-		private static readonly string s_mtr_Report_String = "At {0:F2} minutes after the start of the batch, {1:F4} kg of Material[{2}], at temperature {3:F2} degrees C, was {4} from source[{5}] to destination [{6}]. The transfer took {7:F2} minutes, and the material had {8}{9}";
+            return string.Format(mtr_Report_String, StartTime, MaterialMass, MaterialTypeGuid, MaterialTemperature, type, SourceGuid, DestinationGuid, Duration, parent, note);
+        }
 
-		/// <summary>
-		/// Represents this transfer as a string.
-		/// </summary>
-		/// <returns>A string that describes this transfer.</returns>
-		public string Detail(){
-			string type;
-			switch ( MaterialTransferType ) {
-				case TransferType.Charge: type = "charged"; break;
-				case TransferType.Discharge: type = "discharged"; break;
-				case TransferType.Internal: type = "transferred"; break;
-				case TransferType.Emission: type = "emitted"; break;
-				default: throw new ApplicationException("Unknown TransferType encountered.");
-			}
+        private static readonly string mtr_Report_String = "At {0:F2} minutes after the start of the batch, {1:F4} kg of Material[{2}], at temperature {3:F2} degrees C, was {4} from source[{5}] to destination [{6}]. The transfer took {7:F2} minutes, and the material had {8}{9}";
 
-			string parent = ParentMaterialTypeGuid.Equals(Guid.Empty)?"no parent material.":"a parent material [" + ParentMaterialTypeGuid + "].";
-			string note = (m_note.Length == 0?".":". Note : " + m_note);
+        /// <summary>
+        /// Represents this transfer as a string.
+        /// </summary>
+        /// <returns>A string that describes this transfer.</returns>
+        public string Detail()
+        {
+            string type;
+            switch (MaterialTransferType)
+            {
+                case TransferType.Charge:
+                    type = "charged";
+                    break;
+                case TransferType.Discharge:
+                    type = "discharged";
+                    break;
+                case TransferType.Internal:
+                    type = "transferred";
+                    break;
+                case TransferType.Emission:
+                    type = "emitted";
+                    break;
+                default:
+                    throw new ApplicationException("Unknown TransferType encountered.");
+            }
 
-			return string.Format(s_mtr_Report_String,StartTime,MaterialMass,MaterialTypeGuid,MaterialTemperature,type,SourceGuid,DestinationGuid,Duration,parent,note);
-		}
+            string parent = ParentMaterialTypeGuid.Equals(Guid.Empty) ? "no parent material." : "a parent material [" + ParentMaterialTypeGuid + "].";
+            string note = (_note.Length == 0 ? "." : ". Note : " + _note);
 
-		private string GetModelObjectName(Model model, Guid tgtGuid, string fmtString){
-			if ( tgtGuid!=Guid.Empty ) {
-				IModelObject mo = ((IModelObject)model.ModelObjects[tgtGuid]);
-				if ( mo != null ) {
-					return ((IModelObject)model.ModelObjects[tgtGuid]).Name;
-				}
-			}
-			return string.Format(fmtString,tgtGuid);
-		}
+            return string.Format(mtr_Report_String, StartTime, MaterialMass, MaterialTypeGuid, MaterialTemperature, type, SourceGuid, DestinationGuid, Duration, parent, note);
+        }
 
-		/// <summary>
-		/// An enumeration that describes whether this transfer is entering, leaving, or within the model.
-		/// </summary>
-		public enum TransferType {
-			/// <summary>
-			/// The transfer record is not initialized.
-			/// </summary>
-			Uninitialized,
-			/// <summary>
-			/// The transfer is a charge into the model.
-			/// </summary>
-			Charge,
-			/// <summary>
-			/// The transfer is a discharge from the model.
-			/// </summary>
-			Discharge,
-			/// <summary>
-			/// The transfer is between operations or operation steps, but within the model.
-			/// </summary>
-			Internal,
-			/// <summary>
-			/// The transfer represents an emission.
-			/// </summary>
-			Emission
-		} // If you add one, update both APIs called Detail(...) in this class! Note that you may have to update Catalyst enums as well.
+        private string GetModelObjectName(Model model, Guid tgtGuid, string fmtString)
+        {
+            if (tgtGuid != Guid.Empty)
+            {
+                IModelObject mo = ((IModelObject)model.ModelObjects[tgtGuid]);
+                if (mo != null)
+                {
+                    return ((IModelObject)model.ModelObjects[tgtGuid]).Name;
+                }
+            }
+            return string.Format(fmtString, tgtGuid);
+        }
 
-		public class Sorter : IComparer {
-			#region IComparer Members
+        /// <summary>
+        /// An enumeration that describes whether this transfer is entering, leaving, or within the model.
+        /// </summary>
+        public enum TransferType
+        {
+            /// <summary>
+            /// The transfer record is not initialized.
+            /// </summary>
+            Uninitialized,
+            /// <summary>
+            /// The transfer is a charge into the model.
+            /// </summary>
+            Charge,
+            /// <summary>
+            /// The transfer is a discharge from the model.
+            /// </summary>
+            Discharge,
+            /// <summary>
+            /// The transfer is between operations or operation steps, but within the model.
+            /// </summary>
+            Internal,
+            /// <summary>
+            /// The transfer represents an emission.
+            /// </summary>
+            Emission
+        } // If you add one, update both APIs called Detail(...) in this class! Note that you may have to update Catalyst enums as well.
 
-			public int Compare(object x, object y) {
-				MaterialTransferRecord mtrx = (MaterialTransferRecord)x;
-				MaterialTransferRecord mtry = (MaterialTransferRecord)y;
+        public class Sorter : IComparer
+        {
+            #region IComparer Members
 
-				int retval = Comparer.Default.Compare(mtrx.ConcurrencyGuid,mtry.ConcurrencyGuid);
-				if ( retval == 0 ) retval = Comparer.Default.Compare(mtrx.SerialNumber,mtry.SerialNumber);
+            public int Compare(object x, object y)
+            {
+                MaterialTransferRecord mtrx = (MaterialTransferRecord)x;
+                MaterialTransferRecord mtry = (MaterialTransferRecord)y;
 
-				return retval;
-			}
+                int retval = Comparer.Default.Compare(mtrx.ConcurrencyGuid, mtry.ConcurrencyGuid);
+                if (retval == 0)
+                    retval = Comparer.Default.Compare(mtrx.SerialNumber, mtry.SerialNumber);
 
-			#endregion
-		}
-	}
+                return retval;
+            }
+
+            #endregion
+        }
+    }
 }
