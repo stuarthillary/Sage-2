@@ -10,6 +10,9 @@ namespace Highpoint.Sage.Utility
             this.Value = v;
         }
 
-        public string Value { get; }
+        public string Value
+        {
+            get;
+        }
     }
 }

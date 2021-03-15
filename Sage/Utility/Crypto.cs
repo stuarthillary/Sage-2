@@ -1,21 +1,24 @@
 /* This source code licensed under the GNU Affero General Public License */
 using System;
-using System.Text;
 using System.IO;
 using System.Security.Cryptography;
+using System.Text;
 
-namespace Highpoint.Sage.Utility {
+namespace Highpoint.Sage.Utility
+{
     /// <summary>
     /// A class of static Cryptography helper functions.
     /// </summary>
-    public class Crypto {
+    public class Crypto
+    {
         /// <summary>
         /// Triple-DES encrypts the plain text using the provided key.
         /// </summary>
         /// <param name="plainText">The plain text to be encrypted.</param>
         /// <param name="key">The key to use in encrypting the text.</param>
         /// <returns>The cipher text string resultant from the encryption.</returns>
-        public static string EncryptString(string plainText, string key) {
+        public static string EncryptString(string plainText, string key)
+        {
             TripleDESCryptoServiceProvider tripProvider = new TripleDESCryptoServiceProvider();
             UnicodeEncoding uEncode = new UnicodeEncoding();
             // stores plaintext as a byte array
@@ -44,7 +47,8 @@ namespace Highpoint.Sage.Utility {
         /// <param name="cipherText">The cipher text to be decrypted.</param>
         /// <param name="key">The key to use in decrypting the text.</param>
         /// <returns>The plain text resultant from the decryption.</returns>
-        public static string DecryptString(string cipherText, string key) {
+        public static string DecryptString(string cipherText, string key)
+        {
             TripleDESCryptoServiceProvider tripProvider = new TripleDESCryptoServiceProvider();
             UnicodeEncoding uEncode = new UnicodeEncoding();
             // stores ciphertext as a byte array
@@ -97,7 +101,8 @@ namespace Highpoint.Sage.Utility {
         /// <returns>
         /// Hash value formatted as a base64-encoded string.
         /// </returns>
-        public static string ComputeHash(string plainText, string hashAlgorithm, byte[] saltBytes) {
+        public static string ComputeHash(string plainText, string hashAlgorithm, byte[] saltBytes)
+        {
             /*
              
              low-footprint : 
@@ -107,7 +112,8 @@ namespace Highpoint.Sage.Utility {
              */
 
             // If salt is not specified, generate it on the fly.
-            if (saltBytes == null) {
+            if (saltBytes == null)
+            {
                 // Define min and max salt sizes.
                 int minSaltSize = 4;
                 int maxSaltSize = 8;
@@ -151,7 +157,8 @@ namespace Highpoint.Sage.Utility {
                 hashAlgorithm = "";
 
             // Initialize appropriate hashing algorithm class.
-            switch (hashAlgorithm.ToUpper()) {
+            switch (hashAlgorithm.ToUpper())
+            {
                 case "SHA1":
                     hash = new SHA1Managed();
                     break;
@@ -217,7 +224,8 @@ namespace Highpoint.Sage.Utility {
         /// If computed hash mathes the specified hash the function the return
         /// value is true; otherwise, the function returns false.
         /// </returns>
-        public static bool VerifyHash(string plainText, string hashAlgorithm, string hashValue) {
+        public static bool VerifyHash(string plainText, string hashAlgorithm, string hashValue)
+        {
             // Convert base64-encoded hash value into a byte array.
             byte[] hashWithSaltBytes = Convert.FromBase64String(hashValue);
 
@@ -229,7 +237,8 @@ namespace Highpoint.Sage.Utility {
                 hashAlgorithm = "";
 
             // Size of hash is based on the specified algorithm.
-            switch (hashAlgorithm.ToUpper()) {
+            switch (hashAlgorithm.ToUpper())
+            {
                 case "SHA1":
                     hashSizeInBits = 160;
                     break;
@@ -279,8 +288,9 @@ namespace Highpoint.Sage.Utility {
         /// Gets the key Blob.
         /// </summary>
         /// <returns>The key Blob.</returns>
-        public static byte[] GetKeyBlob() {
-            RSACryptoServiceProvider rsa = new RSACryptoServiceProvider();         
+        public static byte[] GetKeyBlob()
+        {
+            RSACryptoServiceProvider rsa = new RSACryptoServiceProvider();
             return rsa.ExportCspBlob(true);
         }
 
@@ -290,7 +300,8 @@ namespace Highpoint.Sage.Utility {
         /// <param name="hashValue">The hash value.</param>
         /// <param name="cspKeyBlob">The CSP key Blob of the signer.</param>
         /// <returns></returns>
-        public static byte[] GenerateSignature(byte[] hashValue, byte[] cspKeyBlob) {
+        public static byte[] GenerateSignature(byte[] hashValue, byte[] cspKeyBlob)
+        {
             RSACryptoServiceProvider rsa = new RSACryptoServiceProvider();
             rsa.ImportCspBlob(cspKeyBlob);
             RSAPKCS1SignatureFormatter rsaFormatter = new RSAPKCS1SignatureFormatter(rsa);
@@ -305,7 +316,8 @@ namespace Highpoint.Sage.Utility {
         /// <param name="signedHashValue">The signed hash value.</param>
         /// <param name="cspKeyBlob">The CSP key Blob of the asserted signer.</param>
         /// <returns></returns>
-        public static bool ValidateSignature(byte[] hashValue, byte[] signedHashValue, byte[] cspKeyBlob) {
+        public static bool ValidateSignature(byte[] hashValue, byte[] signedHashValue, byte[] cspKeyBlob)
+        {
 
             RSACryptoServiceProvider rsa = new RSACryptoServiceProvider();
             rsa.ImportCspBlob(cspKeyBlob);
@@ -325,7 +337,8 @@ namespace Highpoint.Sage.Utility {
         /// </summary>
         /// <param name="keySize">Size of the key.</param>
         /// <returns>A 1024 bit RSA key pair string.</returns>
-        public static string GenerateFullKeyPair(int keySize) {
+        public static string GenerateFullKeyPair(int keySize)
+        {
             RSACryptoServiceProvider rsa = new RSACryptoServiceProvider(keySize);
             string keyPair = rsa.ToXmlString(true);
             return keyPair;
@@ -336,7 +349,8 @@ namespace Highpoint.Sage.Utility {
         /// </summary>
         /// <param name="fullKeyPair">The full key pair.</param>
         /// <returns></returns>
-        public static string PublicKeyOnly(string fullKeyPair) {
+        public static string PublicKeyOnly(string fullKeyPair)
+        {
             RSACryptoServiceProvider rsa = new RSACryptoServiceProvider();
             rsa.FromXmlString(fullKeyPair);
             string pko = rsa.ToXmlString(false);
