@@ -1,67 +1,53 @@
 /* This source code licensed under the GNU Affero General Public License */
-using System;
-using Highpoint.Sage.SimCore;
 using Highpoint.Sage.Materials.Chemistry;
+using Highpoint.Sage.SimCore;
+using System;
 using System.Collections.Generic;
 using _Debug = System.Diagnostics.Debug;
 
-namespace Highpoint.Sage.Materials {
-
-    /// <summary>
-    /// An implementer makes on-request updates to one or more materials.
-    /// </summary>
-    public interface IUpdater {
-        /// <summary>
-        /// Performs the update operation that this implementer performs.
-        /// </summary>
-        /// <param name="initiator">The material to be updated (along with any dependent materials.)</param>
-        void DoUpdate(IMaterial initiator);
-        /// <summary>
-        /// Causes this updater no longer to perform alterations on the targeted mixture. This may not be implemented in some cases.
-        /// </summary>
-        /// <param name="detachee">The detachee.</param>
-        void Detach(IMaterial detachee);
-    }
-
-    /// <summary>
-    /// A dummy that makes no updates to any materials.
-    /// </summary>
-    internal class NullUpdater : IUpdater {
-        /// <summary>
-        /// Performs the update operation that this implementer performs.
-        /// </summary>
-        /// <param name="initiator">The material to be updated (along with any dependent materials.)</param>
-        public void DoUpdate(IMaterial initiator) { }
-        /// <summary>
-        /// Causes this updater no longer to perform alterations on the targeted mixture. This may not be implemented in some cases.
-        /// </summary>
-        /// <param name="detachee">The detachee.</param>
-        public void Detach(IMaterial detachee) { }
-    }
+namespace Highpoint.Sage.Materials
+{
 
     /// <summary>
     /// Performs transferral of material from one mixture to another.
     /// </summary>
-    public class MaterialTransferrer : IUpdater {
+    public class MaterialTransferrer : IUpdater
+    {
 
-        public class TypeSpec {
+        public class TypeSpec
+        {
 
             #region Private Fields
-            private MaterialType m_mt;
-            private double m_mass;
+            private readonly MaterialType _mt;
+            private readonly double _mass;
             #endregion Private Fields
 
-            public TypeSpec(MaterialType mtype, double mass) {
-                m_mass = mass;
-                m_mt = mtype;
+            public TypeSpec(MaterialType mtype, double mass)
+            {
+                _mass = mass;
+                _mt = mtype;
             }
 
-            public MaterialType MaterialType { get { return m_mt; } }
-            public double Mass { get { return m_mass; } }
+            public MaterialType MaterialType
+            {
+                get
+                {
+                    return _mt;
+                }
+            }
+            public double Mass
+            {
+                get
+                {
+                    return _mass;
+                }
+            }
 
-            public static List<TypeSpec> FromMixture(Mixture exemplar) {
+            public static List<TypeSpec> FromMixture(Mixture exemplar)
+            {
                 List<TypeSpec> typeSpecs = new List<TypeSpec>();
-                foreach (Substance s in exemplar.Constituents) {
+                foreach (Substance s in exemplar.Constituents)
+                {
                     typeSpecs.Add(new TypeSpec(s.MaterialType, s.Mass));
                 }
                 return typeSpecs;
@@ -69,19 +55,19 @@ namespace Highpoint.Sage.Materials {
         }
 
         #region Private Fields
-        private Mixture m_from;
-        private Mixture m_to;
-        private List<TypeSpec> m_what;
-        private TimeSpan m_duration;
-        private IModel m_model;
-        private long m_completionKey = long.MinValue;
-        private long m_startTicks = long.MinValue;
-        private long m_endTicks = long.MinValue;
-        private long m_lastUpdateTicks = long.MinValue;
-        private double m_lastFraction = 0.0;
-        private bool m_inProcess = false;
-        private List<IDetachableEventController> m_startWaiters;
-        private List<IDetachableEventController> m_endWaiters;
+        private readonly Mixture _from;
+        private readonly Mixture _to;
+        private readonly List<TypeSpec> _what;
+        private TimeSpan _duration;
+        private readonly IModel _model;
+        private long _completionKey = long.MinValue;
+        private long _startTicks = long.MinValue;
+        private long _endTicks = long.MinValue;
+        private long _lastUpdateTicks = long.MinValue;
+        private double _lastFraction = 0.0;
+        private bool _inProcess = false;
+        private readonly List<IDetachableEventController> _startWaiters;
+        private readonly List<IDetachableEventController> _endWaiters;
         #endregion Private Fields
 
         /// <summary>
@@ -103,44 +89,52 @@ namespace Highpoint.Sage.Materials {
         /// <param name="to">The destination mixture.</param>
         /// <param name="typespecs">The list of typespecs representing what is to be transferred.</param>
         /// <param name="duration">The transfer duration.</param>
-        public MaterialTransferrer(IModel model, ref Mixture from, ref Mixture to, List<TypeSpec> typespecs, TimeSpan duration) {
-            m_startWaiters = new List<IDetachableEventController>();
-            m_endWaiters = new List<IDetachableEventController>();
-            m_model = model;
-            m_from = from;
-            m_to = to;
-            m_what = typespecs;
+        public MaterialTransferrer(IModel model, ref Mixture from, ref Mixture to, List<TypeSpec> typespecs, TimeSpan duration)
+        {
+            _startWaiters = new List<IDetachableEventController>();
+            _endWaiters = new List<IDetachableEventController>();
+            _model = model;
+            _from = from;
+            _to = to;
+            _what = typespecs;
         }
 
         /// <summary>
         /// Starts the transfer that this MaterialTransferrer represents.
         /// </summary>
-        public void Start() {
+        public void Start()
+        {
 
-            if (m_completionKey != long.MinValue) {
+            if (_completionKey != long.MinValue)
+            {
                 throw new ApplicationException("An already used MaterialTransferrer was asked to start a second time. This is an error.");
             }
 
-            m_startWaiters.ForEach(delegate(IDetachableEventController waiter) { waiter.Resume(); });
-            m_startWaiters.Clear();
-            m_from.Updater = this;
-            m_to.Updater = this;
-            m_startTicks = m_model.Executive.Now.Ticks;
-            m_lastUpdateTicks = m_startTicks;
-            DateTime end = m_model.Executive.Now + m_duration;
-            m_endTicks = end.Ticks;
-            m_completionKey = m_model.Executive.RequestEvent(new ExecEventReceiver(_Update), end, 0.0, null);
+            _startWaiters.ForEach(delegate (IDetachableEventController waiter)
+            {
+                waiter.Resume();
+            });
+            _startWaiters.Clear();
+            _from.Updater = this;
+            _to.Updater = this;
+            _startTicks = _model.Executive.Now.Ticks;
+            _lastUpdateTicks = _startTicks;
+            DateTime end = _model.Executive.Now + _duration;
+            _endTicks = end.Ticks;
+            _completionKey = _model.Executive.RequestEvent(new ExecEventReceiver(_Update), end, 0.0, null);
 
         }
 
         /// <summary>
         /// Blocks the caller's detachable event thread until this transfer has started.
         /// </summary>
-        public void BlockTilStart() {
-            _Debug.Assert(m_model.Executive.CurrentEventType == ExecEventType.Detachable);
-            if (m_completionKey == long.MinValue/*i.e. it has not started*/) {
-                IDetachableEventController waiter = m_model.Executive.CurrentEventController;
-                m_startWaiters.Add(waiter);
+        public void BlockTilStart()
+        {
+            _Debug.Assert(_model.Executive.CurrentEventType == ExecEventType.Detachable);
+            if (_completionKey == long.MinValue/*i.e. it has not started*/)
+            {
+                IDetachableEventController waiter = _model.Executive.CurrentEventController;
+                _startWaiters.Add(waiter);
                 waiter.Suspend();
             }
         }
@@ -148,40 +142,55 @@ namespace Highpoint.Sage.Materials {
         /// <summary>
         /// Blocks the caller's detachable event thread until this transfer has finished.
         /// </summary>
-        public void BlockTilDone() {
-            _Debug.Assert(m_model.Executive.CurrentEventType == ExecEventType.Detachable);
-            if (m_completionKey > m_model.Executive.Now.Ticks) {
-                m_endWaiters.Add(m_model.Executive.CurrentEventController);
-                m_model.Executive.CurrentEventController.Suspend();
+        public void BlockTilDone()
+        {
+            _Debug.Assert(_model.Executive.CurrentEventType == ExecEventType.Detachable);
+            if (_completionKey > _model.Executive.Now.Ticks)
+            {
+                _endWaiters.Add(_model.Executive.CurrentEventController);
+                _model.Executive.CurrentEventController.Suspend();
             }
         }
 
-        private void _Update(IExecutive exec, object userData) {
-            if (!m_inProcess) {
-                m_inProcess = true;
-                double thisFraction = ((double)( m_model.Executive.Now.Ticks - m_startTicks )) / ((double)m_duration.Ticks);
-                double transferFraction = thisFraction - m_lastFraction;
-                if (transferFraction > 0) {
-                    foreach (TypeSpec ts in m_what) {
-                        if (ts.Mass > 0) {
-                            IMaterial extract = m_from.RemoveMaterial(ts.MaterialType, ( ts.Mass * transferFraction ));
-                            m_to.AddMaterial(extract);
+        private void _Update(IExecutive exec, object userData)
+        {
+            if (!_inProcess)
+            {
+                _inProcess = true;
+                double thisFraction = ((double)(_model.Executive.Now.Ticks - _startTicks)) / ((double)_duration.Ticks);
+                double transferFraction = thisFraction - _lastFraction;
+                if (transferFraction > 0)
+                {
+                    foreach (TypeSpec ts in _what)
+                    {
+                        if (ts.Mass > 0)
+                        {
+                            IMaterial extract = _from.RemoveMaterial(ts.MaterialType, (ts.Mass * transferFraction));
+                            _to.AddMaterial(extract);
                         }
                     }
                 }
 
-                if (m_model.Executive.Now.Ticks >= m_endTicks) {
-                    m_endWaiters.ForEach(delegate(IDetachableEventController waiter) { waiter.Resume(); });
-                    m_endWaiters.Clear();
+                if (_model.Executive.Now.Ticks >= _endTicks)
+                {
+                    _endWaiters.ForEach(delegate (IDetachableEventController waiter)
+                    {
+                        waiter.Resume();
+                    });
+                    _endWaiters.Clear();
                 }
 
-                m_lastFraction = thisFraction;
-                m_inProcess = false;
+                _lastFraction = thisFraction;
+                _inProcess = false;
             }
         }
 
-        private void ReleaseWaiters(List<IDetachableEventController> waiters) {
-            waiters.ForEach(delegate(IDetachableEventController waiter) { waiter.Resume(); });
+        private void ReleaseWaiters(List<IDetachableEventController> waiters)
+        {
+            waiters.ForEach(delegate (IDetachableEventController waiter)
+            {
+                waiter.Resume();
+            });
             waiters.Clear();
         }
 
@@ -191,7 +200,8 @@ namespace Highpoint.Sage.Materials {
         /// Performs the update operation that this implementer performs.
         /// </summary>
         /// <param name="initiator">The initiator.</param>
-        public void DoUpdate(IMaterial initiator) {
+        public void DoUpdate(IMaterial initiator)
+        {
             _Update(null, null);
         }
 
@@ -199,7 +209,8 @@ namespace Highpoint.Sage.Materials {
         /// Causes this updater no longer to perform alterations on the targeted mixture. This is not implemented in this class, and will throw an exception.
         /// </summary>
         /// <param name="detachee">The detachee.</param>
-        public void Detach(IMaterial detachee) {
+        public void Detach(IMaterial detachee)
+        {
             throw new NotImplementedException();
         }
 
