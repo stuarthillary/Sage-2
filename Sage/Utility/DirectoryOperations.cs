@@ -2,11 +2,13 @@
 using System;
 using System.IO;
 
-namespace Highpoint.Sage.Utility {
+namespace Highpoint.Sage.Utility
+{
     /// <summary>
     /// A Utility class for convenience operations pertaining to directories.
     /// </summary>
-    public static class DirectoryOperations {
+    public static class DirectoryOperations
+    {
 
         /// <summary>
         /// Gets the named destination directory under the app data dir for this application, ensuring that it exists.
@@ -15,7 +17,8 @@ namespace Highpoint.Sage.Utility {
         /// <returns>
         /// The full path name, ending in the DirectorySeparatorChar.
         /// </returns>
-        public static string GetAppDataDir(string subDir = null) {
+        public static string GetAppDataDir(string subDir = null)
+        {
             //string moduleName = System.Diagnostics.Process.GetCurrentProcess().MainModule.FileName;
             //moduleName = moduleName.Substring(moduleName.LastIndexOf(Path.DirectorySeparatorChar) + 1);
             string folderPath = Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData);
