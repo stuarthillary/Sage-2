@@ -924,6 +924,7 @@
     <Compile Include="Utility\Mementos\ISupportsMementos.cs" />
     <Compile Include="Utility\Mementos\MementoHelper.cs" />
     <Compile Include="Utility\MouseUtilities.cs" />
+    <Compile Include="Utility\MultiArrayListEnumerator.cs" />
     <Compile Include="Utility\NameComparer.cs" />
     <Compile Include="Utility\Heap.cs">
       <SubType>Code</SubType>
@@ -954,7 +955,7 @@
     <Compile Include="Utility\MissingParameterException.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Utility\MultiArrayListEnumeration.cs">
+    <Compile Include="Utility\MultiArrayListEnumerable.cs">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Utility\NameValuePair.cs">
