@@ -782,6 +782,7 @@
     <Compile Include="Scheduling\IHasTimePeriodAspects.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Scheduling\IMilestone.cs" />
     <Compile Include="Scheduling\IObservable.cs" />
     <Compile Include="Scheduling\ISupportsCorrelation.cs" />
     <Compile Include="Scheduling\ITimePeriod.cs">
@@ -791,6 +792,7 @@
     <Compile Include="Scheduling\Milestone.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Scheduling\MilestoneAdjustmentException.cs" />
     <Compile Include="Scheduling\MilestoneRelationship.cs">
       <SubType>Code</SubType>
     </Compile>
