@@ -95,29 +95,29 @@ namespace Highpoint.Sage.Randoms {
 		*/
 
 		/* Period parameters */  
-		private const ulong s_n = 624;
-		private const ulong s_m = 397;
-		private const ulong s_matrix_A = 0x9908b0dfUL;   /* constant vector a */
-		private const ulong s_upper_Mask = 0x80000000UL; /* most significant w-r bits */
-		private const ulong s_lower_Mask = 0x7fffffffUL; /* least significant r bits */
-		private static readonly ulong[] s_mag01 = new ulong[]{0x0UL, s_matrix_A};
-        private ulong[] s_mt = new ulong[s_n]; /* the array for the state vector  */
-        private ulong _mti=s_n + 1; /* mti==N+1 means mt[N] is not initialized */
+		private const ulong n = 624;
+		private const ulong m = 397;
+		private const ulong matrix_A = 0x9908b0dfUL;   /* constant vector a */
+		private const ulong upper_Mask = 0x80000000UL; /* most significant w-r bits */
+		private const ulong lower_Mask = 0x7fffffffUL; /* least significant r bits */
+		private static readonly ulong[] mag01 = new ulong[]{0x0UL, matrix_A};
+        private ulong[] mt = new ulong[n]; /* the array for the state vector  */
+        private ulong _mti=n + 1; /* mti==N+1 means mt[N] is not initialized */
 
         /// <summary>
         /// Initializes this Mersenne Twister with the specified seed.
         /// </summary>
         /// <param name="s">The s.</param>
 		public void Initialize(ulong s) {
-				s_mt[0]= s & 0xffffffffUL;
-			for (_mti=1; _mti<s_n; _mti++) {
-				s_mt[_mti] = 
-					(1812433253UL * (s_mt[_mti-1] ^ (s_mt[_mti-1] >> 30)) + _mti); 
+				mt[0]= s & 0xffffffffUL;
+			for (_mti=1; _mti<n; _mti++) {
+				mt[_mti] = 
+					(1812433253UL * (mt[_mti-1] ^ (mt[_mti-1] >> 30)) + _mti); 
 				/* See Knuth TAOCP Vol2. 3rd Ed. P.106 for multiplier. */
 				/* In the previous versions, MSBs of the seed affect   */
 				/* only MSBs of the array mt[].                        */
 				/* 2002/01/09 modified by Makoto Matsumoto             */
-				s_mt[_mti] &= 0xffffffffUL;
+				mt[_mti] &= 0xffffffffUL;
 				/* for >32 bit machines */
 			}
 		}
@@ -130,24 +130,24 @@ namespace Highpoint.Sage.Randoms {
 			ulong keyLength = (ulong)initKey.Length;
             Initialize(19650218UL);
 			ulong i = 1; ulong j = 0;
-			ulong k = (s_n>keyLength ? s_n : keyLength);
+			ulong k = (n>keyLength ? n : keyLength);
 			for (; (k!=0); k--) {
-				s_mt[i] = (s_mt[i] ^ ((s_mt[i-1] ^ (s_mt[i-1] >> 30)) * 1664525UL))
+				mt[i] = (mt[i] ^ ((mt[i-1] ^ (mt[i-1] >> 30)) * 1664525UL))
 					+ initKey[j] + j; /* non linear */
-				s_mt[i] &= 0xffffffffUL; /* for WORDSIZE > 32 machines */
+				mt[i] &= 0xffffffffUL; /* for WORDSIZE > 32 machines */
 				i++; j++;
-				if (i>=s_n) { s_mt[0] = s_mt[s_n-1]; i=1; }
+				if (i>=n) { mt[0] = mt[n-1]; i=1; }
 				if (j>=keyLength) j=0;
 			}
-			for (k=s_n-1; (k!=0); k--) {
-				s_mt[i] = (s_mt[i] ^ ((s_mt[i-1] ^ (s_mt[i-1] >> 30)) * 1566083941UL))
+			for (k=n-1; (k!=0); k--) {
+				mt[i] = (mt[i] ^ ((mt[i-1] ^ (mt[i-1] >> 30)) * 1566083941UL))
 					- i; /* non linear */
-				s_mt[i] &= 0xffffffffUL; /* for WORDSIZE > 32 machines */
+				mt[i] &= 0xffffffffUL; /* for WORDSIZE > 32 machines */
 				i++;
-				if (i>=s_n) { s_mt[0] = s_mt[s_n-1]; i=1; }
+				if (i>=n) { mt[0] = mt[n-1]; i=1; }
 			}
 
-			s_mt[0] = 0x80000000UL; /* MSB is 1; assuring non-zero initial array */ 
+			mt[0] = 0x80000000UL; /* MSB is 1; assuring non-zero initial array */ 
 		}
 
         /// <summary>
@@ -159,28 +159,28 @@ namespace Highpoint.Sage.Randoms {
 			unchecked {
 				/* mag01[x] = x * MATRIX_A  for x=0,1 */
 
-				if (_mti >= s_n) { /* generate N words at one time */
+				if (_mti >= n) { /* generate N words at one time */
 					ulong kk;
 
-					if (_mti == s_n+1)   /* if init_genrand() has not been called, */
+					if (_mti == n+1)   /* if init_genrand() has not been called, */
 						Initialize(5489UL); /* a default initial seed is used */
 
-					for (kk=0;kk<s_n-s_m;kk++) {
-						y = (s_mt[kk]&s_upper_Mask)|(s_mt[kk+1]&s_lower_Mask);
-						s_mt[kk] = s_mt[kk+s_m] ^ (y >> 1) ^ s_mag01[y & 0x1UL];
+					for (kk=0;kk<n-m;kk++) {
+						y = (mt[kk]&upper_Mask)|(mt[kk+1]&lower_Mask);
+						mt[kk] = mt[kk+m] ^ (y >> 1) ^ mag01[y & 0x1UL];
 					}
-					for (;kk<s_n-1;kk++) {
-						y = (s_mt[kk]&s_upper_Mask)|(s_mt[kk+1]&s_lower_Mask);
-						s_mt[kk] = s_mt[kk+(s_m-s_n)] ^ (y >> 1) ^ s_mag01[y & 0x1UL];
+					for (;kk<n-1;kk++) {
+						y = (mt[kk]&upper_Mask)|(mt[kk+1]&lower_Mask);
+						mt[kk] = mt[kk+(m-n)] ^ (y >> 1) ^ mag01[y & 0x1UL];
 					}
-					y = (s_mt[s_n-1]&s_upper_Mask)|(s_mt[0]&s_lower_Mask);
-					s_mt[s_n-1] = s_mt[s_m-1] ^ (y >> 1) ^ s_mag01[y & 0x1UL];
+					y = (mt[n-1]&upper_Mask)|(mt[0]&lower_Mask);
+					mt[n-1] = mt[m-1] ^ (y >> 1) ^ mag01[y & 0x1UL];
 
 					_mti = 0;
 				}
 
 
-                y = s_mt[_mti++];
+                y = mt[_mti++];
 
 
 				/* Tempering */

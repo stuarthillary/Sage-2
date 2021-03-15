@@ -711,9 +711,13 @@
     </Compile>
     <Compile Include="Persistence\XmlSerializationContext.cs" />
     <Compile Include="Presentation\Converters\Converters.cs" />
+    <Compile Include="Randoms\BufferedRandomChannel.cs" />
+    <Compile Include="Randoms\GlobalRandomServer.cs" />
+    <Compile Include="Randoms\IRandomChannel.cs" />
     <Compile Include="Randoms\MersenneTwister.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Randoms\RandomChannel.cs" />
     <Compile Include="Randoms\RandomServer.cs">
       <SubType>Code</SubType>
     </Compile>
