@@ -961,13 +961,14 @@
     <Compile Include="Utility\NameValuePair.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Utility\OverrideablePrimitives.cs">
+    <Compile Include="Utility\OverrideDouble.cs">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Mathematics\Rationalizer.cs" />
     <Compile Include="Mathematics\IScalable.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Utility\OverrideBool.cs" />
     <Compile Include="Utility\SerialNumber.cs">
       <SubType>Code</SubType>
     </Compile>
