@@ -884,6 +884,7 @@
     <Compile Include="Utility\DateTimeOperations.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Utility\ExecEventLogger.cs" />
     <Compile Include="Utility\FieldDescriptionAttribute.cs" />
     <Compile Include="Utility\DiagnosticAids.cs">
       <SubType>Code</SubType>
