@@ -2,7 +2,6 @@ using System.Collections.Generic;
 
 namespace Highpoint.Sage.SystemDynamics
 {
-    public enum Integrator {  Euler, RK4 }
     public static class Behavior<T> where T : StateBase<T>
     {
 
@@ -21,7 +20,7 @@ namespace Highpoint.Sage.SystemDynamics
 
         public static T RunOneTimeslice(T state, Integrator integrator = Integrator.Euler)
         {
-                return (T) ((integrator == Integrator.Euler) ? state.RunOneTimesliceAsEuler(state) : state.RunOneTimeSliceAsRK4(state));
+            return (T)((integrator == Integrator.Euler) ? state.RunOneTimesliceAsEuler(state) : state.RunOneTimeSliceAsRK4(state));
         }
     }
 }
