@@ -1,30 +1,36 @@
 /* This source code licensed under the GNU Affero General Public License */
 using System;
-using System.Linq;
 using System.Collections.Generic;
-using System.Text;
-using System.Text.RegularExpressions;
 using System.IO;
 using System.IO.Compression;
+using System.Linq;
+using System.Text;
+using System.Text.RegularExpressions;
 
-namespace Highpoint.Sage.Utility {
-	/// <summary>
-	/// Summary description for StringOperations.
-	/// </summary>
-    public static class StringOperations {
-	    public static string NormalizeLength(string from, int nSpaces, Justification justification = Justification.Left, char filler = ' ') {
+namespace Highpoint.Sage.Utility
+{
+    /// <summary>
+    /// Summary description for StringOperations.
+    /// </summary>
+    public static class StringOperations
+    {
+        public static string NormalizeLength(string from, int nSpaces, Justification justification = Justification.Left, char filler = ' ')
+        {
             if (from.Length > nSpaces)
                 return from.Substring(0, nSpaces);
 
             string retval;
-            switch (justification) {
-                case Justification.Left: {
+            switch (justification)
+            {
+                case Justification.Left:
+                    {
                         StringBuilder sb = new StringBuilder(from);
                         while (sb.Length <= nSpaces)
                             sb.Append(filler);
                         return sb.ToString();
                     }
-                case Justification.Center: {
+                case Justification.Center:
+                    {
                         int length = from.Length;
                         int spacesLeft = (nSpaces - length) / 2;
                         int spacesRight = nSpaces - length - spacesLeft;
@@ -39,16 +45,18 @@ namespace Highpoint.Sage.Utility {
                         break;
                     }
 
-                case Justification.Right: {
+                case Justification.Right:
+                    {
                         StringBuilder sb = new StringBuilder();
-                        while (sb.Length <= (nSpaces-from.Length))
+                        while (sb.Length <= (nSpaces - from.Length))
                             sb.Append(filler);
                         sb.Append(from);
                         retval = sb.ToString();
                         break;
                     }
 
-                default: {
+                default:
+                    {
                         throw new ApplicationException("Unknown text mode, " + justification + " requested.");
                     }
             }
@@ -57,30 +65,38 @@ namespace Highpoint.Sage.Utility {
 
         public enum Justification { Left, Center, Right };
 
-	    public static string Spaces(int n) { return NormalizeLength("", n); }
+        public static string Spaces(int n)
+        {
+            return NormalizeLength("", n);
+        }
 
         /// <summary>
         /// Given IEnumerable of strings such as {"Foo", "Bar", "Baz"} returns a string representation, "Foo, Bar and Baz".
         /// </summary>
         /// <param name="enumerable">The enumerable.</param>
         /// <returns>the string representation.</returns>
-        public static string ToCommasAndAndedList(IEnumerable<string> enumerable) {
+        public static string ToCommasAndAndedList(IEnumerable<string> enumerable)
+        {
             IEnumerator<string> lstEnum = enumerable.GetEnumerator();
 
             string last = null;
             bool entryMade = false;
 
             StringBuilder sb = new StringBuilder();
-            while (lstEnum.MoveNext()) {
+            while (lstEnum.MoveNext())
+            {
                 string nxtToLast = last;
                 last = lstEnum.Current;
-                if (nxtToLast == null) continue;
-                if (entryMade) sb.Append(", ");
+                if (nxtToLast == null)
+                    continue;
+                if (entryMade)
+                    sb.Append(", ");
                 sb.Append(nxtToLast);
                 entryMade = true;
             }
 
-            if (entryMade) sb.Append(" and ");
+            if (entryMade)
+                sb.Append(" and ");
             sb.Append(last);
 
             return sb.ToString();
@@ -91,7 +107,8 @@ namespace Highpoint.Sage.Utility {
         /// </summary>
         /// <param name="alist">The list.</param>
         /// <returns>the string representation.</returns>
-        public static string ToCommasAndAndedList(System.Collections.ArrayList alist) {
+        public static string ToCommasAndAndedList(System.Collections.ArrayList alist)
+        {
             // Uses an adapter class built solely for this purpose. See below.
             return ToCommasAndAndedList(new ArrayListToIEnumOfStr(alist));
         }
@@ -103,7 +120,8 @@ namespace Highpoint.Sage.Utility {
         /// <param name="ienum">The IEnumerable of type T.</param>
         /// <param name="converterFunc">The converter function.</param>
         /// <returns>the string representation.</returns>
-        public static string ToCommasAndAndedList<T>(IEnumerable<T> ienum, Func<T,string> converterFunc) {
+        public static string ToCommasAndAndedList<T>(IEnumerable<T> ienum, Func<T, string> converterFunc)
+        {
             return ToCommasAndAndedList(ienum.Select(converterFunc));
         }
 
@@ -113,7 +131,8 @@ namespace Highpoint.Sage.Utility {
         /// <typeparam name="T"></typeparam>
         /// <param name="list">The list.</param>
         /// <returns>the string representation.</returns>
-        public static string ToCommasAndAndedListOfNames<T>(List<T> list) where T : SimCore.IHasName {
+        public static string ToCommasAndAndedListOfNames<T>(List<T> list) where T : SimCore.IHasName
+        {
             return ToCommasAndAndedList(list.ConvertAll(n => n.Name));
         }
 
@@ -122,20 +141,42 @@ namespace Highpoint.Sage.Utility {
         /// A wrapper, used only in this class, to morph an arraylist that I know is going to be converted
         /// to strings, into an IEnumerable of strings - this way the same algo code as others can be used.
         /// </summary>
-        private class ArrayListToIEnumOfStr : IEnumerable<string> {
-            private readonly System.Collections.ArrayList m_alist;
-            public ArrayListToIEnumOfStr(System.Collections.ArrayList alist) { m_alist = alist; }
-            public IEnumerator<string> GetEnumerator() { return new EnumOfStr(m_alist); }
-            System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator() { return m_alist.GetEnumerator(); }
+        private class ArrayListToIEnumOfStr : IEnumerable<string>
+        {
+            private readonly System.Collections.ArrayList _alist;
+            public ArrayListToIEnumOfStr(System.Collections.ArrayList alist)
+            {
+                _alist = alist;
+            }
+            public IEnumerator<string> GetEnumerator()
+            {
+                return new EnumOfStr(_alist);
+            }
+            System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
+            {
+                return _alist.GetEnumerator();
+            }
 
-            private class EnumOfStr : IEnumerator<string> {
+            private class EnumOfStr : IEnumerator<string>
+            {
                 private readonly System.Collections.IEnumerator m_ienum;
-                public EnumOfStr(System.Collections.ArrayList alist) { m_ienum = alist.GetEnumerator(); }
+                public EnumOfStr(System.Collections.ArrayList alist)
+                {
+                    m_ienum = alist.GetEnumerator();
+                }
                 public string Current => m_ienum.Current.ToString();
                 object System.Collections.IEnumerator.Current => m_ienum.Current.ToString();
-                void IDisposable.Dispose() { }
-                public bool MoveNext() { return m_ienum.MoveNext(); }
-                public void Reset() { m_ienum.Reset(); }
+                void IDisposable.Dispose()
+                {
+                }
+                public bool MoveNext()
+                {
+                    return m_ienum.MoveNext();
+                }
+                public void Reset()
+                {
+                    m_ienum.Reset();
+                }
             }
         }
 
@@ -151,14 +192,17 @@ namespace Highpoint.Sage.Utility {
         /// <param name="addToList">if true, automatically updates the list with the new name.</param>
         /// <param name="template">The string format to use. It takes as {0} the name, and as {1}, the index, if any, to use.</param>
         /// <returns>the name you can use - that is unique.</returns>
-        public static string UniqueString(string name, List<string> existingNames, bool addToList = false, string template = "{0}:{1}") {
+        public static string UniqueString(string name, List<string> existingNames, bool addToList = false, string template = "{0}:{1}")
+        {
             string tmpName = name;
             int ndx = 0;
-            while ( existingNames.Contains(tmpName) ) {
+            while (existingNames.Contains(tmpName))
+            {
                 tmpName = string.Format(template, name, ndx++);
             }
 
-            if ( addToList ) {
+            if (addToList)
+            {
                 existingNames.Add(tmpName);
             }
             return tmpName;
@@ -216,29 +260,36 @@ namespace Highpoint.Sage.Utility {
             }
         }
 
-        private class Pc : IComparer<string> {
+        private class Pc : IComparer<string>
+        {
 
             private static string _pattern = @"(\d+)$";
 
-            private static readonly Regex s_regex = new Regex(_pattern, RegexOptions.Compiled);
+            private static readonly Regex _regex = new Regex(_pattern, RegexOptions.Compiled);
 
-            public int Compare(string x, string y) {
-                Match matchX = s_regex.Match(x);
-                Match matchY = s_regex.Match(y);
+            public int Compare(string x, string y)
+            {
+                Match matchX = _regex.Match(x);
+                Match matchY = _regex.Match(y);
                 int result;
-                if ( matchX.Length == 0 || matchY.Length == 0 ) {
+                if (matchX.Length == 0 || matchY.Length == 0)
+                {
                     result = Comparer<string>.Default.Compare(x, y);
-                } else {
+                }
+                else
+                {
                     string baseX = x.Substring(0, x.Length - matchX.Length);
                     string baseY = y.Substring(0, y.Length - matchY.Length);
 
                     result = Comparer<string>.Default.Compare(baseX, baseY);
 
-                    if ( result == 0 ) {
+                    if (result == 0)
+                    {
                         int suffixX = int.Parse(matchX.Value);
                         int suffixY = int.Parse(matchY.Value);
                         result = Comparer<int>.Default.Compare(suffixX, suffixY);
-                        if ( result == 0 ) {
+                        if (result == 0)
+                        {
                             result = Comparer<string>.Default.Compare(matchX.Value, matchY.Value);
                         }
                     }
@@ -247,20 +298,23 @@ namespace Highpoint.Sage.Utility {
             }
         }
 
-        public class RandomStringGenerator {
-            private readonly Random m_random;
-            private readonly string m_letters;
-            public RandomStringGenerator(int seed, string candidateCharacters) {
-                m_letters = candidateCharacters;
-                m_random = new Random(seed);
+        public class RandomStringGenerator
+        {
+            private readonly Random _random;
+            private readonly string _letters;
+            public RandomStringGenerator(int seed, string candidateCharacters)
+            {
+                _letters = candidateCharacters;
+                _random = new Random(seed);
             }
 
             public RandomStringGenerator() : this((new Random()).Next(), "abcdefghijklmnopqrstuvwxyz") { }
 
-            public string RandomString(int nChars) {
+            public string RandomString(int nChars)
+            {
                 StringBuilder sb = new StringBuilder(nChars);
                 for (int i = 0; i < nChars; i++)
-                    sb.Append(m_letters[m_random.Next(m_letters.Length)]);
+                    sb.Append(_letters[_random.Next(_letters.Length)]);
                 return sb.ToString();
             }
         }
