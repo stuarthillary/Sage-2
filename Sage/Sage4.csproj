@@ -642,7 +642,12 @@
     <Compile Include="Mathematics\CauchyCDF.cs" />
     <Compile Include="Mathematics\CauchyDistribution.cs" />
     <Compile Include="Mathematics\ConstantDoubleDistribution.cs" />
+    <Compile Include="Mathematics\CosineDoubleInterpolator.cs" />
     <Compile Include="Mathematics\HistogramBinCategory.cs" />
+    <Compile Include="Mathematics\IDoubleInterpolator.cs" />
+    <Compile Include="Mathematics\IWriteableInterpolable.cs" />
+    <Compile Include="Mathematics\LinearDoubleInterpolator.cs" />
+    <Compile Include="Mathematics\SmallDoubleInterpolable.cs" />
     <Compile Include="Mathematics\TimeSpanDistribution.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -668,7 +673,7 @@
     <Compile Include="Mathematics\IHistogram.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Mathematics\Interpolations.cs">
+    <Compile Include="Mathematics\IInterpolable.cs">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Mathematics\ITimeSpanDistribution.cs" />
