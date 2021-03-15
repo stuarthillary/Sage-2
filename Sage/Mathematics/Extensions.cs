@@ -1,7 +1,7 @@
 ﻿/* This source code licensed under the GNU Affero General Public License */
 using System;
-using System.Linq;
 using System.Collections.Generic;
+using System.Linq;
 using _Debug = System.Diagnostics.Debug;
 // ReSharper disable PossibleMultipleEnumeration // TODO: Must address this.
 // ReSharper disable CompareOfFloatsByEqualityOperator
@@ -46,28 +46,45 @@ namespace Highpoint.Sage.Mathematics
             return ld.Where(d => d >= minBound && d <= maxBound);
         }
 
-        internal class SigmaBoundingContext {
-            public double MinBound { get; set; }
-            public double MaxBound { get; set; }
-            public double Mean { get; set; }
-            public double StdDev { get; set; }
+        internal class SigmaBoundingContext
+        {
+            public double MinBound
+            {
+                get; set;
+            }
+            public double MaxBound
+            {
+                get; set;
+            }
+            public double Mean
+            {
+                get; set;
+            }
+            public double StdDev
+            {
+                get; set;
+            }
 
-            public bool IsValueInBounds(double val){
-                double deviation = (val-Mean)/StdDev;
+            public bool IsValueInBounds(double val)
+            {
+                double deviation = (val - Mean) / StdDev;
                 return (deviation > 0 && deviation < MaxBound) ||
                        (deviation < 0 && -deviation < MinBound);
             }
         }
 
-        public static IEnumerable<T> BoundBySigmas<T>(this IEnumerable<T> ld, Func<T, double> transform, double minBound, double maxBound) {
+        public static IEnumerable<T> BoundBySigmas<T>(this IEnumerable<T> ld, Func<T, double> transform, double minBound, double maxBound)
+        {
             double mean = ld.Average(transform);
             double stdev = ld.StandardDeviation(transform);
             SigmaBoundingContext context = new SigmaBoundingContext { Mean = mean, StdDev = stdev, MinBound = minBound, MaxBound = maxBound };
             return BoundBySigmasIter(ld, transform, context);
         }
 
-        public static IEnumerable<T> BoundBySigmas<T>(this IEnumerable<T> ld, Func<T, double> transform, double minBound, double maxBound, ref object context) {
-            if (context == null) {
+        public static IEnumerable<T> BoundBySigmas<T>(this IEnumerable<T> ld, Func<T, double> transform, double minBound, double maxBound, ref object context)
+        {
+            if (context == null)
+            {
                 double mean = ld.Average(transform);
                 double stdev = ld.StandardDeviation(transform);
                 context = new SigmaBoundingContext() { Mean = mean, StdDev = stdev, MinBound = minBound, MaxBound = maxBound };
@@ -80,16 +97,20 @@ namespace Highpoint.Sage.Mathematics
             return ld.Where(item => context.IsValueInBounds(transform(item)));
         }
 
-        public static IEnumerable<double> BoundBySigmas(this IEnumerable<double> ld, double minBound, double maxBound) {
+        public static IEnumerable<double> BoundBySigmas(this IEnumerable<double> ld, double minBound, double maxBound)
+        {
             object context = null;
             return BoundBySigmas(ld, minBound, maxBound, ref context);
         }
 
-        public static IEnumerable<double> BoundBySigmas(this IEnumerable<double> ld, double minBound, double maxBound, ref object context) {
-            if (!ld.Any()) {
+        public static IEnumerable<double> BoundBySigmas(this IEnumerable<double> ld, double minBound, double maxBound, ref object context)
+        {
+            if (!ld.Any())
+            {
                 return ld;
             }
-            if (context == null) {
+            if (context == null)
+            {
                 double mean = ld.Average();
                 double stdev = ld.StandardDeviation();
                 context = new SigmaBoundingContext { Mean = mean, StdDev = stdev, MinBound = minBound, MaxBound = maxBound };
@@ -121,7 +142,7 @@ namespace Highpoint.Sage.Mathematics
             return ndx > 0 ? transform(lhi.ElementAt(ndx / 2)) : double.NaN;
         }
 
-        public static double Skewness(this IEnumerable<double> ld )
+        public static double Skewness(this IEnumerable<double> ld)
         {
             double skewness = double.NaN;
             double avg = ld.Average();
@@ -183,31 +204,42 @@ namespace Highpoint.Sage.Mathematics
         /// <param name="valueGetter">The function that ascertains the value of each source item.</param>
         /// <param name="interpolate">if set to <c>true</c>, we interpolate between located items' values.</param>
         /// <returns></returns>
-        public static double GetValueAtPercentile<T>(this List<T> srcItems, double percentile, Func<T, double> valueGetter, bool interpolate) {
+        public static double GetValueAtPercentile<T>(this List<T> srcItems, double percentile, Func<T, double> valueGetter, bool interpolate)
+        {
             _Debug.Assert(srcItems.Count > 0, "Percentile was requested from a population of zero items. Percentile source populations must have at least one member.");
             _Debug.Assert(percentile >= 0.0 && percentile <= 100.0, string.Format("Percentile was requested as {0} - it must be a double on the interval [0.0 ... 100.0]", percentile));
             percentile = percentile / 100.0;
-            if (srcItems.Count == 1) {
+            if (srcItems.Count == 1)
+            {
                 return valueGetter(srcItems[0]);
-            } else {
+            }
+            else
+            {
                 srcItems.Sort((t1, t2) => Comparer<double>.Default.Compare(valueGetter(t1), valueGetter(t2)));
 
                 double index = (srcItems.Count - 1) * percentile;
                 double lowNdx = Math.Floor(index);
                 double hiNdx = Math.Ceiling(index);
-                if (lowNdx == hiNdx) {
-                    if (lowNdx == 0) {
+                if (lowNdx == hiNdx)
+                {
+                    if (lowNdx == 0)
+                    {
                         hiNdx++;
-                    } else {
+                    }
+                    else
+                    {
                         lowNdx--;
                     }
                 }
                 double lowVal = valueGetter(srcItems[(int)lowNdx]);
                 double hiVal = valueGetter(srcItems[(int)hiNdx]);
-                if (interpolate) {
+                if (interpolate)
+                {
                     SmallDoubleInterpolable sdi = new SmallDoubleInterpolable(new[] { lowNdx, hiNdx }, new[] { lowVal, hiVal });
                     return sdi.GetYValue(index);
-                } else {
+                }
+                else
+                {
                     return (index - lowNdx) < 0.5 ? lowVal : hiVal;
                 }
             }
@@ -227,16 +259,21 @@ namespace Highpoint.Sage.Mathematics
         /// <param name="targetItem">The item for whose score we want to know its percentile in the srcItems population.</param>
         /// <param name="valueGetter">The function that ascertains the value of each source item.</param>
         /// <returns>The percentile at which the target item falls.</returns>
-        public static double GetPercentileForItem<T>(this List<T> srcItems, T targetItem, Func<T, double> valueGetter) {
+        public static double GetPercentileForItem<T>(this List<T> srcItems, T targetItem, Func<T, double> valueGetter)
+        {
             List<T> lclSrcItems = new List<T>(srcItems);
             _Debug.Assert(lclSrcItems.Count > 0, "Percentile was requested from a population of zero items. Percentile source populations must have at least one member.");
             lclSrcItems.Sort((t1, t2) => Comparer<double>.Default.Compare(valueGetter(t1), valueGetter(t2)));
-            if (lclSrcItems.Contains(targetItem)) {
+            if (lclSrcItems.Contains(targetItem))
+            {
                 // Faster method.
                 int ndx = lclSrcItems.FindIndex(0, tgt => tgt.Equals(targetItem));
-                while (ndx < lclSrcItems.Count && valueGetter(lclSrcItems[ndx]) == valueGetter(targetItem)) ndx++;
+                while (ndx < lclSrcItems.Count && valueGetter(lclSrcItems[ndx]) == valueGetter(targetItem))
+                    ndx++;
                 return ndx / ((double)lclSrcItems.Count);
-            } else {
+            }
+            else
+            {
                 throw new NotSupportedException();
             }
         }
@@ -250,8 +287,10 @@ namespace Highpoint.Sage.Mathematics
         /// <param name="valueGetter">The value getter.</param>
         /// <param name="pd">The object that will hold state for repeated calls to this method on the same list.</param>
         /// <returns></returns>
-        public static double GetPercentileForItem<T>(this List<T> srcItems, T targetItem, Func<T, double> valueGetter, ref object pd) {
-            if (pd == null) {
+        public static double GetPercentileForItem<T>(this List<T> srcItems, T targetItem, Func<T, double> valueGetter, ref object pd)
+        {
+            if (pd == null)
+            {
                 List<T> lclSrcItems = new List<T>(srcItems);
                 lclSrcItems.Sort((t1, t2) => Comparer<double>.Default.Compare(valueGetter(t1), valueGetter(t2)));
                 int nItems = lclSrcItems.Count;
@@ -260,9 +299,11 @@ namespace Highpoint.Sage.Mathematics
                 // to calculate a slope, dy/dx because dx==0). 
                 List<double> data = new List<double>();
                 List<double> percentiles = new List<double>();
-                for (int i = 0; i < nItems; i++) {
+                for (int i = 0; i < nItems; i++)
+                {
                     double xval = valueGetter(lclSrcItems[i]);
-                    if (data.Count == 0 || xval != data.Last()) {
+                    if (data.Count == 0 || xval != data.Last())
+                    {
                         data.Add(xval);
                         percentiles.Add(((double)i + 1) / nItems);
                     }
