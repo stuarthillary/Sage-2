@@ -8,11 +8,11 @@ namespace Highpoint.Sage.SystemDynamics.Utility
     public static class RunProgram<T1> where T1 : StateBase<T1>, new()
     {
         public static void Run(
-            string[] args, 
-            Integrator integrator = Integrator.Euler, 
-            XElement parameters = null, 
+            string[] args,
+            Integrator integrator = Integrator.Euler,
+            XElement parameters = null,
             string outputFileName = null,
-            string header = null, 
+            string header = null,
             Action<TextWriter, T1> toWrite = null,
             T1 seed = null)
         {
@@ -33,11 +33,12 @@ namespace Highpoint.Sage.SystemDynamics.Utility
                     tw.WriteLine();
 
                     // Create Data content
-                    if ( seed == null ) seed = new T1();
+                    if (seed == null)
+                        seed = new T1();
                     seed.Configure(parameters);
                     foreach (T1 s in Behavior<T1>.Run(seed, integrator))
                     {
-                        tw.Write("{0:0.00},", s.TimeSliceNdx*s.TimeStep);
+                        tw.Write("{0:0.00},", s.TimeSliceNdx * s.TimeStep);
                         foreach (var getter in s.StockGetters)
                         {
                             tw.Write("{0:0.000},", getter(s));
