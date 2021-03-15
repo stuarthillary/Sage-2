@@ -1,7 +1,7 @@
 /* This source code licensed under the GNU Affero General Public License */
+using Highpoint.Sage.SimCore;
 using System;
 using System.Collections.Generic;
-using Highpoint.Sage.SimCore;
 
 namespace Highpoint.Sage.Utility
 {
@@ -9,24 +9,29 @@ namespace Highpoint.Sage.Utility
     /// An ExchangeManager manages a set of ITupleSpace instances (Exchanges) that are used for
     /// coordination and synchronization between otherwise uncoupled elements of a simulation.
     /// </summary>
-    public class ExchangeManager : IModelService {
+    public class ExchangeManager : IModelService
+    {
 
         #region Private Memebers
-        private Dictionary<Guid, ITupleSpace> m_exchanges;
-        private IExecutive m_exec;
+        private Dictionary<Guid, ITupleSpace> _exchanges;
+        private IExecutive _exec;
         #endregion
 
         /// <summary>
         /// Creates a new instance of the <see cref="ExchangeManager"/> class.
         /// </summary>
-        public ExchangeManager() {
+        public ExchangeManager()
+        {
         }
 
         /// <summary>
         /// Gets the default exchange for this model.
         /// </summary>
         /// <returns>The default exchange for this model.</returns>
-        public ITupleSpace GetExchange() { return GetExchange(Guid.Empty); }
+        public ITupleSpace GetExchange()
+        {
+            return GetExchange(Guid.Empty);
+        }
 
         /// <summary>
         /// Gets the exchange associated with the provided identifier. If the identifier is Guid.Empty, then
@@ -34,20 +39,25 @@ namespace Highpoint.Sage.Utility
         /// </summary>
         /// <param name="exchangeIdentifier">The exchange identifier.</param>
         /// <returns>The exchange associated with the provided identifier.</returns>
-        public ITupleSpace GetExchange(Guid exchangeIdentifier) {
-            if (m_exchanges == null) {
-                lock (this) {
-                    if (m_exchanges == null) {
-                        m_exchanges = new Dictionary<Guid, ITupleSpace> {{Guid.Empty, new Exchange(m_exec)}};
+        public ITupleSpace GetExchange(Guid exchangeIdentifier)
+        {
+            if (_exchanges == null)
+            {
+                lock (this)
+                {
+                    if (_exchanges == null)
+                    {
+                        _exchanges = new Dictionary<Guid, ITupleSpace> { { Guid.Empty, new Exchange(_exec) } };
                     }
                 }
             }
 
-            if (!m_exchanges.ContainsKey(exchangeIdentifier)) {
-                m_exchanges.Add(exchangeIdentifier, new Exchange(m_exec));
+            if (!_exchanges.ContainsKey(exchangeIdentifier))
+            {
+                _exchanges.Add(exchangeIdentifier, new Exchange(_exec));
             }
 
-            return m_exchanges[exchangeIdentifier];
+            return _exchanges[exchangeIdentifier];
         }
 
         /// <summary>
@@ -57,16 +67,22 @@ namespace Highpoint.Sage.Utility
         /// <param name="model">The model.</param>
         public void InitializeService(IModel model)
         {
-            m_exec = model.Executive;
+            _exec = model.Executive;
         }
 
         /// <summary>
         /// Gets or sets a value indicating whether this instance has been initialized yet.
         /// </summary>
         /// <value><c>true</c> if this instance is initialized; otherwise, <c>false</c>.</value>
-        public bool IsInitialized {
-            get { return m_exec != null; }
-            set { }
+        public bool IsInitialized
+        {
+            get
+            {
+                return _exec != null;
+            }
+            set
+            {
+            }
         }
         /// <summary>
         /// Gets a value indicating whether the service is to be automatically initialized inline when
