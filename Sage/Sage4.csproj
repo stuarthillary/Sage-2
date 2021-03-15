@@ -738,6 +738,8 @@
     <Compile Include="Resources\IResourceRequest.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Resources\MultiRequestProcessor.cs" />
+    <Compile Include="Resources\RequestStatus.cs" />
     <Compile Include="Resources\Resource.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -758,6 +760,7 @@
     </Compile>
     <Compile Include="Resources\SimpleAccessManager.cs" />
     <Compile Include="Resources\SingleKeyAccessRegulator.cs" />
+    <Compile Include="Resources\TerminalResourceRequestAbortedWarning.cs" />
     <Compile Include="Resources\Tracking.cs">
       <SubType>Code</SubType>
     </Compile>
