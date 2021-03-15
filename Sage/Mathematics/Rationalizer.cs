@@ -2,7 +2,8 @@
 using System;
 using System.Collections.Generic;
 
-namespace Highpoint.Sage.Mathematics {
+namespace Highpoint.Sage.Mathematics
+{
 
 
     /// <summary>
@@ -14,12 +15,13 @@ namespace Highpoint.Sage.Mathematics {
     /// value could be a low-order rational number such as 5 1/3, or 6, but the computation results in
     /// 5.3333391 or 6.000000215, or 5.99999938.
     /// </summary>
-    public class Rationalizer {
+    public class Rationalizer
+    {
 
-#region Private Fields
+        #region Private Fields
         private Dictionary<double, double> _ratios = new Dictionary<double, double>();
         private int _numPlaces;
-#endregion Private Fields
+        #endregion Private Fields
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Rationalizer"/> class to a set of fractions and a
@@ -27,15 +29,21 @@ namespace Highpoint.Sage.Mathematics {
         /// </summary>
         /// <param name="denominatorRange">The range of fractions that will be examined for.</param>
         /// <param name="numPlaces">The number of places that will be examined in the mantissa.</param>
-        public Rationalizer(int denominatorRange, int numPlaces) {
+        public Rationalizer(int denominatorRange, int numPlaces)
+        {
             _numPlaces = numPlaces;
-            for (double den = 1 ; den < 10 ; den++) {
-                for (double num = 1 ; num < den ; num++) {
+            for (double den = 1; den < 10; den++)
+            {
+                for (double num = 1; num < den; num++)
+                {
                     double val = num / den;
                     double key = Math.Truncate(val * Math.Pow(10, _numPlaces)) / Math.Pow(10, _numPlaces);
-                    if (_ratios.ContainsKey(key)) {
+                    if (_ratios.ContainsKey(key))
+                    {
                         //Console.WriteLine("{1}/{2} = {0}, but we already have this.", val, num, den);
-                    } else {
+                    }
+                    else
+                    {
                         //Console.WriteLine("{1}/{2} = {0}, we will key on {0:F6}", val, num, den, key);
                         _ratios.Add(key, val);
                     }
@@ -50,15 +58,17 @@ namespace Highpoint.Sage.Mathematics {
         /// </summary>
         /// <param name="valArg">The number to be examined.</param>
         /// <returns>The rationalized value</returns>
-        public double Rationalize(double valArg) {
+        public double Rationalize(double valArg)
+        {
             double sgn = Math.Sign(valArg);
             double val = Math.Abs(valArg);
             double floor = Math.Floor(val);
             double fractional = val - floor;
             double key = Math.Truncate(fractional * Math.Pow(10, _numPlaces)) / Math.Pow(10, _numPlaces);
-            if (_ratios.ContainsKey(key)) {
+            if (_ratios.ContainsKey(key))
+            {
                 fractional = _ratios[key];
-                valArg = sgn * ( floor + fractional );
+                valArg = sgn * (floor + fractional);
             }
             return valArg;
         }

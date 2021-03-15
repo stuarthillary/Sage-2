@@ -19,7 +19,8 @@ namespace Highpoint.Sage.Mathematics.Scaling
         /// Creates a new instance of the <see cref="T:ScalingEngine" /> class.
         /// </summary>
         /// <param name="scalables">The scalables.</param>
-        public ScalingEngine(IEnumerable scalables){
+        public ScalingEngine(IEnumerable scalables)
+        {
             _subjectEnumerator = scalables;
             _aggregate = 1;
         }
@@ -27,10 +28,12 @@ namespace Highpoint.Sage.Mathematics.Scaling
         /// <summary>
         /// The scale to be applied to the target object. Cannot scale by a factor of zero.
         /// </summary>
-        public void Rescale(double byFactor){
+        public void Rescale(double byFactor)
+        {
             // TODO: Figure out a scaling rollback strategy if somebody pukes on scaling.
-            _aggregate*=byFactor;
-            foreach ( IScalable scalable in _subjectEnumerator ) {
+            _aggregate *= byFactor;
+            foreach (IScalable scalable in _subjectEnumerator)
+            {
                 scalable.Rescale(_aggregate);
             }
         }
@@ -39,14 +42,17 @@ namespace Highpoint.Sage.Mathematics.Scaling
         /// The combined, aggregate scale of all of the subjects of this scaling engine
         /// compared to their original scale.
         /// </summary>
-        public double AggregateScale { 
-            get{
+        public double AggregateScale
+        {
+            get
+            {
                 return _aggregate;
             }
-            set{
-                Rescale(1.0/_aggregate); // TODO: Think about this. In non-linear cases this is probably necessary.
+            set
+            {
+                Rescale(1.0 / _aggregate); // TODO: Think about this. In non-linear cases this is probably necessary.
                 Rescale(value);
             }
-        }    
+        }
     }
 }

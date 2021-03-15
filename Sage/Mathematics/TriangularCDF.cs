@@ -8,7 +8,8 @@ namespace Highpoint.Sage.Mathematics
     /// A Triangular Cumulative Density Function.
     /// </summary>
     /// <seealso cref="Highpoint.Sage.Mathematics.ICDF" />
-    public class TriangularCDF : ICDF {
+    public class TriangularCDF : ICDF
+    {
 
         #region Private Fields
         /// <summary>
@@ -43,7 +44,8 @@ namespace Highpoint.Sage.Mathematics
         /// <param name="lowBound">The low bound.</param>
         /// <param name="peak">The peak.</param>
         /// <param name="highBound">The high bound.</param>
-        public TriangularCDF(double lowBound, double peak, double highBound) {
+        public TriangularCDF(double lowBound, double peak, double highBound)
+        {
             //			m_sdi = new SmallDoubleInterpolable(3);
             //			m_sdi.SetYValue(0,lowBound);
             //			m_sdi.SetYValue(.5,peak);
@@ -52,7 +54,7 @@ namespace Highpoint.Sage.Mathematics
             _hi = highBound;
             _loRange = peak - lowBound;
             _hiRange = highBound - peak;
-            _pctLo = ( peak - lowBound ) / ( highBound - lowBound );
+            _pctLo = (peak - lowBound) / (highBound - lowBound);
             _pctHi = 1.0 - _pctLo;
         }
         #region ICDF Members
@@ -62,14 +64,18 @@ namespace Highpoint.Sage.Mathematics
         /// </summary>
         /// <param name="linear">A double in the range of (0.0-1.0].</param>
         /// <returns>System.Double.</returns>
-        public double GetVariate(double linear) {
+        public double GetVariate(double linear)
+        {
             double retval;
-            if (linear <= _pctLo) {
+            if (linear <= _pctLo)
+            {
                 linear /= _pctLo; // back to a [0..1)
-                retval = _lo + ( Math.Sqrt(linear) * _loRange );
-            } else {
-                linear = ( 1.0 - linear ) / _pctHi; // back to a [0..1)
-                retval = _hi - ( Math.Sqrt(linear) * _hiRange );
+                retval = _lo + (Math.Sqrt(linear) * _loRange);
+            }
+            else
+            {
+                linear = (1.0 - linear) / _pctHi; // back to a [0..1)
+                retval = _hi - (Math.Sqrt(linear) * _hiRange);
             }
             return retval;
         }
