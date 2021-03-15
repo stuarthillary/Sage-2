@@ -874,6 +874,7 @@
     <Compile Include="Utility\Aspects.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Utility\BasicIndexingService.cs" />
     <Compile Include="Utility\CompoundComparer.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -915,6 +916,8 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Utility\IDoubleTracker.cs" />
+    <Compile Include="Utility\IIndexingService.cs" />
+    <Compile Include="Utility\IndexingFailedException.cs" />
     <Compile Include="Utility\ISortKey.cs" />
     <Compile Include="Utility\Mementos\ISupportsMementos.cs" />
     <Compile Include="Utility\Mementos\MementoHelper.cs" />
@@ -930,7 +933,7 @@
     <Compile Include="Utility\IHasSortKeys.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Utility\Indexing.cs">
+    <Compile Include="Utility\ISupportsIndexes.cs">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Utility\InitFailureException.cs">
