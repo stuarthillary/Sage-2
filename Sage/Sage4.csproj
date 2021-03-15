@@ -1012,8 +1012,8 @@
     </Compile>
     <Compile Include="Utility\WeakListEnumerator.cs" />
     <Compile Include="Utility\XmlTimeSpan.cs" />
-    <Compile Include="Utility\XmlTransform.cs" />
-    <Compile Include="Utility\XmlConvert.cs">
+    <Compile Include="Utility\XmlConvert.cs" />
+    <Compile Include="Utility\XmlTransform.cs">
       <SubType>Code</SubType>
     </Compile>
   </ItemGroup>
