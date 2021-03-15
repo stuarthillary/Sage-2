@@ -643,10 +643,15 @@
     <Compile Include="Mathematics\CauchyDistribution.cs" />
     <Compile Include="Mathematics\ConstantDoubleDistribution.cs" />
     <Compile Include="Mathematics\CosineDoubleInterpolator.cs" />
+    <Compile Include="Mathematics\DoubleLinearScalingAdapter.cs" />
     <Compile Include="Mathematics\HistogramBinCategory.cs" />
     <Compile Include="Mathematics\IDoubleInterpolator.cs" />
+    <Compile Include="Mathematics\IDoubleScalingAdapter.cs" />
+    <Compile Include="Mathematics\IScalingEngine.cs" />
+    <Compile Include="Mathematics\ITimeSpanScalingAdapter.cs" />
     <Compile Include="Mathematics\IWriteableInterpolable.cs" />
     <Compile Include="Mathematics\LinearDoubleInterpolator.cs" />
+    <Compile Include="Mathematics\ScalingEngine.cs" />
     <Compile Include="Mathematics\SmallDoubleInterpolable.cs" />
     <Compile Include="Mathematics\TimeSpanDistribution.cs">
       <SubType>Code</SubType>
@@ -686,6 +691,7 @@
     <Compile Include="Mathematics\PoissonDistribution.cs" />
     <Compile Include="Mathematics\RMSErrorCalculator.cs" />
     <Compile Include="Mathematics\SupportsDistributionsAttribute.cs" />
+    <Compile Include="Mathematics\TimeSpanLinearScalingAdapter.cs" />
     <Compile Include="Mathematics\TriangularCDF.cs" />
     <Compile Include="Mathematics\TriangularDistribution.cs" />
     <Compile Include="Mathematics\UniformCDF.cs" />
@@ -865,7 +871,7 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Mathematics\Rationalizer.cs" />
-    <Compile Include="Mathematics\Scaling.cs">
+    <Compile Include="Mathematics\IScalable.cs">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Utility\SerialNumber.cs">
