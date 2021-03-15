@@ -1,10 +1,11 @@
 /* This source code licensed under the GNU Affero General Public License */
 
+using Highpoint.Sage.SimCore;
 using System;
 using System.Collections;
-using Highpoint.Sage.SimCore;
 
-namespace Highpoint.Sage.Utility {
+namespace Highpoint.Sage.Utility
+{
 
     public delegate void DictionaryChange(object key, object value);
 
@@ -16,10 +17,11 @@ namespace Highpoint.Sage.Utility {
     /// <seealso cref="ExecutionContext" />
     /// <seealso cref="IModelObject" />
     /// <seealso cref="IDictionary" />
-    public class ExecutionContext : TreeNode<ExecutionContext>, IModelObject, IDictionary {
+    public class ExecutionContext : TreeNode<ExecutionContext>, IModelObject, IDictionary
+    {
 
         #region Private Fields
-        private readonly Hashtable m_dictionary;
+        private readonly Hashtable _dictionary;
         #endregion Private Fields
 
         /// <summary>
@@ -33,48 +35,70 @@ namespace Highpoint.Sage.Utility {
         public ExecutionContext(IModel model, string name, string description, Guid guid, ExecutionContext parent)
         {
             IsSelfReferential = true;
-            m_dictionary = new Hashtable();
+            _dictionary = new Hashtable();
             InitializeIdentity(model, name, description, guid);
             // We skip structural checking, since we just created this node, so it cannot be a child or other
             // descendant of the parent.
             parent?.AddChild(this);
         }
 
-        private void AddChild(ExecutionContext ec, TreeStructureCheckType checkType = TreeStructureCheckType.Deep) {
-            base.AddChild(ec, checkType==TreeStructureCheckType.None);
-            m_dictionary.Add(ec.Guid, ec);
+        private void AddChild(ExecutionContext ec, TreeStructureCheckType checkType = TreeStructureCheckType.Deep)
+        {
+            base.AddChild(ec, checkType == TreeStructureCheckType.None);
+            _dictionary.Add(ec.Guid, ec);
         }
 
         #region Implementation of IModelObject
 
-        private string m_name;
-        private Guid m_guid;
-        private IModel m_model;
-        private string m_description;
+        private string _name;
+        private Guid _guid;
+        private IModel _model;
+        private string _description;
 
         /// <summary>
         /// The IModel to which this object belongs.
         /// </summary>
         /// <value>The object's Model.</value>
-        public IModel Model { [System.Diagnostics.DebuggerStepThrough] get { return m_model; } }
+        public IModel Model
+        {
+            [System.Diagnostics.DebuggerStepThrough]
+            get
+            {
+                return _model;
+            }
+        }
 
         /// <summary>
         /// The name by which this object is known. Typically not required to be unique in a pan-model context.
         /// </summary>
         /// <value>The object's name.</value>
-        public string Name { [System.Diagnostics.DebuggerStepThrough]get { return m_name; } }
+        public string Name
+        {
+            [System.Diagnostics.DebuggerStepThrough]
+            get
+            {
+                return _name;
+            }
+        }
 
         /// <summary>
         /// The description for this object. Typically used for human-readable representations.
         /// </summary>
         /// <value>The object's description.</value>
-        public string Description => (m_description ?? ("No description for " + m_name));
+        public string Description => (_description ?? ("No description for " + _name));
 
         /// <summary>
         /// The Guid for this object. Typically required to be unique in a pan-model context.
         /// </summary>
         /// <value>The object's Guid.</value>
-        public Guid Guid { [System.Diagnostics.DebuggerStepThrough] get { return m_guid; } }
+        public Guid Guid
+        {
+            [System.Diagnostics.DebuggerStepThrough]
+            get
+            {
+                return _guid;
+            }
+        }
 
         /// <summary>
         /// Initializes the fields that feed the properties of this IModelObject identity.
@@ -83,8 +107,9 @@ namespace Highpoint.Sage.Utility {
         /// <param name="name">The IModelObject's new name value.</param>
         /// <param name="description">The IModelObject's new description value.</param>
         /// <param name="guid">The IModelObject's new GUID value.</param>
-        public void InitializeIdentity(IModel model, string name, string description, Guid guid) {
-            IMOHelper.Initialize(ref m_model, model, ref m_name, name, ref m_description, description, ref m_guid, guid);
+        public void InitializeIdentity(IModel model, string name, string description, Guid guid)
+        {
+            IMOHelper.Initialize(ref _model, model, ref _name, name, ref _description, description, ref _guid, guid);
         }
 
         #endregion
@@ -100,9 +125,11 @@ namespace Highpoint.Sage.Utility {
         /// <exception cref="T:System.ArgumentException">An element with the same key already exists in the <see cref="T:System.Collections.IDictionary"></see> object. </exception>
         /// <exception cref="T:System.ArgumentNullException">key is null. </exception>
         /// <exception cref="T:System.NotSupportedException">The <see cref="T:System.Collections.IDictionary"></see> is read-only.-or- The <see cref="T:System.Collections.IDictionary"></see> has a fixed size. </exception>
-        public void Add(object key, object value) {
-            m_dictionary.Add(key, value);
-            if (EntryAdded != null) {
+        public void Add(object key, object value)
+        {
+            _dictionary.Add(key, value);
+            if (EntryAdded != null)
+            {
                 EntryAdded(key, value);
             }
         }
@@ -112,16 +139,21 @@ namespace Highpoint.Sage.Utility {
         /// </summary>
         /// <exception cref="T:System.NotSupportedException">The <see cref="T:System.Collections.IDictionary"></see> object is read-only. </exception>
         [System.Diagnostics.DebuggerStepThrough]
-        public void Clear() {
+        public void Clear()
+        {
             // TODO: Clear other elements that are not in the dictionary.
-            if (EntryRemoved != null) {
-                foreach (object key in m_dictionary.Keys) {
-                    object val = m_dictionary[key];
-                    m_dictionary.Remove(key);
+            if (EntryRemoved != null)
+            {
+                foreach (object key in _dictionary.Keys)
+                {
+                    object val = _dictionary[key];
+                    _dictionary.Remove(key);
                     EntryRemoved(key, val);
                 }
-            } else {
-                m_dictionary.Clear();
+            }
+            else
+            {
+                _dictionary.Clear();
             }
         }
 
@@ -134,8 +166,9 @@ namespace Highpoint.Sage.Utility {
         /// </returns>
         /// <exception cref="T:System.ArgumentNullException">key is null. </exception>
         [System.Diagnostics.DebuggerStepThrough]
-        public bool Contains(object key) {
-            return m_dictionary.Contains(key);
+        public bool Contains(object key)
+        {
+            return _dictionary.Contains(key);
         }
 
         /// <summary>
@@ -145,8 +178,9 @@ namespace Highpoint.Sage.Utility {
         /// An <see cref="T:System.Collections.IDictionaryEnumerator"></see> object for the <see cref="T:System.Collections.IDictionary"></see> object.
         /// </returns>
         [System.Diagnostics.DebuggerStepThrough]
-        public IDictionaryEnumerator GetEnumerator() {
-            return m_dictionary.GetEnumerator();
+        public IDictionaryEnumerator GetEnumerator()
+        {
+            return _dictionary.GetEnumerator();
         }
 
         /// <summary>
@@ -154,9 +188,12 @@ namespace Highpoint.Sage.Utility {
         /// </summary>
         /// <value></value>
         /// <returns>true if the <see cref="T:System.Collections.IDictionary"></see> object has a fixed size; otherwise, false.</returns>
-        public bool IsFixedSize {
-            [System.Diagnostics.DebuggerStepThrough] get {
-                return m_dictionary.IsFixedSize;
+        public bool IsFixedSize
+        {
+            [System.Diagnostics.DebuggerStepThrough]
+            get
+            {
+                return _dictionary.IsFixedSize;
             }
         }
 
@@ -165,9 +202,12 @@ namespace Highpoint.Sage.Utility {
         /// </summary>
         /// <value></value>
         /// <returns>true if the <see cref="T:System.Collections.IDictionary"></see> object is read-only; otherwise, false.</returns>
-        public bool IsReadOnly {
-            [System.Diagnostics.DebuggerStepThrough] get {
-                return m_dictionary.IsReadOnly;
+        public bool IsReadOnly
+        {
+            [System.Diagnostics.DebuggerStepThrough]
+            get
+            {
+                return _dictionary.IsReadOnly;
             }
         }
 
@@ -176,10 +216,12 @@ namespace Highpoint.Sage.Utility {
         /// </summary>
         /// <value></value>
         /// <returns>An <see cref="T:System.Collections.ICollection"></see> object containing the keys of the <see cref="T:System.Collections.IDictionary"></see> object.</returns>
-        public ICollection Keys {
+        public ICollection Keys
+        {
             [System.Diagnostics.DebuggerStepThrough]
-            get {
-                return m_dictionary.Keys;
+            get
+            {
+                return _dictionary.Keys;
             }
         }
 
@@ -190,14 +232,18 @@ namespace Highpoint.Sage.Utility {
         /// <exception cref="T:System.NotSupportedException">The <see cref="T:System.Collections.IDictionary"></see> object is read-only.-or- The <see cref="T:System.Collections.IDictionary"></see> has a fixed size. </exception>
         /// <exception cref="T:System.ArgumentNullException">key is null. </exception>
         [System.Diagnostics.DebuggerStepThrough]
-        public void Remove(object key) {
+        public void Remove(object key)
+        {
             // TODO: Clear other elements that are not in the dictionary.
-            if (EntryRemoved != null) {
-                object val = m_dictionary[key];
-                m_dictionary.Remove(key);
+            if (EntryRemoved != null)
+            {
+                object val = _dictionary[key];
+                _dictionary.Remove(key);
                 EntryRemoved(key, val);
-            } else {
-                m_dictionary.Remove(key);
+            }
+            else
+            {
+                _dictionary.Remove(key);
             }
         }
 
@@ -206,10 +252,12 @@ namespace Highpoint.Sage.Utility {
         /// </summary>
         /// <value></value>
         /// <returns>An <see cref="T:System.Collections.ICollection"></see> object containing the values in the <see cref="T:System.Collections.IDictionary"></see> object.</returns>
-        public ICollection Values {
+        public ICollection Values
+        {
             [System.Diagnostics.DebuggerStepThrough]
-            get {
-                return m_dictionary.Values;
+            get
+            {
+                return _dictionary.Values;
             }
         }
 
@@ -217,18 +265,23 @@ namespace Highpoint.Sage.Utility {
         /// Gets or sets the <see cref="System.Object"/> with the specified key.
         /// </summary>
         /// <value></value>
-        public object this[object key] {
+        public object this[object key]
+        {
             [System.Diagnostics.DebuggerStepThrough]
-            get {
-                return m_dictionary[key];
+            get
+            {
+                return _dictionary[key];
             }
             [System.Diagnostics.DebuggerStepThrough]
-            set {
-                if (EntryChanging != null) {
-                    EntryChanging(key, m_dictionary[key]); // Only retrieve if it's needed.
+            set
+            {
+                if (EntryChanging != null)
+                {
+                    EntryChanging(key, _dictionary[key]); // Only retrieve if it's needed.
                 }
-                m_dictionary[key] = value;
-                if (EntryChanged == null) {
+                _dictionary[key] = value;
+                if (EntryChanged == null)
+                {
                     EntryChanged(key, value);
                 }
             }
@@ -248,8 +301,9 @@ namespace Highpoint.Sage.Utility {
         /// <exception cref="T:System.ArgumentException">array is multidimensional.-or- index is equal to or greater than the length of array.-or- The number of elements in the source <see cref="T:System.Collections.ICollection"></see> is greater than the available space from index to the end of the destination array. </exception>
         /// <exception cref="T:System.InvalidCastException">The type of the source <see cref="T:System.Collections.ICollection"></see> cannot be cast automatically to the type of the destination array. </exception>
         [System.Diagnostics.DebuggerStepThrough]
-        public void CopyTo(Array array, int index) {
-            m_dictionary.CopyTo(array, index);
+        public void CopyTo(Array array, int index)
+        {
+            _dictionary.CopyTo(array, index);
         }
 
         /// <summary>
@@ -257,9 +311,13 @@ namespace Highpoint.Sage.Utility {
         /// </summary>
         /// <value></value>
         /// <returns>The number of elements contained in the <see cref="T:System.Collections.ICollection"></see>.</returns>
-        public int Count {
+        public int Count
+        {
             [System.Diagnostics.DebuggerStepThrough]
-            get { return m_dictionary.Count; }
+            get
+            {
+                return _dictionary.Count;
+            }
         }
 
         /// <summary>
@@ -267,9 +325,13 @@ namespace Highpoint.Sage.Utility {
         /// </summary>
         /// <value></value>
         /// <returns>true if access to the <see cref="T:System.Collections.ICollection"></see> is synchronized (thread safe); otherwise, false.</returns>
-        public bool IsSynchronized {
+        public bool IsSynchronized
+        {
             [System.Diagnostics.DebuggerStepThrough]
-            get { return m_dictionary.IsSynchronized; }
+            get
+            {
+                return _dictionary.IsSynchronized;
+            }
         }
 
         /// <summary>
@@ -277,9 +339,13 @@ namespace Highpoint.Sage.Utility {
         /// </summary>
         /// <value></value>
         /// <returns>An object that can be used to synchronize access to the <see cref="T:System.Collections.ICollection"></see>.</returns>
-        public object SyncRoot {
+        public object SyncRoot
+        {
             [System.Diagnostics.DebuggerStepThrough]
-            get { return m_dictionary.SyncRoot; }
+            get
+            {
+                return _dictionary.SyncRoot;
+            }
         }
 
         #endregion
@@ -293,8 +359,9 @@ namespace Highpoint.Sage.Utility {
         /// An <see cref="T:System.Collections.IEnumerator"></see> object that can be used to iterate through the collection.
         /// </returns>
         [System.Diagnostics.DebuggerStepThrough]
-        IEnumerator IEnumerable.GetEnumerator() {
-            return m_dictionary.GetEnumerator();
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return _dictionary.GetEnumerator();
         }
 
         #endregion
@@ -306,10 +373,13 @@ namespace Highpoint.Sage.Utility {
         public event DictionaryChange EntryChanged;
 
 
-        public object FindUp(string key) {
-            if (Contains(key)) {
+        public object FindUp(string key)
+        {
+            if (Contains(key))
+            {
                 return this[key];
-            } else
+            }
+            else
             {
                 return Parent?.Payload.FindUp(key);
             }
