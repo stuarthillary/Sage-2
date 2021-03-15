@@ -782,9 +782,12 @@
     <Compile Include="Scheduling\IHasTimePeriodAspects.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Scheduling\IObservable.cs" />
+    <Compile Include="Scheduling\ISupportsCorrelation.cs" />
     <Compile Include="Scheduling\ITimePeriod.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Scheduling\ITimePeriodBase.cs" />
     <Compile Include="Scheduling\Milestone.cs">
       <SubType>Code</SubType>
     </Compile>
