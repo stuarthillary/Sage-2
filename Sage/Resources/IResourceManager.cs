@@ -1,18 +1,20 @@
 /* This source code licensed under the GNU Affero General Public License */
 
-using System.Collections;
 using Highpoint.Sage.SimCore;
+using System.Collections;
 // ReSharper disable UnusedMemberInSuper.Global
 // ReSharper disable EventNeverSubscribedTo.Global
 
-namespace Highpoint.Sage.Resources {
+namespace Highpoint.Sage.Resources
+{
     /// <summary>
     /// Interface IResourceManager is implemented by an object that manages the 
     /// granting and recovery of resources. It executes a protocol for finding 
     /// the best resource for a given resource request.
     /// </summary>
     /// <seealso cref="Highpoint.Sage.SimCore.IModelObject" />
-    public interface IResourceManager : IModelObject {
+    public interface IResourceManager : IModelObject
+    {
 
         /// <summary>
         /// Tries to reserve a resource that satisfies the specified resource request.
@@ -46,13 +48,19 @@ namespace Highpoint.Sage.Resources {
         /// Gets the resources owned by this Resource Manager.
         /// </summary>
         /// <value>The resources.</value>
-        IList Resources { get; }
+        IList Resources
+        {
+            get;
+        }
 
         /// <summary>
         /// Gets a value indicating whether this resource manager supports prioritized requests.
         /// </summary>
         /// <value><c>true</c> if [supports prioritized requests]; otherwise, <c>false</c>.</value>
-        bool SupportsPrioritizedRequests { get; }
+        bool SupportsPrioritizedRequests
+        {
+            get;
+        }
 
         /// <summary>
         /// Fired when a resource request is received.
@@ -84,6 +92,9 @@ namespace Highpoint.Sage.Resources {
         /// individual ResourceRequests access to specified resources.
         /// </summary>
         /// <value>The access regulator.</value>
-        IAccessRegulator AccessRegulator { set; get; }
+        IAccessRegulator AccessRegulator
+        {
+            set; get;
+        }
     }
 }
