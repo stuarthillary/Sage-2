@@ -2,17 +2,19 @@
 using System;
 using System.Collections.Generic;
 
-namespace Highpoint.Sage.Utility {
+namespace Highpoint.Sage.Utility
+{
     /// <summary>
     /// The EventedList class provides all of the standard List capabilities as well as the ability to
     /// emit events when the list changes its contents for whatever reason.
     /// </summary>
     /// <typeparam name="T">The type of elements in the list.</typeparam>
-    public class EventedList<T> : IList<T> {
+    public class EventedList<T> : IList<T>
+    {
 
         // TODO: safeguard against possible multiple enumeration of IEnumerable.
 
-        private readonly List<T> m_base;
+        private readonly List<T> _base;
 
         /// <summary>
         /// Signature of events that pertain only to an EventedList.
@@ -129,8 +131,9 @@ namespace Highpoint.Sage.Utility {
         ///     Initializes a new instance of the System.Collections.Generic.List&lt;T&gt; class
         ///     that is empty and has the default initial capacity.
         /// </summary>
-        public EventedList() {
-            m_base = new List<T>();
+        public EventedList()
+        {
+            _base = new List<T>();
         }
 
         /// Summary:
@@ -147,8 +150,9 @@ namespace Highpoint.Sage.Utility {
         ///     capacity is less than 0.
         /// </summary>
         /// <param name="capacity">The number of elements that the new list can initially store.</param>
-        public EventedList(int capacity) {
-            m_base = new List<T>(capacity);
+        public EventedList(int capacity)
+        {
+            _base = new List<T>(capacity);
         }
 
         /// <summary>
@@ -156,17 +160,19 @@ namespace Highpoint.Sage.Utility {
         /// </summary>
         /// <param name="collection">The collection whose elements are copied to the new list.</param>
         /// <exception cref="T:System.ArgumentNullException">collection is null.</exception>
-        public EventedList(IEnumerable<T> collection){
-            m_base = new List<T>(collection);
+        public EventedList(IEnumerable<T> collection)
+        {
+            _base = new List<T>(collection);
         }
 
         /// <summary>
         /// Adds an object to the end of the <see cref="T:System.Collections.Generic.List`1"></see>.
         /// </summary>
         /// <param name="item">The object to be added to the end of the <see cref="T:System.Collections.Generic.List`1"></see>. The value can be null for reference types.</param>
-        public void Add(T item) {
+        public void Add(T item)
+        {
             AboutToAddItem?.Invoke(this, item);
-            m_base.Add(item);
+            _base.Add(item);
             AddedItem?.Invoke(this, item);
             ContentsChanged?.Invoke(this);
         }
@@ -176,10 +182,11 @@ namespace Highpoint.Sage.Utility {
         /// </summary>
         /// <param name="collection">The collection whose elements should be added to the end of the <see cref="T:System.Collections.Generic.List`1"></see>. The collection itself cannot be null, but it can contain elements that are null, if type T is a reference type.</param>
         /// <exception cref="T:System.ArgumentNullException">collection is null.</exception>
-        public void AddRange(IEnumerable<T> collection) {
+        public void AddRange(IEnumerable<T> collection)
+        {
             AboutToAddItems?.Invoke(this, collection);
 
-            m_base.AddRange(collection);
+            _base.AddRange(collection);
 
             AddedItems?.Invoke(this, collection);
 
@@ -190,10 +197,11 @@ namespace Highpoint.Sage.Utility {
         /// Removes the specified item.
         /// </summary>
         /// <param name="item">The item to be removed.</param>
-        public bool Remove(T item) {
+        public bool Remove(T item)
+        {
             AboutToRemoveItem?.Invoke(this, item);
 
-            bool retval = m_base.Remove(item);
+            bool retval = _base.Remove(item);
 
             RemovedItem?.Invoke(this, item);
             ContentsChanged?.Invoke(this);
@@ -205,9 +213,10 @@ namespace Highpoint.Sage.Utility {
         /// Removes all.
         /// </summary>
         /// <param name="match">The match.</param>
-        public void RemoveAll(Predicate<T> match) {
+        public void RemoveAll(Predicate<T> match)
+        {
             AboutToRemoveItems?.Invoke(this, match);
-            m_base.RemoveAll(match);
+            _base.RemoveAll(match);
             RemovedItems?.Invoke(this, match);
             ContentsChanged?.Invoke(this);
         }
@@ -217,10 +226,11 @@ namespace Highpoint.Sage.Utility {
         /// </summary>
         /// <param name="index">The zero-based index of the element to remove.</param>
         /// <exception cref="T:System.ArgumentOutOfRangeException">index is less than 0.-or-index is equal to or greater than <see cref="P:System.Collections.Generic.List`1.Count"></see>.</exception>
-        public void RemoveAt(int index) {
-            T item = m_base[index];
+        public void RemoveAt(int index)
+        {
+            T item = _base[index];
             AboutToRemoveItem?.Invoke(this, item);
-            m_base.RemoveAt(index);
+            _base.RemoveAt(index);
             RemovedItem?.Invoke(this, item);
             ContentsChanged?.Invoke(this);
         }
@@ -232,10 +242,11 @@ namespace Highpoint.Sage.Utility {
         /// <param name="count">The number of elements to remove.</param>
         /// <exception cref="T:System.ArgumentOutOfRangeException">index is less than 0.-or-count is less than 0.</exception>
         /// <exception cref="T:System.ArgumentException">index and count do not denote a valid range of elements in the <see cref="T:System.Collections.Generic.List`1"></see>.</exception>
-        public void RemoveRange(int index, int count) {
+        public void RemoveRange(int index, int count)
+        {
             AboutToRemoveRange?.Invoke(this, index, count);
 
-            m_base.RemoveRange(index, count);
+            _base.RemoveRange(index, count);
 
             RemovedRange?.Invoke(this, index, count);
 
@@ -245,10 +256,11 @@ namespace Highpoint.Sage.Utility {
         /// <summary>
         /// Removes all elements from the <see cref="T:System.Collections.Generic.List`1"></see>.
         /// </summary>
-        public void Clear() {
+        public void Clear()
+        {
             AboutToClear?.Invoke(this);
 
-            m_base.Clear();
+            _base.Clear();
 
             Cleared?.Invoke(this);
 
@@ -269,14 +281,17 @@ namespace Highpoint.Sage.Utility {
         ///     index is less than 0.-or-index is equal to or greater than System.Collections.Generic.List&lt;T&gt;.Count.
         /// </summary>
         /// <param name="index">The zero-based index of the element to get or set.</param>
-        public T this[int index] {
-            get {
-                return m_base[index];
+        public T this[int index]
+        {
+            get
+            {
+                return _base[index];
             }
-            set {
-                T old = m_base[index];
+            set
+            {
+                T old = _base[index];
                 AboutToReplaceItem?.Invoke(this, old, value);
-                m_base[index] = value;
+                _base[index] = value;
                 ReplacedItem?.Invoke(this, old, value);
                 ContentsChanged?.Invoke(this);
             }
@@ -288,9 +303,10 @@ namespace Highpoint.Sage.Utility {
         /// <param name="index">The zero-based index at which item should be inserted.</param>
         /// <param name="item">The object to insert. The value can be null for reference types.</param>
         /// <exception cref="T:System.ArgumentOutOfRangeException">index is less than 0.-or-index is greater than <see cref="P:System.Collections.Generic.List`1.Count"></see>.</exception>
-        public void Insert(int index, T item) {
+        public void Insert(int index, T item)
+        {
             AboutToAddItem?.Invoke(this, item);
-            m_base.Insert(index, item);
+            _base.Insert(index, item);
             AddedItem?.Invoke(this, item);
             ContentsChanged?.Invoke(this);
         }
@@ -302,10 +318,11 @@ namespace Highpoint.Sage.Utility {
         /// <param name="collection">The collection whose elements should be inserted into the <see cref="T:System.Collections.Generic.List`1"></see>. The collection itself cannot be null, but it can contain elements that are null, if type T is a reference type.</param>
         /// <exception cref="T:System.ArgumentOutOfRangeException">index is less than 0.-or-index is greater than <see cref="P:System.Collections.Generic.List`1.Count"></see>.</exception>
         /// <exception cref="T:System.ArgumentNullException">collection is null.</exception>
-        public void InsertRange(int index, IEnumerable<T> collection) {
+        public void InsertRange(int index, IEnumerable<T> collection)
+        {
             AboutToAddItems?.Invoke(this, collection);
 
-            m_base.InsertRange(index, collection);
+            _base.InsertRange(index, collection);
 
             AddedItems?.Invoke(this, collection);
             ContentsChanged?.Invoke(this);
@@ -325,14 +342,24 @@ namespace Highpoint.Sage.Utility {
         ///   System.ArgumentOutOfRangeException:
         ///     System.Collections.Generic.List&lt;T&gt;.Capacity is set to a value that is less
         ///     than System.Collections.Generic.List&lt;T&gt;.Count.
-        public int Capacity { get { return m_base.Capacity; } set { m_base.Capacity = value; } }
+        public int Capacity
+        {
+            get
+            {
+                return _base.Capacity;
+            }
+            set
+            {
+                _base.Capacity = value;
+            }
+        }
         ///
         /// Summary:
         ///     Gets the number of elements actually contained in the System.Collections.Generic.List&lt;T&gt;.
         ///
         /// Returns:
         ///     The number of elements actually contained in the System.Collections.Generic.List&lt;T&gt;.
-        public int Count => m_base.Count;
+        public int Count => _base.Count;
 
         ///
         /// Summary:
@@ -342,7 +369,10 @@ namespace Highpoint.Sage.Utility {
         /// Returns:
         ///     A System.Collections.Generic.ReadOnlyCollection`1 that acts as a read-only
         ///     wrapper around the current System.Collections.Generic.List&lt;T&gt;.
-        public System.Collections.ObjectModel.ReadOnlyCollection<T> AsReadOnly() { return m_base.AsReadOnly(); }
+        public System.Collections.ObjectModel.ReadOnlyCollection<T> AsReadOnly()
+        {
+            return _base.AsReadOnly();
+        }
         ///
         /// Summary:
         ///     Searches the entire sorted System.Collections.Generic.List&lt;T&gt; for an element
@@ -363,7 +393,10 @@ namespace Highpoint.Sage.Utility {
         ///     The default comparer System.Collections.Generic.Comparer&lt;T&gt;.Default cannot
         ///     find an implementation of the System.IComparable&lt;T&gt; generic interface or
         ///     the System.IComparable interface for type T.
-        public int BinarySearch(T item) { return m_base.BinarySearch(item); }
+        public int BinarySearch(T item)
+        {
+            return _base.BinarySearch(item);
+        }
         ///
         /// Summary:
         ///     Searches the entire sorted System.Collections.Generic.List&lt;T&gt; for an element
@@ -388,7 +421,10 @@ namespace Highpoint.Sage.Utility {
         ///     comparer is null, and the default comparer System.Collections.Generic.Comparer&lt;T&gt;.Default
         ///     cannot find an implementation of the System.IComparable&lt;T&gt; generic interface
         ///     or the System.IComparable interface for type T.
-        public int BinarySearch(T item, IComparer<T> comparer) { return m_base.BinarySearch(item, comparer); }
+        public int BinarySearch(T item, IComparer<T> comparer)
+        {
+            return _base.BinarySearch(item, comparer);
+        }
         ///
         /// Summary:
         ///     Searches a range of elements in the sorted System.Collections.Generic.List&lt;T&gt;
@@ -426,7 +462,10 @@ namespace Highpoint.Sage.Utility {
         ///
         ///   System.ArgumentException:
         ///     index and count do not denote a valid range in the System.Collections.Generic.List&lt;T&gt;.
-        public int BinarySearch(int index, int count, T item, IComparer<T> comparer) { return m_base.BinarySearch(index, count, item, comparer); }
+        public int BinarySearch(int index, int count, T item, IComparer<T> comparer)
+        {
+            return _base.BinarySearch(index, count, item, comparer);
+        }
         ///
         /// Summary:
         ///     Determines whether an element is in the System.Collections.Generic.List&lt;T&gt;.
@@ -439,7 +478,10 @@ namespace Highpoint.Sage.Utility {
         /// Returns:
         ///     true if item is found in the System.Collections.Generic.List&lt;T&gt;; otherwise,
         ///     false.
-        public bool Contains(T item) { return m_base.Contains(item); }
+        public bool Contains(T item)
+        {
+            return _base.Contains(item);
+        }
         ///
         /// Summary:
         ///     Converts the elements in the current System.Collections.Generic.List&lt;T&gt; to
@@ -457,7 +499,10 @@ namespace Highpoint.Sage.Utility {
         /// Exceptions:
         ///   System.ArgumentNullException:
         ///     converter is null.
-        public List<TOutput> ConvertAll<TOutput>(Converter<T, TOutput> converter) { return m_base.ConvertAll(converter); }
+        public List<TOutput> ConvertAll<TOutput>(Converter<T, TOutput> converter)
+        {
+            return _base.ConvertAll(converter);
+        }
         ///
         /// Summary:
         ///     Copies the entire System.Collections.Generic.List&lt;T&gt; to a compatible one-dimensional
@@ -476,7 +521,10 @@ namespace Highpoint.Sage.Utility {
         ///
         ///   System.ArgumentNullException:
         ///     array is null.
-        public void CopyTo(T[] array) { m_base.CopyTo(array); }
+        public void CopyTo(T[] array)
+        {
+            _base.CopyTo(array);
+        }
         ///
         /// Summary:
         ///     Copies the entire System.Collections.Generic.List&lt;T&gt; to a compatible one-dimensional
@@ -502,7 +550,10 @@ namespace Highpoint.Sage.Utility {
         ///
         ///   System.ArgumentNullException:
         ///     array is null.
-        public void CopyTo(T[] array, int arrayIndex) { m_base.CopyTo(array, arrayIndex); }
+        public void CopyTo(T[] array, int arrayIndex)
+        {
+            _base.CopyTo(array, arrayIndex);
+        }
         ///
         /// Summary:
         ///     Copies a range of elements from the System.Collections.Generic.List&lt;T&gt; to
@@ -539,7 +590,10 @@ namespace Highpoint.Sage.Utility {
         ///     to or greater than the length of array.-or-The number of elements from index
         ///     to the end of the source System.Collections.Generic.List&lt;T&gt; is greater than
         ///     the available space from arrayIndex to the end of the destination array.
-        public void CopyTo(int index, T[] array, int arrayIndex, int count) { m_base.CopyTo(index, array, arrayIndex, count); }
+        public void CopyTo(int index, T[] array, int arrayIndex, int count)
+        {
+            _base.CopyTo(index, array, arrayIndex, count);
+        }
         ///
         /// Summary:
         ///     Determines whether the System.Collections.Generic.List&lt;T&gt; contains elements
@@ -558,7 +612,10 @@ namespace Highpoint.Sage.Utility {
         /// Exceptions:
         ///   System.ArgumentNullException:
         ///     match is null.
-        public bool Exists(Predicate<T> match) { return m_base.Exists(match); }
+        public bool Exists(Predicate<T> match)
+        {
+            return _base.Exists(match);
+        }
         ///
         /// Summary:
         ///     Searches for an element that matches the conditions defined by the specified
@@ -576,7 +633,10 @@ namespace Highpoint.Sage.Utility {
         /// Exceptions:
         ///   System.ArgumentNullException:
         ///     match is null.
-        public T Find(Predicate<T> match) { return m_base.Find(match); }
+        public T Find(Predicate<T> match)
+        {
+            return _base.Find(match);
+        }
         ///
         /// Summary:
         ///     Retrieves the all the elements that match the conditions defined by the specified
@@ -595,7 +655,10 @@ namespace Highpoint.Sage.Utility {
         /// Exceptions:
         ///   System.ArgumentNullException:
         ///     match is null.
-        public List<T> FindAll(Predicate<T> match) { return m_base.FindAll(match); }
+        public List<T> FindAll(Predicate<T> match)
+        {
+            return _base.FindAll(match);
+        }
         ///
         /// Summary:
         ///     Searches for an element that matches the conditions defined by the specified
@@ -614,7 +677,10 @@ namespace Highpoint.Sage.Utility {
         /// Exceptions:
         ///   System.ArgumentNullException:
         ///     match is null.
-        public int FindIndex(Predicate<T> match) { return m_base.FindIndex(match); }
+        public int FindIndex(Predicate<T> match)
+        {
+            return _base.FindIndex(match);
+        }
         ///
         /// Summary:
         ///     Searches for an element that matches the conditions defined by the specified
@@ -640,7 +706,10 @@ namespace Highpoint.Sage.Utility {
         ///
         ///   System.ArgumentNullException:
         ///     match is null.
-        public int FindIndex(int startIndex, Predicate<T> match) { return m_base.FindIndex(startIndex, match); }
+        public int FindIndex(int startIndex, Predicate<T> match)
+        {
+            return _base.FindIndex(startIndex, match);
+        }
         ///
         /// Summary:
         ///     Searches for an element that matches the conditions defined by the specified
@@ -671,7 +740,10 @@ namespace Highpoint.Sage.Utility {
         ///
         ///   System.ArgumentNullException:
         ///     match is null.
-        public int FindIndex(int startIndex, int count, Predicate<T> match) { return m_base.FindIndex(startIndex, count, match); }
+        public int FindIndex(int startIndex, int count, Predicate<T> match)
+        {
+            return _base.FindIndex(startIndex, count, match);
+        }
         ///
         /// Summary:
         ///     Searches for an element that matches the conditions defined by the specified
@@ -689,7 +761,10 @@ namespace Highpoint.Sage.Utility {
         /// Exceptions:
         ///   System.ArgumentNullException:
         ///     match is null.
-        public T FindLast(Predicate<T> match) { return m_base.FindLast(match); }
+        public T FindLast(Predicate<T> match)
+        {
+            return _base.FindLast(match);
+        }
         ///
         /// Summary:
         ///     Searches for an element that matches the conditions defined by the specified
@@ -708,7 +783,10 @@ namespace Highpoint.Sage.Utility {
         /// Exceptions:
         ///   System.ArgumentNullException:
         ///     match is null.
-        public int FindLastIndex(Predicate<T> match) { return m_base.FindLastIndex(match); }
+        public int FindLastIndex(Predicate<T> match)
+        {
+            return _base.FindLastIndex(match);
+        }
         ///
         /// Summary:
         ///     Searches for an element that matches the conditions defined by the specified
@@ -734,7 +812,10 @@ namespace Highpoint.Sage.Utility {
         ///
         ///   System.ArgumentNullException:
         ///     match is null.
-        public int FindLastIndex(int startIndex, Predicate<T> match) { return m_base.FindLastIndex(startIndex, match); }
+        public int FindLastIndex(int startIndex, Predicate<T> match)
+        {
+            return _base.FindLastIndex(startIndex, match);
+        }
         ///
         /// Summary:
         ///     Searches for an element that matches the conditions defined by the specified
@@ -765,7 +846,10 @@ namespace Highpoint.Sage.Utility {
         ///
         ///   System.ArgumentNullException:
         ///     match is null.
-        public int FindLastIndex(int startIndex, int count, Predicate<T> match) { return m_base.FindLastIndex(startIndex, count, match); }
+        public int FindLastIndex(int startIndex, int count, Predicate<T> match)
+        {
+            return _base.FindLastIndex(startIndex, count, match);
+        }
         ///
         /// Summary:
         ///     Performs the specified action on each element of the System.Collections.Generic.List&lt;T&gt;.
@@ -777,16 +861,25 @@ namespace Highpoint.Sage.Utility {
         /// Exceptions:
         ///   System.ArgumentNullException:
         ///     action is null.
-        public void ForEach(Action<T> action) { m_base.ForEach(action); }
+        public void ForEach(Action<T> action)
+        {
+            _base.ForEach(action);
+        }
         ///
         /// Summary:
         ///     Returns an enumerator that iterates through the System.Collections.Generic.List&lt;T&gt;.
         ///
         /// Returns:
         ///     A System.Collections.Generic.List&lt;T&gt;.Enumerator for the System.Collections.Generic.List&lt;T&gt;.
-        IEnumerator<T> IEnumerable<T>.GetEnumerator() { return new Enumerator(m_base); }
+        IEnumerator<T> IEnumerable<T>.GetEnumerator()
+        {
+            return new Enumerator(_base);
+        }
 
-        System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator() { return new Enumerator(m_base); }
+        System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
+        {
+            return new Enumerator(_base);
+        }
 
 
         ///
@@ -810,7 +903,10 @@ namespace Highpoint.Sage.Utility {
         ///
         ///   System.ArgumentException:
         ///     index and count do not denote a valid range of elements in the System.Collections.Generic.List&lt;T&gt;.
-        public List<T> GetRange(int index, int count) { return m_base.GetRange(index, count); }
+        public List<T> GetRange(int index, int count)
+        {
+            return _base.GetRange(index, count);
+        }
         ///
         /// Summary:
         ///     Searches for the specified object and returns the zero-based index of the
@@ -824,7 +920,10 @@ namespace Highpoint.Sage.Utility {
         /// Returns:
         ///     The zero-based index of the first occurrence of item within the entire System.Collections.Generic.List&lt;T&gt;,
         ///     if found; otherwise, –1.
-        public int IndexOf(T item) { return m_base.IndexOf(item); }
+        public int IndexOf(T item)
+        {
+            return _base.IndexOf(item);
+        }
         ///
         /// Summary:
         ///     Searches for the specified object and returns the zero-based index of the
@@ -847,7 +946,10 @@ namespace Highpoint.Sage.Utility {
         /// Exceptions:
         ///   System.ArgumentOutOfRangeException:
         ///     index is outside the range of valid indexes for the System.Collections.Generic.List&lt;T&gt;.
-        public int IndexOf(T item, int index) { return m_base.IndexOf(item, index); }
+        public int IndexOf(T item, int index)
+        {
+            return _base.IndexOf(item, index);
+        }
         ///
         /// Summary:
         ///     Searches for the specified object and returns the zero-based index of the
@@ -875,7 +977,10 @@ namespace Highpoint.Sage.Utility {
         ///     index is outside the range of valid indexes for the System.Collections.Generic.List&lt;T&gt;.-or-count
         ///     is less than 0.-or-index and count do not specify a valid section in the
         ///     System.Collections.Generic.List&lt;T&gt;.
-        public int IndexOf(T item, int index, int count) { return m_base.IndexOf(item, index, count); }
+        public int IndexOf(T item, int index, int count)
+        {
+            return _base.IndexOf(item, index, count);
+        }
         ///
         /// Summary:
         ///     Searches for the specified object and returns the zero-based index of the
@@ -889,7 +994,10 @@ namespace Highpoint.Sage.Utility {
         /// Returns:
         ///     The zero-based index of the last occurrence of item within the entire the
         ///     System.Collections.Generic.List&lt;T&gt;, if found; otherwise, –1.
-        public int LastIndexOf(T item) { return m_base.IndexOf(item); }
+        public int LastIndexOf(T item)
+        {
+            return _base.IndexOf(item);
+        }
         ///
         /// Summary:
         ///     Searches for the specified object and returns the zero-based index of the
@@ -912,7 +1020,10 @@ namespace Highpoint.Sage.Utility {
         /// Exceptions:
         ///   System.ArgumentOutOfRangeException:
         ///     index is outside the range of valid indexes for the System.Collections.Generic.List&lt;T&gt;.
-        public int LastIndexOf(T item, int index) { return m_base.LastIndexOf(item, index); }
+        public int LastIndexOf(T item, int index)
+        {
+            return _base.LastIndexOf(item, index);
+        }
         ///
         /// Summary:
         ///     Searches for the specified object and returns the zero-based index of the
@@ -941,11 +1052,17 @@ namespace Highpoint.Sage.Utility {
         ///     index is outside the range of valid indexes for the System.Collections.Generic.List&lt;T&gt;.-or-count
         ///     is less than 0.-or-index and count do not specify a valid section in the
         ///     System.Collections.Generic.List&lt;T&gt;.
-        public int LastIndexOf(T item, int index, int count) { return m_base.LastIndexOf(item, index, count); }
+        public int LastIndexOf(T item, int index, int count)
+        {
+            return _base.LastIndexOf(item, index, count);
+        }
         ///
         /// Summary:
         ///     Reverses the order of the elements in the entire System.Collections.Generic.List&lt;T&gt;.
-        public void Reverse() { m_base.Reverse(); }
+        public void Reverse()
+        {
+            _base.Reverse();
+        }
         ///
         /// Summary:
         ///     Reverses the order of the elements in the specified range.
@@ -963,7 +1080,10 @@ namespace Highpoint.Sage.Utility {
         ///
         ///   System.ArgumentOutOfRangeException:
         ///     index is less than 0.-or-count is less than 0.
-        public void Reverse(int index, int count) { m_base.Reverse(index, count); }
+        public void Reverse(int index, int count)
+        {
+            _base.Reverse(index, count);
+        }
         ///
         /// Summary:
         ///     Sorts the elements in the entire System.Collections.Generic.List&lt;T&gt; using
@@ -974,7 +1094,10 @@ namespace Highpoint.Sage.Utility {
         ///     The default comparer System.Collections.Generic.Comparer&lt;T&gt;.Default cannot
         ///     find an implementation of the System.IComparable&lt;T&gt; generic interface or
         ///     the System.IComparable interface for type T.
-        public void Sort() { m_base.Sort(); }
+        public void Sort()
+        {
+            _base.Sort();
+        }
         ///
         /// Summary:
         ///     Sorts the elements in the entire System.Collections.Generic.List&lt;T&gt; using
@@ -991,7 +1114,10 @@ namespace Highpoint.Sage.Utility {
         ///
         ///   System.ArgumentNullException:
         ///     comparison is null.
-        public void Sort(Comparison<T> comparison) { m_base.Sort(comparison); }
+        public void Sort(Comparison<T> comparison)
+        {
+            _base.Sort(comparison);
+        }
         ///
         /// Summary:
         ///     Sorts the elements in the entire System.Collections.Generic.List&lt;T&gt; using
@@ -1011,7 +1137,10 @@ namespace Highpoint.Sage.Utility {
         ///     comparer is null, and the default comparer System.Collections.Generic.Comparer&lt;T&gt;.Default
         ///     cannot find implementation of the System.IComparable&lt;T&gt; generic interface
         ///     or the System.IComparable interface for type T.
-        public void Sort(IComparer<T> comparer) { m_base.Sort(comparer); }
+        public void Sort(IComparer<T> comparer)
+        {
+            _base.Sort(comparer);
+        }
         ///
         /// Summary:
         ///     Sorts the elements in a range of elements in System.Collections.Generic.List&lt;T&gt;
@@ -1041,19 +1170,28 @@ namespace Highpoint.Sage.Utility {
         ///     comparer is null, and the default comparer System.Collections.Generic.Comparer&lt;T&gt;.Default
         ///     cannot find implementation of the System.IComparable&lt;T&gt; generic interface
         ///     or the System.IComparable interface for type T.
-        public void Sort(int index, int count, IComparer<T> comparer) { m_base.Sort(index, count, comparer); }
+        public void Sort(int index, int count, IComparer<T> comparer)
+        {
+            _base.Sort(index, count, comparer);
+        }
         ///
         /// Summary:
         ///     Copies the elements of the System.Collections.Generic.List&lt;T&gt; to a new array.
         ///
         /// Returns:
         ///     An array containing copies of the elements of the System.Collections.Generic.List&lt;T&gt;.
-        public T[] ToArray() { return m_base.ToArray(); }
+        public T[] ToArray()
+        {
+            return _base.ToArray();
+        }
         ///
         /// Summary:
         ///     Sets the capacity to the actual number of elements in the System.Collections.Generic.List&lt;T&gt;,
         ///     if that number is less than a threshold value.
-        public void TrimExcess() { m_base.TrimExcess(); }
+        public void TrimExcess()
+        {
+            _base.TrimExcess();
+        }
         ///
         /// Summary:
         ///     Determines whether every element in the System.Collections.Generic.List&lt;T&gt;
@@ -1072,18 +1210,24 @@ namespace Highpoint.Sage.Utility {
         /// Exceptions:
         ///   System.ArgumentNullException:
         ///     match is null.
-        public bool TrueForAll(Predicate<T> match) { return m_base.TrueForAll(match); }
+        public bool TrueForAll(Predicate<T> match)
+        {
+            return _base.TrueForAll(match);
+        }
 
-        public static implicit operator List<T>(EventedList<T> elist) {
-            return elist.m_base;
+        public static implicit operator List<T>(EventedList<T> elist)
+        {
+            return elist._base;
         }
 
         // Summary:
         //     Enumerates the elements of a System.Collections.Generic.List&lt;T&gt;.
         [Serializable]
-        public struct Enumerator : IEnumerator<T> {
+        public struct Enumerator : IEnumerator<T>
+        {
             private List<T>.Enumerator m_enumerator;
-            public Enumerator(List<T> baseList) {
+            public Enumerator(List<T> baseList)
+            {
                 m_enumerator = baseList.GetEnumerator();
             }
             // Summary:
@@ -1096,7 +1240,10 @@ namespace Highpoint.Sage.Utility {
 
             // Summary:
             //     Releases all resources used by the System.Collections.Generic.List&lt;T&gt;.Enumerator.
-            public void Dispose() { m_enumerator.Dispose();  } 
+            public void Dispose()
+            {
+                m_enumerator.Dispose();
+            }
             //
             // Summary:
             //     Advances the enumerator to the next element of the System.Collections.Generic.List&lt;T&gt;.
@@ -1108,17 +1255,22 @@ namespace Highpoint.Sage.Utility {
             // Exceptions:
             //   System.InvalidOperationException:
             //     The collection was modified after the enumerator was created.
-            public bool MoveNext() { return m_enumerator.MoveNext(); }
+            public bool MoveNext()
+            {
+                return m_enumerator.MoveNext();
+            }
 
             #region IEnumerator Members
 
             object System.Collections.IEnumerator.Current => m_enumerator.Current;
 
-            bool System.Collections.IEnumerator.MoveNext() {
+            bool System.Collections.IEnumerator.MoveNext()
+            {
                 return m_enumerator.MoveNext();
             }
 
-            void System.Collections.IEnumerator.Reset() {
+            void System.Collections.IEnumerator.Reset()
+            {
                 throw new NotSupportedException();
             }
 
