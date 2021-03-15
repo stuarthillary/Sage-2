@@ -1,9 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿/* This source code licensed under the GNU Affero General Public License */
+
 using System.Collections.Specialized;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Highpoint.Sage.Utility
 {
@@ -12,7 +9,7 @@ namespace Highpoint.Sage.Utility
     {
         public ConfigurationManager(string filename)
         {
-            
+
         }
         public NameValueCollection GetSection(string sectionName)
         {
