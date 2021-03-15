@@ -7,24 +7,26 @@ namespace Highpoint.Sage.Resources
     /// the requested subject, and the stored key matches the provided key
     /// via the .Equals(...) operator.
     /// </summary>
-    public class SingleKeyAccessRegulator : IAccessRegulator {
+    public class SingleKeyAccessRegulator : IAccessRegulator
+    {
 
-		#region Private Fields
+        #region Private Fields
 
-		private readonly object m_key;
-		private readonly object m_subject;
+        private readonly object _key;
+        private readonly object _subject;
 
-		#endregion 
+        #endregion
 
         /// <summary>
         /// Creates a new instance of the <see cref="T:SingleKeyAccessRegulator"/> class.
         /// </summary>
         /// <param name="subject">The subject.</param>
         /// <param name="key">The key.</param>
-		public SingleKeyAccessRegulator(object subject, object key){
-			m_subject = subject;
-			m_key = key;
-		}
+        public SingleKeyAccessRegulator(object subject, object key)
+        {
+            _subject = subject;
+            _key = key;
+        }
 
         /// <summary>
         /// Returns true if the given subject can be acquired using the presented key.
@@ -34,8 +36,9 @@ namespace Highpoint.Sage.Resources
         /// <returns>
         /// True if the acquire will be allowed, false if not.
         /// </returns>
-		public bool CanAcquire(object subject, object usingKey){
-			return ( ( m_subject == null || m_subject.Equals(subject) || subject.Equals(m_subject) ) && m_key.Equals(usingKey) );
-		}
-	}
+		public bool CanAcquire(object subject, object usingKey)
+        {
+            return ((_subject == null || _subject.Equals(subject) || subject.Equals(_subject)) && _key.Equals(usingKey));
+        }
+    }
 }
