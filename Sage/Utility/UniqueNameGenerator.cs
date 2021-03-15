@@ -16,14 +16,14 @@ namespace Highpoint.Sage.Utility
     /// </summary>
     public class UniqueNameGenerator
     {
-        private readonly Dictionary<string,UniqueNameData> m_uniqueNameData;
+        private readonly Dictionary<string, UniqueNameData> _uniqueNameData;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="UniqueNameGenerator"/> class.
         /// </summary>
         public UniqueNameGenerator()
         {
-            m_uniqueNameData = new Dictionary<string, UniqueNameData>();
+            _uniqueNameData = new Dictionary<string, UniqueNameData>();
         }
 
         /// <summary>
@@ -38,28 +38,28 @@ namespace Highpoint.Sage.Utility
         public string GetNextName(string seed, int nPlaces, bool zeroBased = false)
         {
             string key = seed + nPlaces;
-            if (!m_uniqueNameData.ContainsKey(key))
+            if (!_uniqueNameData.ContainsKey(key))
             {
-                m_uniqueNameData.Add(key, new UniqueNameData(nPlaces, zeroBased));
+                _uniqueNameData.Add(key, new UniqueNameData(nPlaces, zeroBased));
             }
-            UniqueNameData und = m_uniqueNameData[key];
+            UniqueNameData und = _uniqueNameData[key];
             return seed + und.NextSuffix();
         }
 
         private class UniqueNameData
         {
-            private int m_nextIndex;
-            private readonly string m_formatString;
+            private int _nextIndex;
+            private readonly string _formatString;
 
             public UniqueNameData(int nPlaces, bool zeroBased)
             {
-                m_formatString = string.Format("{{0:D{0}}}", nPlaces);
-                m_nextIndex = zeroBased?0:1;
+                _formatString = string.Format("{{0:D{0}}}", nPlaces);
+                _nextIndex = zeroBased ? 0 : 1;
             }
 
             public string NextSuffix()
             {
-                return string.Format(m_formatString, m_nextIndex++);
+                return string.Format(_formatString, _nextIndex++);
             }
         }
     }
