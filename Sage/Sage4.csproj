@@ -399,6 +399,7 @@
     <Compile Include="Materials\IMaterialTransferHelper.cs" />
     <Compile Include="Materials\IUpdater.cs" />
     <Compile Include="Materials\MaterialChangeType.cs" />
+    <Compile Include="Materials\MaterialState.cs" />
     <Compile Include="Materials\MaterialTransfer.cs" />
     <Compile Include="Materials\MaterialTransferSpecByMass.cs" />
     <Compile Include="Materials\NullUpdater.cs" />
