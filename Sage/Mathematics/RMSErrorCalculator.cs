@@ -11,14 +11,14 @@ namespace Highpoint.Sage.Mathematics
         {
             if (a.Length != b.Length)
                 throw new ArgumentException("Cannot calculate RMS Error between two arrays of unequal length.");
-            return Math.Sqrt(a.Select((t, i) => Math.Pow(t - b[i], 2.0)).Sum())/a.Length;
+            return Math.Sqrt(a.Select((t, i) => Math.Pow(t - b[i], 2.0)).Sum()) / a.Length;
         }
 
         public static double Calculate(List<double> a, List<double> b)
         {
-            if (a.Count !=b.Count)
-            throw new ArgumentException("Cannot calculate RMS Error between two arrays of unequal length.");
-            return Math.Sqrt(a.Select((t, i) => Math.Pow(t - b[i], 2.0)).Sum())/ a.Count;
+            if (a.Count != b.Count)
+                throw new ArgumentException("Cannot calculate RMS Error between two arrays of unequal length.");
+            return Math.Sqrt(a.Select((t, i) => Math.Pow(t - b[i], 2.0)).Sum()) / a.Count;
         }
     }
 }

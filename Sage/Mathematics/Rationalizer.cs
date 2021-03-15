@@ -17,8 +17,8 @@ namespace Highpoint.Sage.Mathematics {
     public class Rationalizer {
 
 #region Private Fields
-        private Dictionary<double, double> m_ratios = new Dictionary<double, double>();
-        private int m_numPlaces;
+        private Dictionary<double, double> _ratios = new Dictionary<double, double>();
+        private int _numPlaces;
 #endregion Private Fields
 
         /// <summary>
@@ -28,21 +28,21 @@ namespace Highpoint.Sage.Mathematics {
         /// <param name="denominatorRange">The range of fractions that will be examined for.</param>
         /// <param name="numPlaces">The number of places that will be examined in the mantissa.</param>
         public Rationalizer(int denominatorRange, int numPlaces) {
-            m_numPlaces = numPlaces;
+            _numPlaces = numPlaces;
             for (double den = 1 ; den < 10 ; den++) {
                 for (double num = 1 ; num < den ; num++) {
                     double val = num / den;
-                    double key = Math.Truncate(val * Math.Pow(10, m_numPlaces)) / Math.Pow(10, m_numPlaces);
-                    if (m_ratios.ContainsKey(key)) {
+                    double key = Math.Truncate(val * Math.Pow(10, _numPlaces)) / Math.Pow(10, _numPlaces);
+                    if (_ratios.ContainsKey(key)) {
                         //Console.WriteLine("{1}/{2} = {0}, but we already have this.", val, num, den);
                     } else {
                         //Console.WriteLine("{1}/{2} = {0}, we will key on {0:F6}", val, num, den, key);
-                        m_ratios.Add(key, val);
+                        _ratios.Add(key, val);
                     }
                 }
             }
-            m_ratios.Add(Math.Round(Math.Truncate(Math.Pow(10, m_numPlaces) - 1) / Math.Pow(10, m_numPlaces), m_numPlaces), 1.0);
-            m_ratios.Add(0.0, 0.0);
+            _ratios.Add(Math.Round(Math.Truncate(Math.Pow(10, _numPlaces) - 1) / Math.Pow(10, _numPlaces), _numPlaces), 1.0);
+            _ratios.Add(0.0, 0.0);
         }
 
         /// <summary>
@@ -55,9 +55,9 @@ namespace Highpoint.Sage.Mathematics {
             double val = Math.Abs(valArg);
             double floor = Math.Floor(val);
             double fractional = val - floor;
-            double key = Math.Truncate(fractional * Math.Pow(10, m_numPlaces)) / Math.Pow(10, m_numPlaces);
-            if (m_ratios.ContainsKey(key)) {
-                fractional = m_ratios[key];
+            double key = Math.Truncate(fractional * Math.Pow(10, _numPlaces)) / Math.Pow(10, _numPlaces);
+            if (_ratios.ContainsKey(key)) {
+                fractional = _ratios[key];
                 valArg = sgn * ( floor + fractional );
             }
             return valArg;

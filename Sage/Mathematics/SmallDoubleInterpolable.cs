@@ -15,7 +15,7 @@ namespace Highpoint.Sage.Mathematics
     {
         private double[] _xVals, _yVals;
         private int _nEntries;
-        private readonly IDoubleInterpolator m_interpolator;
+        private readonly IDoubleInterpolator _interpolator;
 
         /// <summary>
         /// Constructor for an uninitialized SmallDoubleInterpolable, for persistence operations.
@@ -38,8 +38,8 @@ namespace Highpoint.Sage.Mathematics
                     da[i] = double.NaN;
             }
             _nEntries = 0;
-            m_interpolator = new LinearDoubleInterpolator();
-            m_interpolator.SetData(_xVals, _yVals);
+            _interpolator = new LinearDoubleInterpolator();
+            _interpolator.SetData(_xVals, _yVals);
         }
 
         /// <summary>
@@ -49,10 +49,10 @@ namespace Highpoint.Sage.Mathematics
         /// <param name="idi">The doubleInterpolator that this <see cref="T:SmallDoubleInterpolable"/> will use.</param>
 		public SmallDoubleInterpolable(int nPoints, IDoubleInterpolator idi) : this(nPoints)
         {
-            m_interpolator = idi;
-            if (!m_interpolator.HasData)
+            _interpolator = idi;
+            if (!_interpolator.HasData)
             {
-                m_interpolator.SetData(_xVals, _yVals);
+                _interpolator.SetData(_xVals, _yVals);
             }
         }
 
@@ -84,8 +84,8 @@ namespace Highpoint.Sage.Mathematics
         /// <param name="idi">The IDoubleInterpolator to be used to discern Y values between known x values.</param>
 		public SmallDoubleInterpolable(double[] xVals, double[] yVals, IDoubleInterpolator idi) : this(xVals, yVals)
         {
-            m_interpolator = idi;
-            m_interpolator.SetData(xVals, yVals);
+            _interpolator = idi;
+            _interpolator.SetData(xVals, yVals);
         }
 
         /// <summary>
@@ -95,7 +95,7 @@ namespace Highpoint.Sage.Mathematics
         /// <returns></returns>
 		public double GetYValue(double xValue)
         {
-            return m_interpolator.GetYValue(xValue);
+            return _interpolator.GetYValue(xValue);
         }
         /// <summary>
         /// Sets the y value for the specified known x value.
@@ -138,7 +138,7 @@ namespace Highpoint.Sage.Mathematics
                         _xVals[i] = double.NaN;
                         _yVals[i] = double.NaN;
                     }
-                    m_interpolator.SetData(_xVals, _yVals);
+                    _interpolator.SetData(_xVals, _yVals);
                 }
 
                 // Move stuff up to make room.

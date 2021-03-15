@@ -14,30 +14,30 @@ namespace Highpoint.Sage.Mathematics
     /// </summary>
     public class LinearRegression
     {
-        double[,] m_v;            // Least squares and var/covar matrix
+        double[,] _v;            // Least squares and var/covar matrix
         public double[] C;        // Coefficients
         public double[] Sec;      // Std Error of coefficients
-        double m_rysq;            // Multiple correlation coefficient
-        double m_sdv;             // Standard deviation of errors
-        double m_fReg;            // Fisher F statistic for regression
-        double[] m_ycalc;         // Calculated values of Y
-        double[] m_dy;            // Residual values of Y
+        double _rysq;            // Multiple correlation coefficient
+        double _sdv;             // Standard deviation of errors
+        double _fReg;            // Fisher F statistic for regression
+        double[] _ycalc;         // Calculated values of Y
+        double[] _dy;            // Residual values of Y
 
-        public double FisherF => m_fReg;
+        public double FisherF => _fReg;
 
-        public double CorrelationCoefficient => m_rysq;
+        public double CorrelationCoefficient => _rysq;
 
-        public double StandardDeviation => m_sdv;
+        public double StandardDeviation => _sdv;
 
-        public double[] CalculatedValues => m_ycalc;
+        public double[] CalculatedValues => _ycalc;
 
-        public double[] Residuals => m_dy;
+        public double[] Residuals => _dy;
 
         public double[] Coefficients => C;
 
         public double[] CoefficientsStandardError => Sec;
 
-        public double[,] VarianceMatrix => m_v;
+        public double[,] VarianceMatrix => _v;
 
         /// <summary>
         /// Performs a linear regression on the data in Y (independent), X (dependent) and W (weights).
@@ -90,14 +90,14 @@ namespace Highpoint.Sage.Mathematics
             int m = y.Length;             // M = Number of data points
             int n = x.Length / m;         // N = Number of linear terms
             int ndf = m - n;              // Degrees of freedom
-            m_ycalc = new double[m];
-            m_dy = new double[m];
+            _ycalc = new double[m];
+            _dy = new double[m];
             // If not enough data, don't attempt regression
             if (ndf < 1)
             {
                 return false;
             }
-            m_v = new double[n, n];
+            _v = new double[n, n];
             C = new double[n];
             Sec = new double[n];
             double[] b = new double[n];   // Vector for LSQ
@@ -105,23 +105,23 @@ namespace Highpoint.Sage.Mathematics
             // Clear the matrices to start out
             for (int i = 0; i < n; i++)
                 for (int j = 0; j < n; j++)
-                    m_v[i, j] = 0;
+                    _v[i, j] = 0;
 
             // Form Least Squares Matrix
             for (int i = 0; i < n; i++)
             {
                 for (int j = 0; j < n; j++)
                 {
-                    m_v[i, j] = 0;
+                    _v[i, j] = 0;
                     for (int k = 0; k < m; k++)
-                        m_v[i, j] = m_v[i, j] + w[k] * x[i, k] * x[j, k];
+                        _v[i, j] = _v[i, j] + w[k] * x[i, k] * x[j, k];
                 }
                 b[i] = 0;
                 for (int k = 0; k < m; k++)
                     b[i] = b[i] + w[k] * x[i, k] * y[k];
             }
             // V now contains the raw least squares matrix
-            if (!SymmetricMatrixInvert(m_v))
+            if (!SymmetricMatrixInvert(_v))
             {
                 return false;
             }
@@ -131,7 +131,7 @@ namespace Highpoint.Sage.Mathematics
             {
                 C[i] = 0;
                 for (int j = 0; j < n; j++)
-                    C[i] = C[i] + m_v[i, j] * b[j];
+                    C[i] = C[i] + _v[i, j] * b[j];
             }
 
             // Calculate statistics
@@ -147,26 +147,26 @@ namespace Highpoint.Sage.Mathematics
             ybar = ybar / wsum;
             for (int k = 0; k < m; k++)
             {
-                m_ycalc[k] = 0;
+                _ycalc[k] = 0;
                 for (int i = 0; i < n; i++)
-                    m_ycalc[k] = m_ycalc[k] + C[i] * x[i, k];
-                m_dy[k] = m_ycalc[k] - y[k];
+                    _ycalc[k] = _ycalc[k] + C[i] * x[i, k];
+                _dy[k] = _ycalc[k] - y[k];
                 tss = tss + w[k] * (y[k] - ybar) * (y[k] - ybar);
-                rss = rss + w[k] * m_dy[k] * m_dy[k];
+                rss = rss + w[k] * _dy[k] * _dy[k];
             }
             double ssq = rss / ndf;
-            m_rysq = 1 - rss / tss;
-            m_fReg = 9999999;
-            if (m_rysq < 0.9999999)
-                m_fReg = m_rysq / (1 - m_rysq) * ndf / (n - 1);
-            m_sdv = Math.Sqrt(ssq);
+            _rysq = 1 - rss / tss;
+            _fReg = 9999999;
+            if (_rysq < 0.9999999)
+                _fReg = _rysq / (1 - _rysq) * ndf / (n - 1);
+            _sdv = Math.Sqrt(ssq);
 
             // Calculate var-covar matrix and std error of coefficients
             for (int i = 0; i < n; i++)
             {
                 for (int j = 0; j < n; j++)
-                    m_v[i, j] = m_v[i, j] * ssq;
-                Sec[i] = Math.Sqrt(m_v[i, i]);
+                    _v[i, j] = _v[i, j] * ssq;
+                Sec[i] = Math.Sqrt(_v[i, i]);
             }
             return true;
         }
