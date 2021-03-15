@@ -825,6 +825,8 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Core\BaseModelObject.cs" />
+    <Compile Include="SmartPropertyBag\WriteLock.cs" />
+    <Compile Include="SmartPropertyBag\WriteProtectionViolationException.cs" />
     <Compile Include="SystemDynamics\Behavior.cs" />
     <Compile Include="SystemDynamics\Design\Interfaces.cs" />
     <Compile Include="SystemDynamics\Utility\RunProgram.cs" />
