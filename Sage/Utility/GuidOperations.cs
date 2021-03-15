@@ -1,31 +1,40 @@
 /* This source code licensed under the GNU Affero General Public License */
+using Highpoint.Sage.SimCore;
 using System;
 using System.Collections;
-using Highpoint.Sage.SimCore;
 
-namespace Highpoint.Sage.Utility {
+namespace Highpoint.Sage.Utility
+{
 
-    public static class GuidOps {
+    public static class GuidOps
+    {
 
         private static System.Security.Cryptography.HashAlgorithm _hash;
         private static readonly object s_lock = new object();
 
         public static Guid Mask = Guid.Empty;
 
-        public static Guid FromString(string src) {
+        public static Guid FromString(string src)
+        {
             char[] ca = Convert.ToBase64String(Hash.ComputeHash(System.Text.Encoding.UTF8.GetBytes(src))).ToCharArray();
             byte[] ba = new byte[16];
-            for (int i = 0 ; i < ca.Length ; i++) {
-                ba[i%16] = (byte)(ca[i]);
+            for (int i = 0; i < ca.Length; i++)
+            {
+                ba[i % 16] = (byte)(ca[i]);
             }
             return new Guid(ba);
         }
 
-        private static System.Security.Cryptography.HashAlgorithm Hash {
-            get {
-                if (_hash == null) {
-                    lock (s_lock){
-                        if (_hash == null) {
+        private static System.Security.Cryptography.HashAlgorithm Hash
+        {
+            get
+            {
+                if (_hash == null)
+                {
+                    lock (s_lock)
+                    {
+                        if (_hash == null)
+                        {
                             _hash = new System.Security.Cryptography.SHA1Managed();
                         }
                     }
@@ -35,20 +44,24 @@ namespace Highpoint.Sage.Utility {
         }
 
         // ReSharper disable once InconsistentNaming
-        public static Guid XOR(Guid a, Guid b) {
+        public static Guid XOR(Guid a, Guid b)
+        {
             byte[] aBytes = a.ToByteArray();
             byte[] bBytes = b.ToByteArray();
             byte[] cBytes = new byte[16];
-            for (int i = 0; i < aBytes.Length; i++) {
+            for (int i = 0; i < aBytes.Length; i++)
+            {
                 cBytes[i] = (byte)(aBytes[i] ^ bBytes[i]);
             }
             Guid c = new Guid(cBytes);
             return c;
         }
 
-        public static Guid Increment(Guid a) {
+        public static Guid Increment(Guid a)
+        {
             byte[] ba = a.ToByteArray();
-            for (int i = ba.Length - 1; i >= 0; i--) {
+            for (int i = ba.Length - 1; i >= 0; i--)
+            {
                 ba[i]++;
                 if (ba[i] != 0)
                     break;
@@ -56,9 +69,11 @@ namespace Highpoint.Sage.Utility {
             return new Guid(ba);
         }
 
-        public static Guid Decrement(Guid a) {
+        public static Guid Decrement(Guid a)
+        {
             byte[] ba = a.ToByteArray();
-            for (int i = ba.Length - 1; i >= 0; i--) {
+            for (int i = ba.Length - 1; i >= 0; i--)
+            {
                 ba[i]--;
                 if (ba[i] != 0xFF)
                     break;
@@ -66,10 +81,13 @@ namespace Highpoint.Sage.Utility {
             return new Guid(ba);
         }
 
-        public static Guid Add(Guid a, int n) {
+        public static Guid Add(Guid a, int n)
+        {
             byte[] ba = a.ToByteArray();
-            for (int h = 0; h < n; h++) {
-                for (int i = ba.Length - 1; i >= 0; i--) {
+            for (int h = 0; h < n; h++)
+            {
+                for (int i = ba.Length - 1; i >= 0; i--)
+                {
                     ba[i]++;
                     if (ba[i] != 0)
                         break;
@@ -84,19 +102,24 @@ namespace Highpoint.Sage.Utility {
         /// <param name="a">A.</param>
         /// <param name="b">The b.</param>
         /// <returns></returns>
-        public static int Subtract(Guid a, Guid b) {
+        public static int Subtract(Guid a, Guid b)
+        {
             int n = 0;
-            while (!a.Equals(b)) {
+            while (!a.Equals(b))
+            {
                 b = Increment(b);
                 n++;
             }
             return n;
         }
 
-        public static Guid Subtract(Guid a, int n) {
+        public static Guid Subtract(Guid a, int n)
+        {
             byte[] ba = a.ToByteArray();
-            for (int h = 0; h < n; h++) {
-                for (int i = ba.Length - 1; i >= 0; i--) {
+            for (int h = 0; h < n; h++)
+            {
+                for (int i = ba.Length - 1; i >= 0; i--)
+                {
                     ba[i]--;
                     if (ba[i] != 0xFF)
                         break;
@@ -105,12 +128,14 @@ namespace Highpoint.Sage.Utility {
             return new Guid(ba);
         }
 
-        public static int Compare(Guid a, Guid b) {
+        public static int Compare(Guid a, Guid b)
+        {
             byte[] ba = a.ToByteArray();
             byte[] bb = b.ToByteArray();
 
             int comp = 0;
-            for (int i = ba.Length - 1; i >= 0; i--) {
+            for (int i = ba.Length - 1; i >= 0; i--)
+            {
                 comp = Comparer.Default.Compare(ba[i], bb[i]);
                 if (comp != 0)
                     return comp;
@@ -123,28 +148,36 @@ namespace Highpoint.Sage.Utility {
         /// display order for a number of reasons. If you want Guids in &quot;Visually&quot; sorted order, use the
         /// AsStringGuidComparer.
         /// </summary>
-        public class GuidComparer : System.Collections.Generic.IComparer<Guid> {
+        public class GuidComparer : System.Collections.Generic.IComparer<Guid>
+        {
             /// <summary>
             /// Compares the specified Guid a with the specified Guid b by binary values.
             /// </summary>
             /// <param name="a">One Guid.</param>
             /// <param name="b">The other Guid.</param>
             /// <returns>-1, 0 or 1, depending on the relationship between a &amp; b.</returns>
-            public int Compare(Guid a, Guid b) { return GuidOps.Compare(a, b); }
+            public int Compare(Guid a, Guid b)
+            {
+                return GuidOps.Compare(a, b);
+            }
         }
 
         /// <summary>
         /// A comparer use for sorting implementers of IHasIdentity on their Guids.
         /// </summary>
         /// <typeparam name="T">The actual type of the elements being sorted. Must implement IHasIdentity</typeparam>
-        public class HasIdentityByGuidComparer<T> : System.Collections.Generic.IComparer<T> where T : IHasIdentity {
+        public class HasIdentityByGuidComparer<T> : System.Collections.Generic.IComparer<T> where T : IHasIdentity
+        {
             /// <summary>
             /// Compares the specified a with the specified b by binary values.
             /// </summary>
             /// <param name="a">One IHasIdentity implementer.</param>
             /// <param name="b">The other IHasIdentity implementer.</param>
             /// <returns>-1, 0 or 1, depending on the relationship between a &amp; b.</returns>
-            public int Compare(T a, T b) { return GuidOps.Compare(a.Guid, b.Guid); }
+            public int Compare(T a, T b)
+            {
+                return GuidOps.Compare(a.Guid, b.Guid);
+            }
         }
 
         /// <summary>
@@ -152,14 +185,16 @@ namespace Highpoint.Sage.Utility {
         /// binary order for a number of reasons. If you want Guids in &quot;Binary&quot; sorted order, use the
         /// GuidComparer.
         /// </summary>
-        public class AsStringGuidComparer : System.Collections.Generic.IComparer<Guid> {
+        public class AsStringGuidComparer : System.Collections.Generic.IComparer<Guid>
+        {
             /// <summary>
             /// Compares the specified Guid a with the specified Guid b by string representations.
             /// </summary>
             /// <param name="a">One Guid.</param>
             /// <param name="b">The other Guid.</param>
             /// <returns>-1, 0 or 1, depending on the relationship between a &amp; b.</returns>
-            public int Compare(Guid a, Guid b) {
+            public int Compare(Guid a, Guid b)
+            {
                 return Comparer.Default.Compare(a.ToString(), b.ToString());
             }
         }
@@ -170,7 +205,8 @@ namespace Highpoint.Sage.Utility {
         /// <param name="a">One Guid.</param>
         /// <param name="b">The other Guid.</param>
         /// <returns>-1, 0 or 1, depending on the relationship between a &amp; b.</returns>
-        public static int CompareAsString(Guid a, Guid b) {
+        public static int CompareAsString(Guid a, Guid b)
+        {
             return Comparer.Default.Compare(a.ToString(), b.ToString());
         }
 
@@ -185,7 +221,8 @@ namespace Highpoint.Sage.Utility {
         /// <param name="a">The guid to rotate.</param>
         /// <param name="n">The number of places left to rotate it.</param>
         /// <returns></returns>
-        public static Guid Rotate(Guid a, int n) {
+        public static Guid Rotate(Guid a, int n)
+        {
 
             while (n < 0)
                 n += 128;
@@ -195,7 +232,8 @@ namespace Highpoint.Sage.Utility {
 
             int nBitsToShift = n % 8;
             int nBytesToShift = n >> 3;
-            for (int j = 0; j < 16; j++) {
+            for (int j = 0; j < 16; j++)
+            {
                 int tgtNdx = j + nBytesToShift;
                 if (tgtNdx > 15)
                     tgtNdx -= 16;
@@ -205,11 +243,13 @@ namespace Highpoint.Sage.Utility {
             }
 
             uint overflow = 0;
-            for (int j = 0; j < 16; j++) {
+            for (int j = 0; j < 16; j++)
+            {
                 uint tmp = (uint)(dstba[j] << nBitsToShift);
                 dstba[j] = (byte)(tmp + overflow);
                 overflow = tmp >> 8;
-                if (overflow < 0) overflow = 0;
+                if (overflow < 0)
+                    overflow = 0;
             }
             dstba[0] += (byte)overflow;
 
