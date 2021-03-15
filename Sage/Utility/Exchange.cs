@@ -1,7 +1,7 @@
 /* This source code licensed under the GNU Affero General Public License */
+using Highpoint.Sage.SimCore;
 using System;
 using System.Collections;
-using Highpoint.Sage.SimCore;
 // ReSharper disable InconsistentlySynchronizedField
 
 namespace Highpoint.Sage.Utility
@@ -10,31 +10,33 @@ namespace Highpoint.Sage.Utility
     /// An exchange is a place where objects can post, read and or take tokens, either with a blocking
     /// or non-blocking call.
     /// </summary>
-    public class Exchange : ITupleSpace {
+    public class Exchange : ITupleSpace
+    {
 
         #region >>> Private Fields <<<
-        private static double _readPriority = double.MaxValue;
-        private static readonly double s_takePriority = _readPriority - double.Epsilon;
-        private static readonly double s_postPriority = s_takePriority - double.Epsilon;
-        private readonly IExecutive m_exec;
-        private readonly Hashtable m_ts;
-        private readonly HashtableOfLists m_waitersToRead;
-        private readonly HashtableOfLists m_waitersToTake;
-        private readonly Hashtable m_blockedPosters;
+        private static readonly double _readPriority = double.MaxValue;
+        private static readonly double _takePriority = _readPriority - double.Epsilon;
+        private static readonly double _postPriority = _takePriority - double.Epsilon;
+        private readonly IExecutive _exec;
+        private readonly Hashtable _ts;
+        private readonly HashtableOfLists _waitersToRead;
+        private readonly HashtableOfLists _waitersToTake;
+        private readonly Hashtable _blockedPosters;
         #endregion
 
         /// <summary>
         /// Creates a new instance of the <see cref="T:Highpoint.Sage.Utility.Exchange"/> class.
         /// </summary>
         /// <param name="exec">The exec.</param>
-        public Exchange(IExecutive exec) {
-            m_exec = exec;
+        public Exchange(IExecutive exec)
+        {
+            _exec = exec;
             // TODO: Add a GracefulAbort(...) to IDetachableEventController. 
             // exec.ExecutiveFinished +=new ExecutiveEvent(exec_ExecutiveFinished);
-            m_ts = Hashtable.Synchronized(new Hashtable());
-            m_waitersToRead = new HashtableOfLists();
-            m_waitersToTake = new HashtableOfLists();
-            m_blockedPosters = new Hashtable();
+            _ts = Hashtable.Synchronized(new Hashtable());
+            _waitersToRead = new HashtableOfLists();
+            _waitersToTake = new HashtableOfLists();
+            _blockedPosters = new Hashtable();
         }
 
         #region ITupleSpace Members
@@ -54,10 +56,14 @@ namespace Highpoint.Sage.Utility
         /// <param name="tuple">The tuple.</param>
         /// <param name="blocking">if set to <c>true</c> this call blocks
         /// the caller's thread until the Tuple is taken from the space by another caller..</param>
-        public void Post(ITuple tuple, bool blocking) {
-            if ( blocking ) {
+        public void Post(ITuple tuple, bool blocking)
+        {
+            if (blocking)
+            {
                 BlockingPost(tuple);
-            } else {
+            }
+            else
+            {
                 NonBlockingPost(tuple);
             }
         }
@@ -69,8 +75,9 @@ namespace Highpoint.Sage.Utility
         /// <param name="key">The key.</param>
         /// <param name="data">The data.</param>
         /// <param name="blocking">if set to <c>true</c> [blocking].</param>
-        public void Post(object key, object data, bool blocking) {
-            Post(new TupleWrapper(key,data),blocking);
+        public void Post(object key, object data, bool blocking)
+        {
+            Post(new TupleWrapper(key, data), blocking);
         }
 
         /// <summary>
@@ -79,8 +86,9 @@ namespace Highpoint.Sage.Utility
         /// <param name="key">The key.</param>
         /// <param name="blocking">if set to <c>true</c> [blocking].</param>
         /// <returns>The Tuple stored under the specified key</returns>
-        public ITuple Read(object key, bool blocking) {
-            return (blocking?BlockingRead(key):NonBlockingRead(key));
+        public ITuple Read(object key, bool blocking)
+        {
+            return (blocking ? BlockingRead(key) : NonBlockingRead(key));
         }
 
         /// <summary>
@@ -90,27 +98,31 @@ namespace Highpoint.Sage.Utility
         /// <param name="blocking">if set to <c>true</c> the calling thread will not return until a Tuple has been found with the
         /// specified key value.</param>
         /// <returns>The Tuple stored under the specified key</returns>
-        public ITuple Take(object key, bool blocking) {
-            return (blocking?BlockingTake(key):NonBlockingTake(key));
+        public ITuple Take(object key, bool blocking)
+        {
+            return (blocking ? BlockingTake(key) : NonBlockingTake(key));
         }
 
         /// <summary>
         /// Blocks the calling thread until the specified key is not in the TupleSpace.
         /// </summary>
         /// <param name="key">The key.</param>
-        public void BlockWhilePresent(object key) {
+        public void BlockWhilePresent(object key)
+        {
             #region Ensure that this is a Detachable Event.
 #if DEBUG
-            if (m_exec.CurrentEventType != ExecEventType.Detachable)
+            if (_exec.CurrentEventType != ExecEventType.Detachable)
                 throw new ApplicationException("Attempt to do a blocking post with an executive event that is not Detachable.");
 #endif
             #endregion
 
             ITuple tuple;
-            lock (m_ts) {
-                tuple = (ITuple)m_ts[key];
+            lock (_ts)
+            {
+                tuple = (ITuple)_ts[key];
             }
-            if (tuple != null) {
+            if (tuple != null)
+            {
                 new BlockTilKeyGoneHandler(this, tuple).Run();
             }
         }
@@ -122,88 +134,107 @@ namespace Highpoint.Sage.Utility
         #endregion
         #endregion
 
-        private void BlockingPost(ITuple tuple){
+        private void BlockingPost(ITuple tuple)
+        {
             #region Ensure that this is a Detachable Event.
 #if DEBUG
-            if ( m_exec.CurrentEventType != ExecEventType.Detachable ) throw new ApplicationException("Attempt to do a blocking post with an executive event that is not Detachable.");
+            if (_exec.CurrentEventType != ExecEventType.Detachable)
+                throw new ApplicationException("Attempt to do a blocking post with an executive event that is not Detachable.");
 #endif
             #endregion
-			
+
             NonBlockingPost(tuple);
-			
+
             #region Wait 'til next take against this key.
-            IDetachableEventController idec = m_exec.CurrentEventController;
-            m_blockedPosters.Add(tuple.Key,idec);
+            IDetachableEventController idec = _exec.CurrentEventController;
+            _blockedPosters.Add(tuple.Key, idec);
             idec.Suspend();
             #endregion
         }
-        private void NonBlockingPost(ITuple tuple){
-            m_ts.Add(tuple.Key,tuple);
+        private void NonBlockingPost(ITuple tuple)
+        {
+            _ts.Add(tuple.Key, tuple);
             tuple.OnPosted(this);
-            TuplePosted?.Invoke(this,tuple);
-            foreach ( IDetachableEventController idec in m_waitersToRead[tuple.Key] ) idec.Resume(_readPriority);
-            foreach ( IDetachableEventController idec in m_waitersToTake[tuple.Key] ) idec.Resume(s_takePriority);
-            m_waitersToRead.Remove(tuple.Key);
-            m_waitersToTake.Remove(tuple.Key);
+            TuplePosted?.Invoke(this, tuple);
+            foreach (IDetachableEventController idec in _waitersToRead[tuple.Key])
+                idec.Resume(_readPriority);
+            foreach (IDetachableEventController idec in _waitersToTake[tuple.Key])
+                idec.Resume(_takePriority);
+            _waitersToRead.Remove(tuple.Key);
+            _waitersToTake.Remove(tuple.Key);
         }
-        private ITuple BlockingRead(object key){
+        private ITuple BlockingRead(object key)
+        {
             #region Ensure that this is a Detachable Event.
 #if DEBUG
-            if ( m_exec.CurrentEventType != ExecEventType.Detachable ) throw new ApplicationException("Attempt to do a blocking read with an executive event that is not Detachable.");
+            if (_exec.CurrentEventType != ExecEventType.Detachable)
+                throw new ApplicationException("Attempt to do a blocking read with an executive event that is not Detachable.");
 #endif
             #endregion
-            while ( true ){
+            while (true)
+            {
                 ITuple tuple = NonBlockingRead(key);
-                if ( tuple != null ) return tuple;
+                if (tuple != null)
+                    return tuple;
                 #region Wait 'til next post against this key.
-                IDetachableEventController idec = m_exec.CurrentEventController;
-                m_waitersToRead.Add(key,idec);
+                IDetachableEventController idec = _exec.CurrentEventController;
+                _waitersToRead.Add(key, idec);
                 idec.Suspend();
                 #endregion
-				
+
             }
         }
-        private ITuple NonBlockingRead(object key){
-            ITuple tuple = (ITuple)m_ts[key];
-            if ( tuple != null ) {
+        private ITuple NonBlockingRead(object key)
+        {
+            ITuple tuple = (ITuple)_ts[key];
+            if (tuple != null)
+            {
                 tuple.OnRead(this);
                 TupleRead?.Invoke(this, tuple);
             }
             return tuple;
         }
-        private ITuple BlockingTake(object key){
+        private ITuple BlockingTake(object key)
+        {
 
             #region Ensure that this is a Detachable Event.
 #if DEBUG
-            if ( m_exec.CurrentEventType != ExecEventType.Detachable ) throw new ApplicationException("Attempt to do a blocking take with an executive event that is not Detachable.");
+            if (_exec.CurrentEventType != ExecEventType.Detachable)
+                throw new ApplicationException("Attempt to do a blocking take with an executive event that is not Detachable.");
 #endif
             #endregion
 
-            while ( true ){
+            while (true)
+            {
                 ITuple tuple = NonBlockingTake(key);
-                if ( tuple != null ) return tuple;
+                if (tuple != null)
+                    return tuple;
 
                 #region Wait 'til next take against this key.
-                IDetachableEventController idec = m_exec.CurrentEventController;
-                m_waitersToTake.Add(key,idec);
+                IDetachableEventController idec = _exec.CurrentEventController;
+                _waitersToTake.Add(key, idec);
                 idec.Suspend();
                 #endregion
             }
         }
-        private ITuple NonBlockingTake(object key){
+        private ITuple NonBlockingTake(object key)
+        {
             ITuple tuple;
-            lock ( m_ts ) {
-                tuple = (ITuple)m_ts[key];
-                if ( tuple != null ) {
+            lock (_ts)
+            {
+                tuple = (ITuple)_ts[key];
+                if (tuple != null)
+                {
 
-                    m_ts.Remove(key);
+                    _ts.Remove(key);
                     tuple.OnTaken(this);
-                    TupleTaken?.Invoke(this,tuple);
+                    TupleTaken?.Invoke(this, tuple);
 
-                    IDetachableEventController blockedPoster = (IDetachableEventController)m_blockedPosters[tuple.Key];
-                    if ( blockedPoster != null ) {
-                        m_blockedPosters.Remove(tuple.Key);
-                        blockedPoster.Resume(s_postPriority);
+                    IDetachableEventController blockedPoster = (IDetachableEventController)_blockedPosters[tuple.Key];
+                    if (blockedPoster != null)
+                    {
+                        _blockedPosters.Remove(tuple.Key);
+                        blockedPoster.Resume(_postPriority);
                     }
                 }
             }
@@ -219,49 +250,68 @@ namespace Highpoint.Sage.Utility
         //    m_waitersToTake.Clear();
         //}
 
-        private class BlockTilKeyGoneHandler {
-            private readonly IDetachableEventController m_idec;
-            private readonly ITuple m_tuple;
-            private readonly Exchange m_exchange;
-            private readonly TupleEvent m_myEvent;
-            
-            public BlockTilKeyGoneHandler(Exchange exchange, ITuple tuple) {
-                m_exchange = exchange;
-                m_idec = m_exchange.m_exec.CurrentEventController;
-                m_tuple = tuple;
-                m_myEvent = m_exchange_TupleTaken;
+        private class BlockTilKeyGoneHandler
+        {
+            private readonly IDetachableEventController _idec;
+            private readonly ITuple _tuple;
+            private readonly Exchange _exchange;
+            private readonly TupleEvent _myEvent;
+
+            public BlockTilKeyGoneHandler(Exchange exchange, ITuple tuple)
+            {
+                _exchange = exchange;
+                _idec = _exchange._exec.CurrentEventController;
+                _tuple = tuple;
+                _myEvent = exchange_TupleTaken;
             }
 
-            public void Run() {
-                m_exchange.TupleTaken += m_myEvent;
-                m_idec.Suspend();
+            public void Run()
+            {
+                _exchange.TupleTaken += _myEvent;
+                _idec.Suspend();
             }
 
-            void m_exchange_TupleTaken(ITupleSpace space, ITuple tuple) {
-                if (tuple.Equals(m_tuple)) {
-                    m_exchange.TupleTaken -= m_myEvent;
-                    m_idec.Resume();
+            void exchange_TupleTaken(ITupleSpace space, ITuple tuple)
+            {
+                if (tuple.Equals(_tuple))
+                {
+                    _exchange.TupleTaken -= _myEvent;
+                    _idec.Resume();
                 }
             }
         }
 
-        private class TupleWrapper : ITuple {
-            public TupleWrapper(object key, object data){
+        private class TupleWrapper : ITuple
+        {
+            public TupleWrapper(object key, object data)
+            {
                 Key = key;
                 Data = data;
             }
 
             #region ITuple Members
 
-            public object Key { get; }
+            public object Key
+            {
+                get;
+            }
 
-            public object Data { get; }
+            public object Data
+            {
+                get;
+            }
 
-            public void OnPosted(ITupleSpace ts) {}
+            public void OnPosted(ITupleSpace ts)
+            {
+            }
 
-            public void OnRead(ITupleSpace ts) {}
+            public void OnRead(ITupleSpace ts)
+            {
+            }
 
-            public void OnTaken(ITupleSpace ts) {}
+            public void OnTaken(ITupleSpace ts)
+            {
+            }
 
             #endregion
         }
