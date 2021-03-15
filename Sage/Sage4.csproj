@@ -394,6 +394,7 @@
     <Compile Include="Materials\Emissions\VacuumDistillationModel.cs" />
     <Compile Include="Materials\Emissions\VacuumDistillationWScrubberModel.cs" />
     <Compile Include="Materials\Emissions\VacuumDryModel.cs" />
+    <Compile Include="Materials\IContainer.cs" />
     <Compile Include="Materials\IMaterialExtractor.cs" />
     <Compile Include="Materials\IMaterialTransferHelper.cs" />
     <Compile Include="Materials\IUpdater.cs" />
