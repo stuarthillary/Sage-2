@@ -807,6 +807,8 @@
     <Compile Include="Scheduling\TimePeriod.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Scheduling\TimePeriodAdjustmentException.cs" />
+    <Compile Include="Scheduling\TimePeriodEnvelope.cs" />
     <Compile Include="Scheduling\TimePeriodPart.cs">
       <SubType>Code</SubType>
     </Compile>
