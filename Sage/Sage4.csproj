@@ -921,6 +921,8 @@
     <Compile Include="Utility\IIndexingService.cs" />
     <Compile Include="Utility\IndexingFailedException.cs" />
     <Compile Include="Utility\ISortKey.cs" />
+    <Compile Include="Utility\ITreeNodeT.cs" />
+    <Compile Include="Utility\ITreeNodeEventController.cs" />
     <Compile Include="Utility\ITreeNodeProxy.cs" />
     <Compile Include="Utility\Mementos\ISupportsMementos.cs" />
     <Compile Include="Utility\Mementos\MementoHelper.cs" />
@@ -976,12 +978,15 @@
     <Compile Include="Utility\StringOperations.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Utility\SubtreeChangeType.cs" />
     <Compile Include="Utility\SysInfoOperations.cs" />
     <Compile Include="Utility\TimeBasedSelection.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Utility\TreeNodeCollection.cs" />
     <Compile Include="Utility\TreeNodeHelper.cs" />
-    <Compile Include="Utility\TreeSupport.cs" />
+    <Compile Include="Utility\TreeStructureCheckType.cs" />
+    <Compile Include="Utility\TreeNode.cs" />
     <Compile Include="Utility\Tuples.cs">
       <SubType>Code</SubType>
     </Compile>
