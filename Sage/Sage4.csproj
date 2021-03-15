@@ -721,6 +721,7 @@
     <Compile Include="Randoms\RandomServer.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Resources\GuidSelectiveResourceRequest.cs" />
     <Compile Include="Resources\IHasCapacity.cs" />
     <Compile Include="Resources\IHasControllableCapacity.cs" />
     <Compile Include="Resources\IModelWithResources.cs" />
@@ -760,6 +761,7 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Resources\SimpleAccessManager.cs" />
+    <Compile Include="Resources\SimpleResourceRequest.cs" />
     <Compile Include="Resources\SingleKeyAccessRegulator.cs" />
     <Compile Include="Resources\TerminalResourceRequestAbortedWarning.cs" />
     <Compile Include="Resources\Tracking.cs">
