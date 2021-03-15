@@ -642,6 +642,7 @@
     <Compile Include="Mathematics\CauchyCDF.cs" />
     <Compile Include="Mathematics\CauchyDistribution.cs" />
     <Compile Include="Mathematics\ConstantDoubleDistribution.cs" />
+    <Compile Include="Mathematics\HistogramBinCategory.cs" />
     <Compile Include="Mathematics\TimeSpanDistribution.cs">
       <SubType>Code</SubType>
     </Compile>

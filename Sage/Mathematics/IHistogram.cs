@@ -1,10 +1,11 @@
 /* This source code licensed under the GNU Affero General Public License */
 
-using System;
 using Highpoint.Sage.SimCore;
+using System;
 // ReSharper disable UnusedMemberInSuper.Global
 
-namespace Highpoint.Sage.Mathematics {
+namespace Highpoint.Sage.Mathematics
+{
 
     /// <summary>
     /// Returns true if the data in a certain Histogram bin meet a certain criteria.
@@ -13,76 +14,59 @@ namespace Highpoint.Sage.Mathematics {
     /// <param name="coordinates">The coordinates of the bin in the data.</param>
     /// <returns>True if the data in a certain Histogram bin meet a certain criteria.</returns>
 	public delegate bool HistogramDataFilter(Array data, int[] coordinates);
-	/// <summary>
-	/// Returns a string that characterizes a bin in a Histogram located at the given dimensional coordinates.
-	/// </summary>
-	/// <param name="coordinates">The coordinates of the bin whose label is desired.</param>
+    /// <summary>
+    /// Returns a string that characterizes a bin in a Histogram located at the given dimensional coordinates.
+    /// </summary>
+    /// <param name="coordinates">The coordinates of the bin whose label is desired.</param>
     /// <returns>A string that characterizes a bin in a Histogram located at the given dimensional coordinates.</returns>
     public delegate string LabelProvider(int[] coordinates);
-
-
-	/// <summary>
-	/// A flag enumerator that specifies which bins in a histogram the caller is referring to.
-	/// </summary>
-    [ Flags ]
-	public enum HistogramBinCategory : byte { 
-        /// <summary>
-        /// No bins are to be, or were, included in the operation.
-        /// </summary>
-        None = 0,
-        /// <summary>
-        /// Only the off-scale-low bin is to be, or was, included in the operation.
-        /// </summary>
-        OffScaleLow = 0x01,
-        /// <summary>
-        /// All in-range bins are to be, or were, included in the operation.
-        /// </summary>
-        InRange=0x02,
-        /// <summary>
-        /// Only the off-scale-high bin is to be, or was, included in the operation.
-        /// </summary>
-        OffScaleHigh=0x04,
-        /// <summary>
-        /// All bins are to be, or were, included in the operation.
-        /// </summary>
-        All=0x07 }
 
 
     /// <summary>
     /// Implemented by an object that processes raw data items into bins and presents some
     /// basic statistics on those bins.
     /// </summary>
-	public interface IHistogram : IHasIdentity {
+	public interface IHistogram : IHasIdentity
+    {
         /// <summary>
         /// Gets or sets the raw data that comprises this Histogram.
         /// </summary>
         /// <value>The raw data.</value>
-		Array RawData { get; set; }
+		Array RawData
+        {
+            get; set;
+        }
         /// <summary>
         /// Gets the bins that are a part of this Histogram.
         /// </summary>
         /// <value>The bins.</value>
-		Array Bins { get; }
+		Array Bins
+        {
+            get;
+        }
         /// <summary>
         /// Gets the number of dimensions in this Histogram (a linear histogram is 1-dimensional.
         /// </summary>
         /// <value>The dimension.</value>
-		int   Dimension{ get; }
+		int Dimension
+        {
+            get;
+        }
         /// <summary>
         /// Clears this Histogram.
         /// </summary>
-		void  Clear();
+		void Clear();
         /// <summary>
         /// Recalculates this Histogram, resulting in new bins and counts.
         /// </summary>
-		void  Recalculate();
+		void Recalculate();
         /// <summary>
         /// Recalculates the Histogram with new high &amp; low bounds, resulting in new bins and counts.
         /// </summary>
         /// <param name="lowBounds">The low bounds of the Histogram.</param>
         /// <param name="highBounds">The high bounds of the Histogram.</param>
         /// <param name="nBins">The number of bins.</param>
-		void  Recalculate(Array lowBounds, Array highBounds, int nBins);
+		void Recalculate(Array lowBounds, Array highBounds, int nBins);
         /// <summary>
         /// Counts the entries in the bins identified by the given <see cref="Highpoint.Sage.Mathematics.HistogramBinCategory"/>.
         /// </summary>
@@ -96,14 +80,14 @@ namespace Highpoint.Sage.Mathematics {
         /// <param name="highbounds">The highbounds.</param>
         /// <returns></returns>
 		int CountEntries(int[] lowBounds, int[] highbounds);
-//		int EquivalentEntries(HistogramBinCategory hbc); 
-//		int EquivalentEntries(int[] lowBounds, int[] highbounds); 
+        //		int EquivalentEntries(HistogramBinCategory hbc); 
+        //		int EquivalentEntries(int[] lowBounds, int[] highbounds); 
         /// <summary>
         /// Returns the index of the biggest bin in each dimension, among the bins identified by the given <see cref="Highpoint.Sage.Mathematics.HistogramBinCategory"/>. 
         /// </summary>
         /// <param name="hbc">The HistogramBinCategory.</param>
         /// <returns>he index of the biggest bin in each dimension, among the bins identified by the given <see cref="Highpoint.Sage.Mathematics.HistogramBinCategory"/>.</returns>
-		int[] BiggestBin(HistogramBinCategory hbc);
+        int[] BiggestBin(HistogramBinCategory hbc);
         /// <summary>
         /// Returns the index of the biggest bin in each dimension, among the bins identified by the given low and high bounds.
         /// </summary>
@@ -129,18 +113,27 @@ namespace Highpoint.Sage.Mathematics {
         /// Gets the low bound of the Histogram.
         /// </summary>
         /// <value>The low bound.</value>
-		object LowBound { get; }
+		object LowBound
+        {
+            get;
+        }
         /// <summary>
         /// Gets the high bound of the Histogram..
         /// </summary>
         /// <value>The high bound.</value>
-		object HighBound { get; }
+		object HighBound
+        {
+            get;
+        }
 
         /// <summary>
         /// Gets or sets the label provider.
         /// </summary>
         /// <value>The label provider.</value>
-		LabelProvider LabelProvider { get; set; }
+		LabelProvider LabelProvider
+        {
+            get; set;
+        }
         /// <summary>
         /// Gets the label for the bin at the specified coordiantes.
         /// </summary>
@@ -176,7 +169,7 @@ namespace Highpoint.Sage.Mathematics {
         /// <param name="highbounds">The high bounds.</param>
         /// <returns>The sum of values.</returns>
         object SumEntries(int[] lowBounds, int[] highbounds);//
-	}
+    }
 }
 
 
