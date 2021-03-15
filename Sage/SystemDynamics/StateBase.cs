@@ -1,14 +1,14 @@
-﻿using System;
+﻿using Highpoint.Sage.Mathematics;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Xml.Linq;
-using Highpoint.Sage.Mathematics;
 
 namespace Highpoint.Sage.SystemDynamics
 {
     public abstract class StateBase<T> : StateBase
     {
-        public static bool m_debug = false;
+        public static bool Debug = false;
         public static bool DEFAULT_NEGATIVE_STOCK_MANAGEMENT_SETTING = true;
 
         public double Start = 0;
@@ -44,15 +44,15 @@ namespace Highpoint.Sage.SystemDynamics
 
         #region Statistical Fuctions (3.5.2)
 
-        private Dictionary<string, IDoubleDistribution> m_distros = new Dictionary<string, IDoubleDistribution>();
+        private Dictionary<string, IDoubleDistribution> _distros = new Dictionary<string, IDoubleDistribution>();
 
         private IDoubleDistribution getDistro(string key, Func<IDoubleDistribution> creator)
         {
             IDoubleDistribution retval;
-            if (!m_distros.TryGetValue(key, out retval))
+            if (!_distros.TryGetValue(key, out retval))
             {
                 retval = creator();
-                m_distros.Add(key, retval);
+                _distros.Add(key, retval);
             }
             return retval;
         }
@@ -95,26 +95,28 @@ namespace Highpoint.Sage.SystemDynamics
 
         protected double Pulse(double magnitude, double firstTime, double interval)
         {
-            double tolerance = TimeStep/1000;
+            double tolerance = TimeStep / 1000;
             double timeTilPulse = firstTime - ((TimeSliceNdx * TimeStep) % interval);
             if (Math.Abs(timeTilPulse) < tolerance)
             {
-                return magnitude/TimeStep;
+                return magnitude / TimeStep;
             }
             return 0.0;
         }
 
         protected double Ramp(double slope, double startTime)
         {
-            double nIntervals = (TimeSliceNdx*TimeStep) - startTime;
-            if (nIntervals > 0) return nIntervals*slope/TimeStep;
+            double nIntervals = (TimeSliceNdx * TimeStep) - startTime;
+            if (nIntervals > 0)
+                return nIntervals * slope / TimeStep;
             return 0.0;
         }
 
         protected double Step(double height, double startTime)
         {
-            double nIntervals = (TimeSliceNdx*TimeStep) - startTime;
-            if (nIntervals > 0) return height/ TimeStep; // It's going to get multiplied in the aggregation stage.
+            double nIntervals = (TimeSliceNdx * TimeStep) - startTime;
+            if (nIntervals > 0)
+                return height / TimeStep; // It's going to get multiplied in the aggregation stage.
             return 0.0;
         }
 
@@ -141,7 +143,7 @@ namespace Highpoint.Sage.SystemDynamics
         protected double DeltaT => TimeStep;
         protected double StartTime => Start;
         protected double StopTime => Finish;
-        protected double CurrentTime => TimeSliceNdx*TimeStep; // TODO: Compute this once each timestep.
+        protected double CurrentTime => TimeSliceNdx * TimeStep; // TODO: Compute this once each timestep.
 
         #endregion
 
@@ -150,7 +152,9 @@ namespace Highpoint.Sage.SystemDynamics
             return Math.Max(min, Math.Min(max, val));
         }
 
-        protected virtual void ProcessChildModelsAsEuler(StateBase<T> state) {}
+        protected virtual void ProcessChildModelsAsEuler(StateBase<T> state)
+        {
+        }
 
         public StateBase<T> RunOneTimesliceAsEuler(StateBase<T> state)
         {
@@ -248,17 +252,20 @@ namespace Highpoint.Sage.SystemDynamics
             double[] retval = new double[state.StockGetters.Length];
 
             // For each stock.
-            if (m_debug) Console.WriteLine($"TIMESLICE {state.TimeSliceNdx} = {state.CurrentTime}");
+            if (Debug)
+                Console.WriteLine($"TIMESLICE {state.TimeSliceNdx} = {state.CurrentTime}");
             for (int i = 0; i < state.StockGetters.Length; i++)
             {
-                if (m_debug) Console.WriteLine("\t{0}\r\n\t\t  {1:F2}", state.StockNames()[i], state.StockGetters[i](state));
+                if (Debug)
+                    Console.WriteLine("\t{0}\r\n\t\t  {1:F2}", state.StockNames()[i], state.StockGetters[i](state));
                 double increase = 0;
                 double decrease = 0;
                 // accumulate inflows
                 for (int j = 0; j < state.StockInflows[i].Length; j++)
                 {
                     int whichFlow = state.StockInflows[i][j];
-                    if (m_debug) Console.WriteLine("\t\t+ {0:F2} ({1}).", state.Flows[whichFlow](state), state.FlowNames()[whichFlow]);
+                    if (Debug)
+                        Console.WriteLine("\t\t+ {0:F2} ({1}).", state.Flows[whichFlow](state), state.FlowNames()[whichFlow]);
                     increase += state.Flows[whichFlow](state);
                 }
                 increase *= state.TimeStep;
@@ -268,7 +275,8 @@ namespace Highpoint.Sage.SystemDynamics
                 for (int j = 0; j < state.StockOutflows[i].Length; j++)
                 {
                     int whichFlow = state.StockOutflows[i][j];
-                    if (m_debug) Console.WriteLine("\t\t- {0:F2} ({1}).", state.Flows[whichFlow](state), state.FlowNames()[whichFlow]);
+                    if (Debug)
+                        Console.WriteLine("\t\t- {0:F2} ({1}).", state.Flows[whichFlow](state), state.FlowNames()[whichFlow]);
                     decrease += state.Flows[whichFlow](state);
                 }
                 decrease *= state.TimeStep;
@@ -295,8 +303,14 @@ namespace Highpoint.Sage.SystemDynamics
 
     public abstract class StateBase
     {
-        public abstract TimeSpan NominalPeriod { get; }
-        public abstract TimeSpan ActivePeriod { get; }
+        public abstract TimeSpan NominalPeriod
+        {
+            get;
+        }
+        public abstract TimeSpan ActivePeriod
+        {
+            get;
+        }
         protected abstract void Initialize();
 
         protected double PeriodAdjust(double val)
@@ -318,382 +332,378 @@ namespace Highpoint.Sage.SystemDynamics
 
         public class Delay : IFunction
         {
-            private readonly Queue<double> queue = new Queue<double>();
-            private string m_myString;
-            private bool m_hasInitialValue;
-            private int m_nBins;
+            private readonly Queue<double> _queue = new Queue<double>();
+            private readonly string _myString;
+            private readonly bool _hasInitialValue;
+            private readonly int _nBins;
 
             public Delay(double dt, double delay, double initVal = Double.NegativeInfinity)
             {
-                m_myString = String.Format("Delay({0},{1},{2});", delay, dt, initVal);
-                m_hasInitialValue = !Double.IsNegativeInfinity(initVal);
-                m_nBins = (int)(delay / dt);
-                if (!m_hasInitialValue)
+                _myString = String.Format("Delay({0},{1},{2});", delay, dt, initVal);
+                _hasInitialValue = !Double.IsNegativeInfinity(initVal);
+                _nBins = (int)(delay / dt);
+                if (!_hasInitialValue)
                 {
-                    for (int i = 0; i < m_nBins; i++) queue.Enqueue(initVal);
+                    for (int i = 0; i < _nBins; i++)
+                        _queue.Enqueue(initVal);
                 }
             }
 
             public double Process(double stimulus)
             {
-                if (!m_hasInitialValue)
+                if (!_hasInitialValue)
                 {
-                    for (int i = 0; i < m_nBins - 1; i++) queue.Enqueue(stimulus);
+                    for (int i = 0; i < _nBins - 1; i++)
+                        _queue.Enqueue(stimulus);
                 }
-                queue.Enqueue(stimulus);
-                return queue.Dequeue();
+                _queue.Enqueue(stimulus);
+                return _queue.Dequeue();
             }
 
             public override string ToString()
             {
-                return m_myString;
+                return _myString;
             }
         }
 
         public class Delay1 : IFunction
         {
-            private double m_hold;
-            private readonly double m_delay;
-            private readonly double m_dt;
-            private bool m_hasInitialValue;
-            private string m_myString;
+            private double _hold;
+            private readonly double _delay;
+            private readonly double _dt;
+            private bool _hasInitialValue;
+            private readonly string _myString;
 
             public Delay1(double dt, double delay, double initVal = Double.NegativeInfinity)
             {
-                m_myString = String.Format("Delay1({0},{1},{2});", delay, dt, initVal);
-                m_delay = delay;
-                m_dt = dt;
-                m_hasInitialValue = !Double.IsNegativeInfinity(initVal);
-                m_hold = m_hasInitialValue ? initVal * delay : 0;
+                _myString = String.Format("Delay1({0},{1},{2});", delay, dt, initVal);
+                _delay = delay;
+                _dt = dt;
+                _hasInitialValue = !Double.IsNegativeInfinity(initVal);
+                _hold = _hasInitialValue ? initVal * delay : 0;
             }
 
             public double Process(double stimulus)
             {
-                if (!m_hasInitialValue)
+                if (!_hasInitialValue)
                 {
-                    m_hold = stimulus * m_delay;
-                    m_hasInitialValue = true;
+                    _hold = stimulus * _delay;
+                    _hasInitialValue = true;
                 }
 
-                double retval = m_hold / m_delay;
-                m_hold -= (retval * m_dt);
-                m_hold += (stimulus * m_dt);
+                double retval = _hold / _delay;
+                _hold -= (retval * _dt);
+                _hold += (stimulus * _dt);
                 return retval;
             }
 
             public override string ToString()
             {
-                return m_myString;
+                return _myString;
             }
         }
 
         public class Delay3 : IFunction
         {
-            private readonly double m_delay;
-            private double m_hold1;
-            private double m_hold2;
-            private double m_hold3;
-            private double m_dt;
-            private bool m_hasInitialValue;
-            private string m_myString;
+            private readonly double _delay;
+            private double _hold1;
+            private double _hold2;
+            private double _hold3;
+            private readonly double _dt;
+            private bool _hasInitialValue;
+            private readonly string _myString;
 
             public Delay3(double dt, double delay, double initVal = Double.NegativeInfinity)
             {
-                m_myString = String.Format("Delay3({0},{1},{2});", delay, dt, initVal);
-                m_dt = dt;
-                m_delay = delay;
-                m_hasInitialValue = !Double.IsNegativeInfinity(initVal);
-                m_hold1 = m_hold2 = m_hold3 = m_hasInitialValue ? (initVal * (m_delay / 3)) : 0;
+                _myString = String.Format("Delay3({0},{1},{2});", delay, dt, initVal);
+                _dt = dt;
+                _delay = delay;
+                _hasInitialValue = !Double.IsNegativeInfinity(initVal);
+                _hold1 = _hold2 = _hold3 = _hasInitialValue ? (initVal * (_delay / 3)) : 0;
             }
 
             public double Process(double stimulus)
             {
-                if (!m_hasInitialValue)
+                if (!_hasInitialValue)
                 {
-                    m_hold1 = m_hold2 = m_hold3 = stimulus * (m_delay / 3);
-                    m_hasInitialValue = true;
+                    _hold1 = _hold2 = _hold3 = stimulus * (_delay / 3);
+                    _hasInitialValue = true;
                 }
-                double from3 = (m_hold3 / (m_delay / 3)) * m_dt;
-                m_hold3 -= from3;
+                double from3 = (_hold3 / (_delay / 3)) * _dt;
+                _hold3 -= from3;
 
-                double from2 = (m_hold2 / (m_delay / 3)) * m_dt;
-                m_hold2 -= from2;
-                m_hold3 += from2;
+                double from2 = (_hold2 / (_delay / 3)) * _dt;
+                _hold2 -= from2;
+                _hold3 += from2;
 
-                double from1 = (m_hold1 / (m_delay / 3)) * m_dt;
-                m_hold1 += stimulus * m_dt;
-                m_hold1 -= from1;
-                m_hold2 += from1;
+                double from1 = (_hold1 / (_delay / 3)) * _dt;
+                _hold1 += stimulus * _dt;
+                _hold1 -= from1;
+                _hold2 += from1;
 
-                return from3 / m_dt;
+                return from3 / _dt;
             }
 
             public override string ToString()
             {
-                return m_myString;
+                return _myString;
             }
         }
 
         public class DelayN : IFunction
         {
-            private readonly double m_delay;
-            private readonly double m_dt;
-            private readonly int m_nStages;
-            private double[] m_hold;
-            private bool m_hasInitialValue;
-            private string m_myString;
+            private readonly double _delay;
+            private readonly double _dt;
+            private readonly int _nStages;
+            private double[] _hold;
+            private bool _hasInitialValue;
+            private readonly string _myString;
 
             public DelayN(double dt, double delay, int nStages, double initVal = Double.NegativeInfinity)
             {
-                m_myString = String.Format("DelayN({0},{1},{2},{3});", delay, dt, nStages, initVal);
-                m_dt = dt;
-                m_delay = delay;
-                m_nStages = nStages;
-                m_hasInitialValue = !Double.IsNegativeInfinity(initVal);
-                if (m_hasInitialValue)
+                _myString = String.Format("DelayN({0},{1},{2},{3});", delay, dt, nStages, initVal);
+                _dt = dt;
+                _delay = delay;
+                _nStages = nStages;
+                _hasInitialValue = !Double.IsNegativeInfinity(initVal);
+                if (_hasInitialValue)
                 {
-                    m_hold = Enumerable.Repeat(initVal * (m_delay / m_nStages), m_nStages).ToArray();
+                    _hold = Enumerable.Repeat(initVal * (_delay / _nStages), _nStages).ToArray();
                 }
             }
 
             public double Process(double stimulus)
             {
-                if (!m_hasInitialValue)
+                if (!_hasInitialValue)
                 {
-                    m_hold = Enumerable.Repeat(stimulus * (m_delay / m_nStages), m_nStages).ToArray();
-                    m_hasInitialValue = true;
+                    _hold = Enumerable.Repeat(stimulus * (_delay / _nStages), _nStages).ToArray();
+                    _hasInitialValue = true;
                 }
 
-                double[] xfer = new double[m_nStages + 1];
-                xfer[0] = stimulus * m_dt;
-                for (int i = 1; i <= m_nStages; i++)
+                double[] xfer = new double[_nStages + 1];
+                xfer[0] = stimulus * _dt;
+                for (int i = 1; i <= _nStages; i++)
                 {
-                    xfer[i] = (m_hold[i - 1] / (m_delay / m_nStages)) * m_dt;
+                    xfer[i] = (_hold[i - 1] / (_delay / _nStages)) * _dt;
                 }
 
-                for (int i = 0; i <= m_nStages; i++)
+                for (int i = 0; i <= _nStages; i++)
                 {
-                    if (i > 0) m_hold[i - 1] -= xfer[i];
-                    if (i < m_nStages) m_hold[i] += xfer[i];
+                    if (i > 0)
+                        _hold[i - 1] -= xfer[i];
+                    if (i < _nStages)
+                        _hold[i] += xfer[i];
                 }
 
                 //Console.WriteLine("{0:F2}->[{1:F2}]-{2:F2}->[{3:F2}]-{4:F2}->[{5:F2}]-{6:F2}->",
                 //    xfer[0], m_hold[0], xfer[1], m_hold[1], xfer[2], m_hold[2], xfer[3]);
 
-                return xfer[m_nStages] / m_dt;
+                return xfer[_nStages] / _dt;
 
             }
 
             public override string ToString()
             {
-                return m_myString;
+                return _myString;
             }
 
         }
 
         public class Smooth1 : IFunction
         {
-            private double m_hold;
-            private readonly double m_averagingTime;
-            private bool m_hasInitialValue;
-            private string m_myString;
+            private double _hold;
+            private readonly double _averagingTime;
+            private bool _hasInitialValue;
+            private readonly string _myString;
 
             public Smooth1(double averagingTime, double initVal = Double.NegativeInfinity)
             {
-                m_myString = String.Format("Smooth1({0},{1});", averagingTime, initVal);
-                m_averagingTime = averagingTime;
-                m_hasInitialValue = !Double.IsNegativeInfinity(initVal);
-                m_hold = m_hasInitialValue ? initVal * averagingTime : 0;
+                _myString = String.Format("Smooth1({0},{1});", averagingTime, initVal);
+                _averagingTime = averagingTime;
+                _hasInitialValue = !Double.IsNegativeInfinity(initVal);
+                _hold = _hasInitialValue ? initVal * averagingTime : 0;
             }
 
             public double Process(double stimulus)
             {
-                if (!m_hasInitialValue)
+                if (!_hasInitialValue)
                 {
-                    m_hold = stimulus * m_averagingTime;
-                    m_hasInitialValue = true;
+                    _hold = stimulus * _averagingTime;
+                    _hasInitialValue = true;
                 }
 
-                double retval = m_hold / m_averagingTime;
-                m_hold -= retval;
-                m_hold += stimulus;
+                double retval = _hold / _averagingTime;
+                _hold -= retval;
+                _hold += stimulus;
                 return retval;
             }
 
             public override string ToString()
             {
-                return m_myString;
+                return _myString;
             }
         }
 
         public class Smooth3 : IFunction
         {
-            private readonly double m_averagingTime;
-            private double m_hold1;
-            private double m_hold2;
-            private double m_hold3;
-            private bool m_hasInitialValue;
-            private string m_myString;
+            private readonly double _averagingTime;
+            private double _hold1;
+            private double _hold2;
+            private double _hold3;
+            private bool _hasInitialValue;
+            private readonly string _myString;
 
             public Smooth3(double averagingTime, double initVal = Double.NegativeInfinity)
             {
-                m_myString = String.Format("Smooth3({0},{1});", averagingTime, initVal);
-                m_averagingTime = averagingTime;
-                m_hasInitialValue = !Double.IsNegativeInfinity(initVal);
-                m_hold1 = m_hold2 = m_hold3 = m_hasInitialValue ? (initVal * (m_averagingTime / 3)) : 0;
+                _myString = String.Format("Smooth3({0},{1});", averagingTime, initVal);
+                _averagingTime = averagingTime;
+                _hasInitialValue = !Double.IsNegativeInfinity(initVal);
+                _hold1 = _hold2 = _hold3 = _hasInitialValue ? (initVal * (_averagingTime / 3)) : 0;
             }
 
             public double Process(double stimulus)
             {
-                if (!m_hasInitialValue)
+                if (!_hasInitialValue)
                 {
-                    m_hold1 = m_hold2 = m_hold3 = stimulus * (m_averagingTime / 3);
-                    m_hasInitialValue = true;
+                    _hold1 = _hold2 = _hold3 = stimulus * (_averagingTime / 3);
+                    _hasInitialValue = true;
                 }
-                double from3 = (m_hold3 / (m_averagingTime / 3));
-                m_hold3 -= from3;
+                double from3 = (_hold3 / (_averagingTime / 3));
+                _hold3 -= from3;
 
-                double from2 = (m_hold2 / (m_averagingTime / 3));
-                m_hold2 -= from2;
-                m_hold3 += from2;
+                double from2 = (_hold2 / (_averagingTime / 3));
+                _hold2 -= from2;
+                _hold3 += from2;
 
-                double from1 = (m_hold1 / (m_averagingTime / 3));
-                m_hold1 += stimulus;
-                m_hold1 -= from1;
-                m_hold2 += from1;
+                double from1 = (_hold1 / (_averagingTime / 3));
+                _hold1 += stimulus;
+                _hold1 -= from1;
+                _hold2 += from1;
 
                 return from3;
             }
 
             public override string ToString()
             {
-                return m_myString;
+                return _myString;
             }
         }
 
         public class SmoothN : IFunction
         {
-            private readonly double m_averagingTime;
-            private readonly int m_nStages;
-            private double[] m_hold;
-            private bool m_hasInitialValue;
-            private string m_myString;
+            private readonly double _averagingTime;
+            private readonly int _nStages;
+            private double[] _hold;
+            private bool _hasInitialValue;
+            private readonly string _myString;
 
             public SmoothN(double averagingTime, int nStages, double initVal = Double.NegativeInfinity)
             {
-                m_myString = String.Format("SmoothN({0},{1},{2});", averagingTime, nStages, initVal);
-                m_averagingTime = averagingTime;
-                m_nStages = nStages;
-                m_hasInitialValue = !Double.IsNegativeInfinity(initVal);
-                if (m_hasInitialValue)
+                _myString = String.Format("SmoothN({0},{1},{2});", averagingTime, nStages, initVal);
+                _averagingTime = averagingTime;
+                _nStages = nStages;
+                _hasInitialValue = !Double.IsNegativeInfinity(initVal);
+                if (_hasInitialValue)
                 {
-                    m_hold = Enumerable.Repeat(initVal * (m_averagingTime / m_nStages), m_nStages).ToArray();
+                    _hold = Enumerable.Repeat(initVal * (_averagingTime / _nStages), _nStages).ToArray();
                 }
             }
 
             public double Process(double stimulus)
             {
-                if (!m_hasInitialValue)
+                if (!_hasInitialValue)
                 {
-                    m_hold = Enumerable.Repeat(stimulus * (m_averagingTime / m_nStages), m_nStages).ToArray();
-                    m_hasInitialValue = true;
+                    _hold = Enumerable.Repeat(stimulus * (_averagingTime / _nStages), _nStages).ToArray();
+                    _hasInitialValue = true;
                 }
 
-                double[] xfer = new double[m_nStages + 1];
+                double[] xfer = new double[_nStages + 1];
                 xfer[0] = stimulus;
-                for (int i = 1; i <= m_nStages; i++)
+                for (int i = 1; i <= _nStages; i++)
                 {
-                    xfer[i] = (m_hold[i - 1] / (m_averagingTime / m_nStages));
+                    xfer[i] = (_hold[i - 1] / (_averagingTime / _nStages));
                 }
 
-                for (int i = 0; i <= m_nStages; i++)
+                for (int i = 0; i <= _nStages; i++)
                 {
-                    if (i > 0) m_hold[i - 1] -= xfer[i];
-                    if (i < m_nStages) m_hold[i] += xfer[i];
+                    if (i > 0)
+                        _hold[i - 1] -= xfer[i];
+                    if (i < _nStages)
+                        _hold[i] += xfer[i];
                 }
 
                 //Console.WriteLine("{0:F2}->[{1:F2}]-{2:F2}->[{3:F2}]-{4:F2}->[{5:F2}]-{6:F2}->",
                 //    xfer[0], m_hold[0], xfer[1], m_hold[1], xfer[2], m_hold[2], xfer[3]);
 
-                return xfer[m_nStages];
+                return xfer[_nStages];
 
             }
 
             public override string ToString()
             {
-                return m_myString;
+                return _myString;
             }
 
         }
 
         public class Trend : IFunction
         {
-            private double m_averageInput;
-            private readonly double m_averagingTime;
-            private readonly double m_dt;
-            private string m_myString;
+            private double _averageInput;
+            private readonly double _averagingTime;
+            private readonly double _dt;
+            private readonly string _myString;
 
             public Trend(double dt, double averagingTime, double initVal = 0)
             {
-                m_myString = String.Format("Trend({0}, {1}, {2});", averagingTime, dt, initVal);
-                m_averagingTime = averagingTime;
-                m_dt = dt;
-                m_averageInput = initVal;
+                _myString = String.Format("Trend({0}, {1}, {2});", averagingTime, dt, initVal);
+                _averagingTime = averagingTime;
+                _dt = dt;
+                _averageInput = initVal;
             }
 
             public double Process(double input)
             {
-                double changeInAverage = (input - m_averageInput) / m_averagingTime;
-                double trend = (input - m_averageInput) / (m_averageInput * m_averagingTime * m_dt);
+                double changeInAverage = (input - _averageInput) / _averagingTime;
+                double trend = (input - _averageInput) / (_averageInput * _averagingTime * _dt);
                 //Console.WriteLine("{0:F2}->[{1:F2}] = {2:F2}, Trend = {3}", input, m_averageInput, changeInAverage, trend);
-                m_averageInput += m_dt * changeInAverage;
+                _averageInput += _dt * changeInAverage;
 
                 return trend;
             }
 
-            public double AverageInput => m_averageInput;
+            public double AverageInput => _averageInput;
 
             public override string ToString()
             {
-                return m_myString;
+                return _myString;
             }
         }
 
         public class Forecast : IFunction
         {
-            private Trend m_trend;
-            private readonly double m_horizon;
-            private string m_myString;
+            private readonly Trend _trend;
+            private readonly double _horizon;
+            private readonly string _myString;
 
             public Forecast(double dt, double averagingTime, double horizon, double initVal = 0)
             {
-                m_myString = String.Format("Forecast({0}, {1}, {2}, {3});", averagingTime, dt, horizon, initVal);
-                m_trend = new Trend(averagingTime, dt, initVal);
-                m_horizon = horizon;
+                _myString = string.Format("Forecast({0}, {1}, {2}, {3});", averagingTime, dt, horizon, initVal);
+                _trend = new Trend(averagingTime, dt, initVal);
+                _horizon = horizon;
             }
 
             public double Process(double input)
             {
-                double trend = m_trend.Process(input);
-                return m_trend.AverageInput + (trend * m_horizon);
+                double trend = _trend.Process(input);
+                return _trend.AverageInput + (trend * _horizon);
             }
 
             public override string ToString()
             {
-                return m_myString;
+                return _myString;
             }
         }
 
         #endregion
-    }
-
-    public struct ModelToModelFlow<TModelTypeFrom, TModelTypeTo> 
-        where TModelTypeFrom : StateBase<TModelTypeFrom>
-        where TModelTypeTo : StateBase<TModelTypeTo>
-    {
-        public ModelToModelFlow(TModelTypeFrom flowFrom, TModelTypeTo flowTo, Func<double> flow)
-        {
-            
-        }
     }
 }

@@ -868,6 +868,7 @@
     <Compile Include="SystemDynamics\Design\MacroFilter.cs" />
     <Compile Include="SystemDynamics\Design\RunSpecs.cs" />
     <Compile Include="SystemDynamics\Integrator.cs" />
+    <Compile Include="SystemDynamics\ModelToModelFlow.cs" />
     <Compile Include="SystemDynamics\Utility\RunProgram.cs" />
     <Compile Include="SystemDynamics\StateBase.cs" />
     <Compile Include="Utility\Aspects.cs">
