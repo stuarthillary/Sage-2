@@ -815,12 +815,16 @@
     <Compile Include="Scheduling\TimePeriodSorter.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="SmartPropertyBag\HierarchicalDictionaryEntry.cs" />
     <Compile Include="SmartPropertyBag\IHasWriteLock.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="SmartPropertyBag\ISPBTreeNode.cs" />
     <Compile Include="SmartPropertyBag\SmartPropertyBag.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="SmartPropertyBag\SmartPropertyBagContentsException.cs" />
+    <Compile Include="SmartPropertyBag\SmartPropertyBagException.cs" />
     <Compile Include="SmartPropertyBag\SPBInitializer.cs">
       <SubType>Code</SubType>
     </Compile>
