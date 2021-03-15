@@ -726,6 +726,7 @@
     <Compile Include="Resources\IHasControllableCapacity.cs" />
     <Compile Include="Resources\IModelWithResources.cs" />
     <Compile Include="Resources\IResourceManagerCollection.cs" />
+    <Compile Include="Resources\IResourceTracker.cs" />
     <Compile Include="Resources\MultiKeyAccessRegulator.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -741,10 +742,14 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Resources\MultiRequestProcessor.cs" />
+    <Compile Include="Resources\MultiResourceTracker.cs" />
     <Compile Include="Resources\RequestStatus.cs" />
     <Compile Include="Resources\Resource.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Resources\ResourceAction.cs" />
+    <Compile Include="Resources\ResourceEventRecord.cs" />
+    <Compile Include="Resources\ResourceEventRecordFilters.cs" />
     <Compile Include="Resources\ResourceExceptions.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -757,6 +762,7 @@
     <Compile Include="Resources\ResourceRequest.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Resources\ResourceTrackerAggregator.cs" />
     <Compile Include="Resources\SelfManagingResource.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -764,7 +770,7 @@
     <Compile Include="Resources\SimpleResourceRequest.cs" />
     <Compile Include="Resources\SingleKeyAccessRegulator.cs" />
     <Compile Include="Resources\TerminalResourceRequestAbortedWarning.cs" />
-    <Compile Include="Resources\Tracking.cs">
+    <Compile Include="Resources\ResourceTracker.cs">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Scheduling\Activity.cs">
