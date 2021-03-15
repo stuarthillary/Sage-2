@@ -919,6 +919,7 @@
     <Compile Include="Utility\IIndexingService.cs" />
     <Compile Include="Utility\IndexingFailedException.cs" />
     <Compile Include="Utility\ISortKey.cs" />
+    <Compile Include="Utility\ITreeNodeProxy.cs" />
     <Compile Include="Utility\Mementos\ISupportsMementos.cs" />
     <Compile Include="Utility\Mementos\MementoHelper.cs" />
     <Compile Include="Utility\MouseUtilities.cs" />
@@ -975,6 +976,7 @@
     <Compile Include="Utility\TimeBasedSelection.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Utility\TreeNodeHelper.cs" />
     <Compile Include="Utility\TreeSupport.cs" />
     <Compile Include="Utility\Tuples.cs">
       <SubType>Code</SubType>
