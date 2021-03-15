@@ -916,6 +916,7 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Utility\IDoubleTracker.cs" />
+    <Compile Include="Utility\IHasLabel.cs" />
     <Compile Include="Utility\IIndexingService.cs" />
     <Compile Include="Utility\IndexingFailedException.cs" />
     <Compile Include="Utility\ISortKey.cs" />
