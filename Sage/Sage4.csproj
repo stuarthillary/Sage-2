@@ -724,6 +724,7 @@
     <Compile Include="Resources\IHasCapacity.cs" />
     <Compile Include="Resources\IHasControllableCapacity.cs" />
     <Compile Include="Resources\IModelWithResources.cs" />
+    <Compile Include="Resources\IResourceManagerCollection.cs" />
     <Compile Include="Resources\MultiKeyAccessRegulator.cs">
       <SubType>Code</SubType>
     </Compile>
