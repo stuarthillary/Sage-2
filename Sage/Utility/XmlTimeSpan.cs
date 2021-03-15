@@ -10,16 +10,21 @@ namespace Highpoint.Sage.Utility
     /// </summary>
     public class XmlTimeSpan
     {
-        private const long m_ticksPerMs = TimeSpan.TicksPerMillisecond;
+        private const long _ticksPerMs = TimeSpan.TicksPerMillisecond;
 
-        private TimeSpan m_value = TimeSpan.Zero;
+        private TimeSpan _value = TimeSpan.Zero;
 
-        public XmlTimeSpan() { }
-        public XmlTimeSpan(TimeSpan source) { m_value = source; }
-
-        public static implicit operator TimeSpan? (XmlTimeSpan o)
+        public XmlTimeSpan()
         {
-            return o?.m_value;
+        }
+        public XmlTimeSpan(TimeSpan source)
+        {
+            _value = source;
+        }
+
+        public static implicit operator TimeSpan?(XmlTimeSpan o)
+        {
+            return o?._value;
         }
 
         public static implicit operator XmlTimeSpan(TimeSpan? o)
@@ -29,7 +34,7 @@ namespace Highpoint.Sage.Utility
 
         public static implicit operator TimeSpan(XmlTimeSpan o)
         {
-            return o?.m_value ?? default(TimeSpan);
+            return o?._value ?? default(TimeSpan);
         }
 
         public static implicit operator XmlTimeSpan(TimeSpan o)
@@ -40,8 +45,14 @@ namespace Highpoint.Sage.Utility
         [System.Xml.Serialization.XmlText]
         public long Default
         {
-            get { return m_value.Ticks / m_ticksPerMs; }
-            set { m_value = new TimeSpan(value * m_ticksPerMs); }
+            get
+            {
+                return _value.Ticks / _ticksPerMs;
+            }
+            set
+            {
+                _value = new TimeSpan(value * _ticksPerMs);
+            }
         }
     }
 }
