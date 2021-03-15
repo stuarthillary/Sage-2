@@ -2,20 +2,23 @@
 using System;
 using System.Collections;
 
-namespace Highpoint.Sage.Utility {
+namespace Highpoint.Sage.Utility
+{
     /// <summary>
     /// A hashtable whose entries are weak - that is, if the underlying object
     /// is discarded from the runtime, so is the entry in the hashtable.
     /// </summary>
-    public class WeakHashtable : IDictionary {
+    public class WeakHashtable : IDictionary
+    {
 
-        private readonly Hashtable m_ht;
+        private readonly Hashtable _ht;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="WeakHashtable"/> class.
         /// </summary>
-        public WeakHashtable() {
-            m_ht = new Hashtable();
+        public WeakHashtable()
+        {
+            _ht = new Hashtable();
         }
 
         #region IDictionary Members
@@ -25,7 +28,7 @@ namespace Highpoint.Sage.Utility {
         /// </summary>
         /// <value></value>
         /// <returns>true if the <see cref="T:System.Collections.IDictionary"></see> object is read-only; otherwise, false.</returns>
-        public bool IsReadOnly => m_ht.IsReadOnly;
+        public bool IsReadOnly => _ht.IsReadOnly;
 
         /// <summary>
         /// Returns an <see cref="T:System.Collections.IDictionaryEnumerator"></see> object for the <see cref="T:System.Collections.IDictionary"></see> object.
@@ -33,27 +36,31 @@ namespace Highpoint.Sage.Utility {
         /// <returns>
         /// An <see cref="T:System.Collections.IDictionaryEnumerator"></see> object for the <see cref="T:System.Collections.IDictionary"></see> object.
         /// </returns>
-        public IDictionaryEnumerator GetEnumerator() {
-            return new WeakHashtableEnumerator(m_ht.GetEnumerator());
+        public IDictionaryEnumerator GetEnumerator()
+        {
+            return new WeakHashtableEnumerator(_ht.GetEnumerator());
         }
 
         /// <summary>
         /// Gets or sets the <see cref="System.Object"/> with the specified key.
         /// </summary>
         /// <value></value>
-        public object this[object key] {
-            get {
-                if (!m_ht.Contains(key))
+        public object this[object key]
+        {
+            get
+            {
+                if (!_ht.Contains(key))
                     return null;
-                WeakReference wr = (WeakReference)m_ht[key];
+                WeakReference wr = (WeakReference)_ht[key];
                 if (wr == null)
                     return null;
                 if (!wr.IsAlive)
-                    m_ht.Remove(key);
+                    _ht.Remove(key);
                 return wr.Target;
             }
-            set {
-                m_ht[key] = new WeakReference(value);
+            set
+            {
+                _ht[key] = new WeakReference(value);
             }
         }
 
@@ -63,8 +70,9 @@ namespace Highpoint.Sage.Utility {
         /// <param name="key">The key of the element to remove.</param>
         /// <exception cref="T:System.NotSupportedException">The <see cref="T:System.Collections.IDictionary"></see> object is read-only.-or- The <see cref="T:System.Collections.IDictionary"></see> has a fixed size. </exception>
         /// <exception cref="T:System.ArgumentNullException">key is null. </exception>
-        public void Remove(object key) {
-            m_ht.Remove(key);
+        public void Remove(object key)
+        {
+            _ht.Remove(key);
         }
 
         /// <summary>
@@ -75,16 +83,18 @@ namespace Highpoint.Sage.Utility {
         /// true if the <see cref="T:System.Collections.IDictionary"></see> contains an element with the key; otherwise, false.
         /// </returns>
         /// <exception cref="T:System.ArgumentNullException">key is null. </exception>
-        public bool Contains(object key) {
-            return m_ht.Contains(key);
+        public bool Contains(object key)
+        {
+            return _ht.Contains(key);
         }
 
         /// <summary>
         /// Removes all elements from the <see cref="T:System.Collections.IDictionary"></see> object.
         /// </summary>
         /// <exception cref="T:System.NotSupportedException">The <see cref="T:System.Collections.IDictionary"></see> object is read-only. </exception>
-        public void Clear() {
-            m_ht.Clear();
+        public void Clear()
+        {
+            _ht.Clear();
         }
 
         /// <summary>
@@ -92,18 +102,24 @@ namespace Highpoint.Sage.Utility {
         /// </summary>
         /// <value></value>
         /// <returns>An <see cref="T:System.Collections.ICollection"></see> object containing the values in the <see cref="T:System.Collections.IDictionary"></see> object.</returns>
-        public ICollection Values {
-            get {
+        public ICollection Values
+        {
+            get
+            {
                 int i = 0;
-                ArrayList al = new ArrayList(m_ht.Values.Count);
-                foreach (WeakReference wr in m_ht.Values) {
-                    if (wr.IsAlive) {
+                ArrayList al = new ArrayList(_ht.Values.Count);
+                foreach (WeakReference wr in _ht.Values)
+                {
+                    if (wr.IsAlive)
+                    {
                         al.Add(wr.Target);
-                    } else {
+                    }
+                    else
+                    {
                         i++;
                     }
                 }
-                if (i > ( 0.25 * m_ht.Count ))
+                if (i > (0.25 * _ht.Count))
                     Clean();
 
                 return al;
@@ -113,14 +129,16 @@ namespace Highpoint.Sage.Utility {
         /// <summary>
         /// Cleans this instance by removing all entries for which the Weak Link has been broken..
         /// </summary>
-        public void Clean() {
+        public void Clean()
+        {
             ArrayList deadKeys = new ArrayList();
-            foreach (DictionaryEntry de in m_ht) {
-                if (!( (WeakReference)de.Value ).IsAlive)
+            foreach (DictionaryEntry de in _ht)
+            {
+                if (!((WeakReference)de.Value).IsAlive)
                     deadKeys.Add(de.Key);
             }
             foreach (object deadKey in deadKeys)
-                m_ht.Remove(deadKey);
+                _ht.Remove(deadKey);
         }
 
         /// <summary>
@@ -131,8 +149,9 @@ namespace Highpoint.Sage.Utility {
         /// <exception cref="T:System.ArgumentException">An element with the same key already exists in the <see cref="T:System.Collections.IDictionary"></see> object. </exception>
         /// <exception cref="T:System.ArgumentNullException">key is null. </exception>
         /// <exception cref="T:System.NotSupportedException">The <see cref="T:System.Collections.IDictionary"></see> is read-only.-or- The <see cref="T:System.Collections.IDictionary"></see> has a fixed size. </exception>
-        public void Add(object key, object value) {
-            m_ht.Add(key, new WeakReference(value));
+        public void Add(object key, object value)
+        {
+            _ht.Add(key, new WeakReference(value));
         }
 
         /// <summary>
@@ -140,14 +159,14 @@ namespace Highpoint.Sage.Utility {
         /// </summary>
         /// <value></value>
         /// <returns>An <see cref="T:System.Collections.ICollection"></see> object containing the keys of the <see cref="T:System.Collections.IDictionary"></see> object.</returns>
-        public ICollection Keys => m_ht.Keys;
+        public ICollection Keys => _ht.Keys;
 
         /// <summary>
         /// Gets a value indicating whether the <see cref="T:System.Collections.IDictionary"></see> object has a fixed size.
         /// </summary>
         /// <value></value>
         /// <returns>true if the <see cref="T:System.Collections.IDictionary"></see> object has a fixed size; otherwise, false.</returns>
-        public bool IsFixedSize => m_ht.IsFixedSize;
+        public bool IsFixedSize => _ht.IsFixedSize;
 
         #endregion
 
@@ -158,14 +177,14 @@ namespace Highpoint.Sage.Utility {
         /// </summary>
         /// <value></value>
         /// <returns>true if access to the <see cref="T:System.Collections.ICollection"></see> is synchronized (thread safe); otherwise, false.</returns>
-        public bool IsSynchronized => m_ht.IsSynchronized;
+        public bool IsSynchronized => _ht.IsSynchronized;
 
         /// <summary>
         /// Gets the number of elements contained in the <see cref="T:System.Collections.ICollection"></see>.
         /// </summary>
         /// <value></value>
         /// <returns>The number of elements contained in the <see cref="T:System.Collections.ICollection"></see>.</returns>
-        public int Count => m_ht.Count;
+        public int Count => _ht.Count;
 
         /// <summary>
         /// Copies the elements of the <see cref="T:System.Collections.ICollection"></see> to an <see cref="T:System.Array"></see>, starting at a particular <see cref="T:System.Array"></see> index.
@@ -176,8 +195,9 @@ namespace Highpoint.Sage.Utility {
         /// <exception cref="T:System.ArgumentOutOfRangeException">index is less than zero. </exception>
         /// <exception cref="T:System.ArgumentException">array is multidimensional.-or- index is equal to or greater than the length of array.-or- The number of elements in the source <see cref="T:System.Collections.ICollection"></see> is greater than the available space from index to the end of the destination array. </exception>
         /// <exception cref="T:System.InvalidCastException">The type of the source <see cref="T:System.Collections.ICollection"></see> cannot be cast automatically to the type of the destination array. </exception>
-        public void CopyTo(Array array, int index) {
-            m_ht.CopyTo(array, index);
+        public void CopyTo(Array array, int index)
+        {
+            _ht.CopyTo(array, index);
         }
 
         /// <summary>
@@ -185,7 +205,7 @@ namespace Highpoint.Sage.Utility {
         /// </summary>
         /// <value></value>
         /// <returns>An object that can be used to synchronize access to the <see cref="T:System.Collections.ICollection"></see>.</returns>
-        public object SyncRoot => m_ht.SyncRoot;
+        public object SyncRoot => _ht.SyncRoot;
 
         #endregion
 
@@ -197,44 +217,56 @@ namespace Highpoint.Sage.Utility {
         /// <returns>
         /// An <see cref="T:System.Collections.IEnumerator"></see> object that can be used to iterate through the collection.
         /// </returns>
-        IEnumerator IEnumerable.GetEnumerator() {
-            return new WeakHashtableEnumerator(m_ht.GetEnumerator());
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return new WeakHashtableEnumerator(_ht.GetEnumerator());
         }
 
         #endregion
 
-        private class WeakHashtableEnumerator : IDictionaryEnumerator {
-            private readonly IEnumerator m_enum;
+        private class WeakHashtableEnumerator : IDictionaryEnumerator
+        {
+            private readonly IEnumerator _enum;
 
-            public WeakHashtableEnumerator(IEnumerator weakHashtableEnum) {
-                m_enum = weakHashtableEnum;
+            public WeakHashtableEnumerator(IEnumerator weakHashtableEnum)
+            {
+                _enum = weakHashtableEnum;
             }
 
             #region IEnumerator Members
 
-            public void Reset() {
-                m_enum.Reset();
+            public void Reset()
+            {
+                _enum.Reset();
             }
 
-            public object Current {
-                get {
-                    while (true) {
-                        DictionaryEntry de = (DictionaryEntry)m_enum.Current;
-                        if (!( (WeakReference)de.Value ).IsAlive) {
+            public object Current
+            {
+                get
+                {
+                    while (true)
+                    {
+                        DictionaryEntry de = (DictionaryEntry)_enum.Current;
+                        if (!((WeakReference)de.Value).IsAlive)
+                        {
                             if (!MoveNext())
                                 return null;
-                        } else {
-                            return new DictionaryEntry(de.Key, ( (WeakReference)de.Value ).Target);
+                        }
+                        else
+                        {
+                            return new DictionaryEntry(de.Key, ((WeakReference)de.Value).Target);
                         }
                     }
                 }
             }
 
-            public bool MoveNext() {
-                do {
-                    if (!m_enum.MoveNext())
+            public bool MoveNext()
+            {
+                do
+                {
+                    if (!_enum.MoveNext())
                         return false;
-                } while (!( (WeakReference)( (DictionaryEntry)m_enum.Current ).Value ).IsAlive);
+                } while (!((WeakReference)((DictionaryEntry)_enum.Current).Value).IsAlive);
                 return true;
             }
 
@@ -242,9 +274,9 @@ namespace Highpoint.Sage.Utility {
 
             #region IDictionaryEnumerator Members
 
-            public object Key => ( (DictionaryEntry)Current ).Key;
+            public object Key => ((DictionaryEntry)Current).Key;
 
-            public object Value => ( (DictionaryEntry)Current ).Value;
+            public object Value => ((DictionaryEntry)Current).Value;
 
             public DictionaryEntry Entry => (DictionaryEntry)Current;
 
