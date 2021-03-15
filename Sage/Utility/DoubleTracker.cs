@@ -1,120 +1,107 @@
 /* This source code licensed under the GNU Affero General Public License */
 
-namespace Highpoint.Sage.Utility {
-	
-	/// <summary>
-	/// An object implementing this interface tracks the values that a double takes on, 
-	/// registering its initial, minimum, maximum, and final values. This interface is
-	/// just the public face of the bookkeeping. See class DoubleTracker.
-	/// </summary>
-	public interface IDoubleTracker {
-		/// <summary>
-		/// The first recorded value of the double.
-		/// </summary>
-		double InitialValue { get; }
-		/// <summary>
-		/// The last recorded value of the double.
-		/// </summary>
-		double FinalValue { get; }
-		/// <summary>
-		/// The minimum recorded value of the double.
-		/// </summary>
-		double MinValue { get; }
-		/// <summary>
-		/// The maximum recorded value of the double.
-		/// </summary>
-		double MaxValue { get; }
-	}
-	
-	/// <summary>
-	/// An object of this class tracks the values that a double takes on, recording its initial,
-	/// minimum, maximum, and final values. It relies on the user of the object to implement a
-	/// watcher on the double of interest, that registers a new double value with this object
-	/// whenever the double changes.
-	/// </summary>
-	public class DoubleTracker : IDoubleTracker {
-		private double m_min;
-		private double m_max;
-		private double m_initial;
-		private double m_final;
-		/// <summary>
-		/// Creates a DoubleTracker.
-		/// </summary>
-		public DoubleTracker() {
-			Reset();
-		}
-		/// <summary>
-		/// Resets a DoubleTracker so that the initial and final values are double.NaN, the maximum
-		/// value is double.MinValue, and the minimum value is double.MaxValue.
-		/// </summary>
-		public void Reset(){
-			m_min = double.MaxValue;
-			m_max = double.MinValue;
-			m_initial = double.NaN;
-			m_final = double.NaN;
-		}
+namespace Highpoint.Sage.Utility
+{
 
-		/// <summary>
-		/// Resets a DoubleTracker so that the initial and final values are double.NaN, the maximum
-		/// value is double.MinValue, and the minimum value is double.MaxValue.
-		/// </summary>
-		public void Set(double initial, double minimum, double maximum, double final){
-			m_min = minimum;
-			m_max = maximum;
-			m_initial = initial;
-			m_final = final;
-		}
-		/// <summary>
-		/// Presents a candidate double to this tracker for consideration. Initial, min, max and final
-		/// value records are updated if appropriate, based on existing values, and this value.
-		/// </summary>
-		/// <param name="candidate">The new double value of the underlying field or data.</param>
-		public void Register(double candidate){
-			if ( double.IsNaN(m_initial) ) m_initial = candidate;
-			if ( candidate < m_min ) m_min = candidate;
-			if ( candidate > m_max ) m_max = candidate;
-			m_final = candidate;
-		}
+    /// <summary>
+    /// An object of this class tracks the values that a double takes on, recording its initial,
+    /// minimum, maximum, and final values. It relies on the user of the object to implement a
+    /// watcher on the double of interest, that registers a new double value with this object
+    /// whenever the double changes.
+    /// </summary>
+    public class DoubleTracker : IDoubleTracker
+    {
+        private double _min;
+        private double _max;
+        private double _initial;
+        private double _final;
+        /// <summary>
+        /// Creates a DoubleTracker.
+        /// </summary>
+        public DoubleTracker()
+        {
+            Reset();
+        }
+        /// <summary>
+        /// Resets a DoubleTracker so that the initial and final values are double.NaN, the maximum
+        /// value is double.MinValue, and the minimum value is double.MaxValue.
+        /// </summary>
+        public void Reset()
+        {
+            _min = double.MaxValue;
+            _max = double.MinValue;
+            _initial = double.NaN;
+            _final = double.NaN;
+        }
 
-		/// <summary>
-		/// The first recorded value of the double.
-		/// </summary>
-		public double InitialValue => m_initial;
+        /// <summary>
+        /// Resets a DoubleTracker so that the initial and final values are double.NaN, the maximum
+        /// value is double.MinValue, and the minimum value is double.MaxValue.
+        /// </summary>
+        public void Set(double initial, double minimum, double maximum, double final)
+        {
+            _min = minimum;
+            _max = maximum;
+            _initial = initial;
+            _final = final;
+        }
+        /// <summary>
+        /// Presents a candidate double to this tracker for consideration. Initial, min, max and final
+        /// value records are updated if appropriate, based on existing values, and this value.
+        /// </summary>
+        /// <param name="candidate">The new double value of the underlying field or data.</param>
+        public void Register(double candidate)
+        {
+            if (double.IsNaN(_initial))
+                _initial = candidate;
+            if (candidate < _min)
+                _min = candidate;
+            if (candidate > _max)
+                _max = candidate;
+            _final = candidate;
+        }
 
-	    /// <summary>
-		/// The last recorded value of the double.
-		/// </summary>
-		public double FinalValue => m_final;
+        /// <summary>
+        /// The first recorded value of the double.
+        /// </summary>
+        public double InitialValue => _initial;
 
-	    /// <summary>
-		/// The minimum recorded value of the double.
-		/// </summary>
-		public double MinValue => m_min;
+        /// <summary>
+        /// The last recorded value of the double.
+        /// </summary>
+        public double FinalValue => _final;
 
-	    /// <summary>
-		/// The maximum recorded value of the double.
-		/// </summary>
-		public double MaxValue => m_max;
+        /// <summary>
+        /// The minimum recorded value of the double.
+        /// </summary>
+        public double MinValue => _min;
 
-	    /// <summary>
-		/// Provides a string representation of this DoubleTracker, of the form [initial/minimum/maximum/final]
-		/// </summary>
-		/// <returns>A string representation of this DoubleTracker, of the form [initial/minimum/maximum/final]</returns>
-		public override string ToString() {
-            return string.Format("[{0}/{1}/{2}/{3}]", m_initial.ToString("r"), m_min.ToString("r"), m_max.ToString("r"), m_final.ToString("r"));
-		}
+        /// <summary>
+        /// The maximum recorded value of the double.
+        /// </summary>
+        public double MaxValue => _max;
+
+        /// <summary>
+        /// Provides a string representation of this DoubleTracker, of the form [initial/minimum/maximum/final]
+        /// </summary>
+        /// <returns>A string representation of this DoubleTracker, of the form [initial/minimum/maximum/final]</returns>
+        public override string ToString()
+        {
+            return string.Format("[{0}/{1}/{2}/{3}]", _initial.ToString("r"), _min.ToString("r"), _max.ToString("r"), _final.ToString("r"));
+        }
 
         /// <summary>
         /// Initializes this double tracker from a string similar to the one generated by ToString().
         /// </summary>
         /// <param name="s">The string.</param>
-        public void FromString(string s) {
+        public void FromString(string s)
+        {
             Reset();
             string[] vals = s.Substring(1, s.Length - 2).Split('/');
-            double.TryParse(vals[0], out m_initial);
-            double.TryParse(vals[1], out m_min);
-            double.TryParse(vals[2], out m_max);
-            double.TryParse(vals[3], out m_final);
+            double.TryParse(vals[0], out _initial);
+            double.TryParse(vals[1], out _min);
+            double.TryParse(vals[2], out _max);
+            double.TryParse(vals[3], out _final);
         }
 
         //private static void testMe() {
@@ -140,5 +127,5 @@ namespace Highpoint.Sage.Utility {
         //    Console.WriteLine(d.Equals(double.Parse(d.ToString("r"))));
 
         //}
-	}
+    }
 }

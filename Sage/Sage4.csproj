@@ -914,6 +914,7 @@
     <Compile Include="Utility\HashtableOfLists.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Utility\IDoubleTracker.cs" />
     <Compile Include="Utility\Mementos\ISupportsMementos.cs" />
     <Compile Include="Utility\Mementos\MementoHelper.cs" />
     <Compile Include="Utility\MouseUtilities.cs" />
