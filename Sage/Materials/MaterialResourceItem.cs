@@ -1,15 +1,16 @@
 /* This source code licensed under the GNU Affero General Public License */
 
-using System;
-using System.Diagnostics;
-using System.Collections;
-using Highpoint.Sage.SimCore;
 using Highpoint.Sage.Resources;
+using Highpoint.Sage.SimCore;
+using System;
+using System.Collections;
+using System.Diagnostics;
 using GuidOps = Highpoint.Sage.Utility.GuidOps;
 // ReSharper disable RedundantDefaultMemberInitializer
 // ReSharper disable EventNeverSubscribedTo.Global
 
-namespace Highpoint.Sage.Materials.Chemistry {
+namespace Highpoint.Sage.Materials.Chemistry
+{
     // TODO: Either convert Material to a substance, or allow this to handle mixtures.
 
     /// <summary>
@@ -19,26 +20,27 @@ namespace Highpoint.Sage.Materials.Chemistry {
     /// <seealso cref="Highpoint.Sage.Resources.IResource" />
     /// <seealso cref="Highpoint.Sage.Resources.IResourceManager" />
     /// <seealso cref="Highpoint.Sage.Resources.IHasControllableCapacity" />
-    public class MaterialResourceItem : IResource, IResourceManager, IHasControllableCapacity {
+    public class MaterialResourceItem : IResource, IResourceManager, IHasControllableCapacity
+    {
 
         #region Private fields
-		private static readonly bool s_diagnostics = Diagnostics.DiagnosticAids.Diagnostics("MaterialResourceItem");
+        private static readonly bool diagnostics = Diagnostics.DiagnosticAids.Diagnostics("MaterialResourceItem");
 
-        private IModel m_model;
-        private IMaterial m_material;
-        private string m_name;
-        private Guid m_guid;
-        private readonly ArrayList m_waiters;
-        private static readonly ArrayList s_empty_List = ArrayList.ReadOnly(new ArrayList());
+        private IModel _model;
+        private IMaterial _material;
+        private string _name;
+        private Guid _guid;
+        private readonly ArrayList _waiters;
+        private static readonly ArrayList _empty_List = ArrayList.ReadOnly(new ArrayList());
 
-        private readonly ResourceRequestAbortEvent m_onResourceRequestAborting;
+        private readonly ResourceRequestAbortEvent _onResourceRequestAborting;
 
-        private readonly double m_initialCapacity = 0.0;
-        private readonly double m_initialQuantity = 0.0;
-        private double m_capacity = 0.0;
+        private readonly double _initialCapacity = 0.0;
+        private readonly double _initialQuantity = 0.0;
+        private double _capacity = 0.0;
         // private double m_available = 0.0; <-- This is done via m_material.Mass
 
-        private readonly double m_initialTemperature = 0.0;
+        private readonly double _initialTemperature = 0.0;
         #endregion
 
         /// <summary>
@@ -51,7 +53,7 @@ namespace Highpoint.Sage.Materials.Chemistry {
         /// <param name="initialCapacity">The initial capacity of the MaterialResourceItem to hold the substance.</param>
         /// <exception cref="System.ApplicationException">A MaterialResourceItem cannot contain a spec with the same Guid as that of its own core material type.</exception>
         public MaterialResourceItem(IModel model, MaterialType mt, double initialQuantity, double initialTemp, double initialCapacity)
-			:this(model,"Material Resource Item : " + mt.Name,Guid.NewGuid(),mt,initialQuantity,initialTemp,initialCapacity,null){}
+            : this(model, "Material Resource Item : " + mt.Name, Guid.NewGuid(), mt, initialQuantity, initialTemp, initialCapacity, null) { }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="MaterialResourceItem"/> class with its name being the material type name.
@@ -64,7 +66,7 @@ namespace Highpoint.Sage.Materials.Chemistry {
         /// <param name="initialCapacity">The initial capacity of the MaterialResourceItem to hold the substance.</param>
         /// <exception cref="System.ApplicationException">A MaterialResourceItem cannot contain a spec with the same Guid as that of its own core material type.</exception>
 		public MaterialResourceItem(IModel model, Guid guid, MaterialType mt, double initialQuantity, double initialTemp, double initialCapacity)
-			:this(model,"Material Resource Item : " + mt.Name,guid,mt,initialQuantity,initialTemp,initialCapacity,null){}
+            : this(model, "Material Resource Item : " + mt.Name, guid, mt, initialQuantity, initialTemp, initialCapacity, null) { }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="MaterialResourceItem"/> class with its name being the material type name.
@@ -77,8 +79,8 @@ namespace Highpoint.Sage.Materials.Chemistry {
         /// <param name="initialCapacity">The initial capacity of the MaterialResourceItem to hold the substance.</param>
         /// <exception cref="System.ApplicationException">A MaterialResourceItem cannot contain a spec with the same Guid as that of its own core material type.</exception>
 		[Obsolete("Change to use MaterialResourceItem(IModel model, Guid guid, MaterialType mt, double initialQuantity, double initialTemp, double initialCapacity) API instead.")]
-		public MaterialResourceItem(IModel model, MaterialType mt, double initialQuantity, double initialTemp, double initialCapacity, Guid guid)
-			:this(model,"Material Resource Item : " + mt.Name,guid,mt,initialQuantity,initialTemp,initialCapacity,null){}
+        public MaterialResourceItem(IModel model, MaterialType mt, double initialQuantity, double initialTemp, double initialCapacity, Guid guid)
+            : this(model, "Material Resource Item : " + mt.Name, guid, mt, initialQuantity, initialTemp, initialCapacity, null) { }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="MaterialResourceItem"/> class.
@@ -92,40 +94,50 @@ namespace Highpoint.Sage.Materials.Chemistry {
         /// <param name="initialCapacity">The initial capacity of the MaterialResourceItem to hold the substance.</param>
         /// <param name="materialSpecGuids">The material specification guids. See Material Specifications tech note.</param>
         /// <exception cref="System.ApplicationException">A MaterialResourceItem cannot contain a spec with the same Guid as that of its own core material type.</exception>
-        public MaterialResourceItem(IModel model, string name, Guid guid, MaterialType mt, double initialQuantity, double initialTemp, double initialCapacity, ICollection materialSpecGuids) {
-			if ( materialSpecGuids == null ) materialSpecGuids = s_empty_List;
-			m_guid = guid;
-			m_name = name;
-			m_model = model;
-			m_initialCapacity = initialCapacity;
-			m_initialQuantity = initialQuantity;
-			m_initialTemperature = initialTemp;
-			MaterialType = mt;
-			MaterialSpecificationGuids = materialSpecGuids;
-			m_waiters = new ArrayList();
-			Initialize();
-			if ( s_diagnostics ) m_material.MaterialChanged+=m_material_MaterialChanged;
-			m_onResourceRequestAborting = OnResourceRequestAborting;
+        public MaterialResourceItem(IModel model, string name, Guid guid, MaterialType mt, double initialQuantity, double initialTemp, double initialCapacity, ICollection materialSpecGuids)
+        {
+            if (materialSpecGuids == null)
+                materialSpecGuids = _empty_List;
+            _guid = guid;
+            _name = name;
+            _model = model;
+            _initialCapacity = initialCapacity;
+            _initialQuantity = initialQuantity;
+            _initialTemperature = initialTemp;
+            MaterialType = mt;
+            MaterialSpecificationGuids = materialSpecGuids;
+            _waiters = new ArrayList();
+            Initialize();
+            if (diagnostics)
+                _material.MaterialChanged += m_material_MaterialChanged;
+            _onResourceRequestAborting = OnResourceRequestAborting;
 
-			// Ensure that no specifications contain the same Guid as the MRI's core material type.
+            // Ensure that no specifications contain the same Guid as the MRI's core material type.
 
-            foreach(object obj in MaterialSpecificationGuids) {
-			    Guid msGuid;
-			    if ( obj is Guid ) {
-					msGuid = (Guid)obj;
-				} else {
-					msGuid = (Guid)((DictionaryEntry)obj).Key;
-				}
-				if ( msGuid == MaterialType.Guid ) throw new ApplicationException("A MRI cannot contain a spec with the same Guid as that of its own core material type.");
-			}
-
-			if ( m_model != null ) {
-                if (model is IModelWithResources) {
-                    ( (IModelWithResources)m_model ).OnNewResourceCreated(this);
+            foreach (object obj in MaterialSpecificationGuids)
+            {
+                Guid msGuid;
+                if (obj is Guid)
+                {
+                    msGuid = (Guid)obj;
                 }
-				m_model.ModelObjects.Add(guid,this);
-			}
-		}
+                else
+                {
+                    msGuid = (Guid)((DictionaryEntry)obj).Key;
+                }
+                if (msGuid == MaterialType.Guid)
+                    throw new ApplicationException("A MRI cannot contain a spec with the same Guid as that of its own core material type.");
+            }
+
+            if (_model != null)
+            {
+                if (model is IModelWithResources)
+                {
+                    ((IModelWithResources)_model).OnNewResourceCreated(this);
+                }
+                _model.ModelObjects.Add(guid, this);
+            }
+        }
 
         /// <summary>
         /// Initialize the identity of this model object, once.
@@ -134,88 +146,104 @@ namespace Highpoint.Sage.Materials.Chemistry {
         /// <param name="name">The name of this component.</param>
         /// <param name="description">The description for this component.</param>
         /// <param name="guid">The GUID of this component.</param>
-        public void InitializeIdentity(IModel model, string name, string description, Guid guid) {
-            IMOHelper.Initialize(ref m_model, model, ref m_name, name, ref m_description, description, ref m_guid, guid);
+        public void InitializeIdentity(IModel model, string name, string description, Guid guid)
+        {
+            IMOHelper.Initialize(ref _model, model, ref _name, name, ref _description, description, ref _guid, guid);
         }
 
         /// <summary>
         /// The amount of capacity this MaterialResourceItem began with.
         /// </summary>
-        public double InitialCapacity => m_initialCapacity;
+        public double InitialCapacity => _initialCapacity;
 
         /// <summary>
         /// The initial temperature of the material in this MaterialResourceItem.
         /// </summary>
-        public double InitialTemperature => m_initialTemperature;
+        public double InitialTemperature => _initialTemperature;
 
         /// <summary>
         /// The amount of material this MaterialResourceItem began with.
         /// </summary>
-        public double InitialAvailable => m_initialQuantity;
+        public double InitialAvailable => _initialQuantity;
 
         /// <summary>
         /// Gets the collection of material specification guids. See the Material Specifications tech note.
         /// </summary>
         /// <value>The material specification guids.</value>
-        public ICollection MaterialSpecificationGuids { get; }
+        public ICollection MaterialSpecificationGuids
+        {
+            get;
+        }
 
         /// <summary>
 		/// The type of the material this MRI holds.
 		/// </summary>
-		public MaterialType MaterialType { get; }
+		public MaterialType MaterialType
+        {
+            get;
+        }
 
         #region Utility Functions
 
-		/// <summary>
-		/// Function to check if a guid is contained in this MRI. See 'g' below for possiblitites
-		/// </summary>
-		/// <param name="g">Can be a MRI guid, material type guid, a material specification, 
-		/// or an XOR of material type and specification guids</param>
-		/// <returns>True if found</returns>
-		public bool ContainsGuid(Guid g) {
-			if(m_guid == g || MaterialType.Guid == g) return true;
-			else {
-			    // ReSharper disable once LoopCanBeConvertedToQuery
-				foreach(Guid specGuid in MaterialSpecificationGuids) {
-					if(specGuid != MaterialType.Guid 
-						&& ( specGuid == g || GuidOps.XOR(MaterialType.Guid, specGuid) == g ) ) return true;
-				} // end foreach specGuid
-			} // end !mri.Guid == g
-			return false;
-		} // end ContainsGuid
+        /// <summary>
+        /// Function to check if a guid is contained in this MRI. See 'g' below for possiblitites
+        /// </summary>
+        /// <param name="g">Can be a MRI guid, material type guid, a material specification, 
+        /// or an XOR of material type and specification guids</param>
+        /// <returns>True if found</returns>
+        public bool ContainsGuid(Guid g)
+        {
+            if (_guid == g || MaterialType.Guid == g)
+                return true;
+            else
+            {
+                // ReSharper disable once LoopCanBeConvertedToQuery
+                foreach (Guid specGuid in MaterialSpecificationGuids)
+                {
+                    if (specGuid != MaterialType.Guid
+                        && (specGuid == g || GuidOps.XOR(MaterialType.Guid, specGuid) == g))
+                        return true;
+                } // end foreach specGuid
+            } // end !mri.Guid == g
+            return false;
+        } // end ContainsGuid
 
-		/// <summary>
-		/// Performs an XOR on mri's MT and Specs to give a unique key into the contents.
-		/// </summary>
-		/// <param name="mri">The MRI to search</param>
-		/// <returns>Guid defining the unqueness of the mri</returns>
-		public static Guid ContentsXOR(MaterialResourceItem mri) {
-			return ContentsXOR(mri.MaterialType.Guid, mri.MaterialSpecificationGuids);
-		}
+        /// <summary>
+        /// Performs an XOR on mri's MT and Specs to give a unique key into the contents.
+        /// </summary>
+        /// <param name="mri">The MRI to search</param>
+        /// <returns>Guid defining the unqueness of the mri</returns>
+        public static Guid ContentsXOR(MaterialResourceItem mri)
+        {
+            return ContentsXOR(mri.MaterialType.Guid, mri.MaterialSpecificationGuids);
+        }
 
-		/// <summary>
-		/// Performs an XOR on mri's MT and Specs to give a unique key into the contents.
-		/// </summary>
-		/// <param name="mtGuid">Guid of the MaterialType</param>
-		/// <param name="specGuid">Guid of the MaterialSpecification</param>
-		/// <returns>Guid representing the XOR of the two guids</returns>
-		public static Guid ContentsXOR(Guid mtGuid, Guid specGuid) {
-			return ContentsXOR(mtGuid, new ArrayList(new[] { specGuid }));
-		}
+        /// <summary>
+        /// Performs an XOR on mri's MT and Specs to give a unique key into the contents.
+        /// </summary>
+        /// <param name="mtGuid">Guid of the MaterialType</param>
+        /// <param name="specGuid">Guid of the MaterialSpecification</param>
+        /// <returns>Guid representing the XOR of the two guids</returns>
+        public static Guid ContentsXOR(Guid mtGuid, Guid specGuid)
+        {
+            return ContentsXOR(mtGuid, new ArrayList(new[] { specGuid }));
+        }
 
-		/// <summary>
-		/// Performs an XOR on mri's MT and Specs to give a unique key into the contents.
-		/// </summary>
-		/// <param name="mtGuid">Guid of the MaterialType</param>
-		/// <param name="specGuids">Guids for the list of MaterialSpecifications</param>
-		/// <returns>Guid defining the unqueness of the Guids</returns>
-		public static Guid ContentsXOR(Guid mtGuid, ICollection specGuids) {
-			Guid returnGuid = mtGuid;
-		    // ReSharper disable once LoopCanBeConvertedToQuery
-			foreach(Guid specGuid in specGuids) returnGuid = GuidOps.XOR(returnGuid, specGuid);
+        /// <summary>
+        /// Performs an XOR on mri's MT and Specs to give a unique key into the contents.
+        /// </summary>
+        /// <param name="mtGuid">Guid of the MaterialType</param>
+        /// <param name="specGuids">Guids for the list of MaterialSpecifications</param>
+        /// <returns>Guid defining the unqueness of the Guids</returns>
+        public static Guid ContentsXOR(Guid mtGuid, ICollection specGuids)
+        {
+            Guid returnGuid = mtGuid;
+            // ReSharper disable once LoopCanBeConvertedToQuery
+            foreach (Guid specGuid in specGuids)
+                returnGuid = GuidOps.XOR(returnGuid, specGuid);
 
-			return returnGuid;
-		}
+            return returnGuid;
+        }
 
         #endregion Utility Functions
 
@@ -226,14 +254,17 @@ namespace Highpoint.Sage.Materials.Chemistry {
         /// </summary>
         /// <value>The manager.</value>
         /// <exception cref="System.NotSupportedException">A MaterialResourceItem is a self-managed resource, and therefore cannot be assigned a resource manager (since it already has its own...).</exception>
-        public IResourceManager Manager {
-			get {
-				return this;
-			}
-			set {
-				throw new NotSupportedException("A MaterialResourceItem is a self-managed resource, and therefore cannot be assigned a resource manager (since it already has its own...).");
-			}
-		}
+        public IResourceManager Manager
+        {
+            get
+            {
+                return this;
+            }
+            set
+            {
+                throw new NotSupportedException("A MaterialResourceItem is a self-managed resource, and therefore cannot be assigned a resource manager (since it already has its own...).");
+            }
+        }
 
         /// <summary>
         /// Gets a value indicating whether this instance is discrete. A discrete resource is allocated in integral amounts, such as cartons or drums.
@@ -256,49 +287,59 @@ namespace Highpoint.Sage.Materials.Chemistry {
         /// <summary>
         /// Resets this instance, returning it to its initial capacity and availability.
         /// </summary>
-        public void Reset() {
-			Initialize();
-		}
+        public void Reset()
+        {
+            Initialize();
+        }
 
-		private bool AttemptExecution(IResourceRequest request ){
-			double proposedNewAmountAvailable = m_material.Mass - request.QuantityDesired;
-			if ( proposedNewAmountAvailable < (-PermissibleOverbook) || proposedNewAmountAvailable > m_capacity ) return false;
-			request.QuantityObtained = request.QuantityDesired;
-			request.ResourceObtained = this;
-		    Substance material = m_material as Substance;
-		    if ( material != null ) {
-				material.Remove(request.QuantityDesired);
-			} else if ( m_material is Mixture ) {
-				((Mixture)m_material).RemoveMaterial(request.QuantityDesired);
-			} else {
-				Debug.Assert(false,"Unknown IMaterial type : " + m_material.GetType().Name);
-			}
-			request.ResourceObtainedFrom = this;
-			return true;
-		}
+        private bool AttemptExecution(IResourceRequest request)
+        {
+            double proposedNewAmountAvailable = _material.Mass - request.QuantityDesired;
+            if (proposedNewAmountAvailable < (-PermissibleOverbook) || proposedNewAmountAvailable > _capacity)
+                return false;
+            request.QuantityObtained = request.QuantityDesired;
+            request.ResourceObtained = this;
+            Substance material = _material as Substance;
+            if (material != null)
+            {
+                material.Remove(request.QuantityDesired);
+            }
+            else if (_material is Mixture)
+            {
+                ((Mixture)_material).RemoveMaterial(request.QuantityDesired);
+            }
+            else
+            {
+                Debug.Assert(false, "Unknown IMaterial type : " + _material.GetType().Name);
+            }
+            request.ResourceObtainedFrom = this;
+            return true;
+        }
 
-		private void DoRollback(IResourceRequest request ){
-		    // ReSharper disable once PossibleUnintendedReferenceComparison (Intended reference comparison.)
-			if ( request.ResourceObtained != this ) {
-				throw new ResourceMismatchException(request, 
-					this,
-					ResourceMismatchException.MismatchType.UnReserve);
-			}
+        private void DoRollback(IResourceRequest request)
+        {
+            // ReSharper disable once PossibleUnintendedReferenceComparison (Intended reference comparison.)
+            if (request.ResourceObtained != this)
+            {
+                throw new ResourceMismatchException(request,
+                    this,
+                    ResourceMismatchException.MismatchType.UnReserve);
+            }
 
-			Substance addBackIn = (Substance)((Substance)m_material).MaterialType.CreateMass(request.QuantityObtained,m_material.Temperature);
-		    // ReSharper disable once ConditionIsAlwaysTrueOrFalse
-		    Substance material = (Substance) m_material;
-		    //if ( material != null ) {
-				material.Add(addBackIn);
-			/*} else if ( m_material is Mixture ) {
+            Substance addBackIn = (Substance)((Substance)_material).MaterialType.CreateMass(request.QuantityObtained, _material.Temperature);
+            // ReSharper disable once ConditionIsAlwaysTrueOrFalse
+            Substance material = (Substance)_material;
+            //if ( material != null ) {
+            material.Add(addBackIn);
+            /*} else if ( m_material is Mixture ) {
 				((Mixture)m_material).AddMaterial(addBackIn);
 			} else {
 				Debug.Assert(false,"Unknown IMaterial type : " + m_material.GetType().Name);
 			}*/
-			request.ResourceObtained = null;
-			request.ResourceObtainedFrom = null;
-			request.QuantityObtained = 0;
-		}
+            request.ResourceObtained = null;
+            request.ResourceObtainedFrom = null;
+            request.QuantityObtained = 0;
+        }
 
 
         /// <summary>
@@ -306,69 +347,83 @@ namespace Highpoint.Sage.Materials.Chemistry {
         /// </summary>
         /// <param name="request">The request.</param>
         /// <returns><c>true</c> if the resource was successfully reserved, <c>false</c> otherwise.</returns>
-        public bool Reserve(IResourceRequest request) {
-		    ResourceRequested?.Invoke(request,this);
-		    RequestEvent?.Invoke(request,this);
-		    lock ( this ) {
-				if ( AttemptExecution(request) ){
-				    ReservedEvent?.Invoke(request,this);
-				    ResourceReserved?.Invoke(request,this);
-				    return true;
-				}
-				return false;
-			}           
-		}
+        public bool Reserve(IResourceRequest request)
+        {
+            ResourceRequested?.Invoke(request, this);
+            RequestEvent?.Invoke(request, this);
+            lock (this)
+            {
+                if (AttemptExecution(request))
+                {
+                    ReservedEvent?.Invoke(request, this);
+                    ResourceReserved?.Invoke(request, this);
+                    return true;
+                }
+                return false;
+            }
+        }
 
         /// <summary>
         /// Unreserves the specified request. Returns it to availability.
         /// </summary>
         /// <param name="request">The request.</param>
-        public void Unreserve(IResourceRequest request) {
-			lock ( this ) {
-				DoRollback(request);
-			    UnreservedEvent?.Invoke(request,this);
-			    ResourceUnreserved?.Invoke(request,this);
-			}
-			while ( m_waiters.Count > 0 ) {
-				IDetachableEventController dec = (IDetachableEventController)m_waiters[0];
-				m_waiters.RemoveAt(0);
-				dec.Resume();
-			}
-		}
+        public void Unreserve(IResourceRequest request)
+        {
+            lock (this)
+            {
+                DoRollback(request);
+                UnreservedEvent?.Invoke(request, this);
+                ResourceUnreserved?.Invoke(request, this);
+            }
+            while (_waiters.Count > 0)
+            {
+                IDetachableEventController dec = (IDetachableEventController)_waiters[0];
+                _waiters.RemoveAt(0);
+                dec.Resume();
+            }
+        }
 
         /// <summary>
         /// Acquires the specified request. Removes it from availability and from the resource pool.
         /// </summary>
         /// <param name="request">The request.</param>
         /// <returns><c>true</c> if if the resource was successfully acquired, <c>false</c> otherwise.</returns>
-        public bool Acquire(IResourceRequest request) {
-            ResourceRequested?.Invoke(request,this);
-            RequestEvent?.Invoke(request,this);
-            lock ( this ) {
-				if ( AttemptExecution(request) ){
-				    AcquiredEvent?.Invoke(request,this);
-				    ResourceAcquired?.Invoke(request,this);
-				    return true;
-				} else return false;
-			}
-		}
+        public bool Acquire(IResourceRequest request)
+        {
+            ResourceRequested?.Invoke(request, this);
+            RequestEvent?.Invoke(request, this);
+            lock (this)
+            {
+                if (AttemptExecution(request))
+                {
+                    AcquiredEvent?.Invoke(request, this);
+                    ResourceAcquired?.Invoke(request, this);
+                    return true;
+                }
+                else
+                    return false;
+            }
+        }
 
         /// <summary>
         /// Releases the specified request. Returns it to availability and the resource pool.
         /// </summary>
         /// <param name="request">The request.</param>
-        public void Release(IResourceRequest request) {
-			lock ( this ) {
-				DoRollback(request);
-			    ReleasedEvent?.Invoke(request,this);
+        public void Release(IResourceRequest request)
+        {
+            lock (this)
+            {
+                DoRollback(request);
+                ReleasedEvent?.Invoke(request, this);
                 ResourceReleased?.Invoke(request, this);
             }
-			while ( m_waiters.Count > 0 ) {
-				IDetachableEventController dec = (IDetachableEventController)m_waiters[0];
-				m_waiters.RemoveAt(0);
-				dec.Resume();
-			}
-		}
+            while (_waiters.Count > 0)
+            {
+                IDetachableEventController dec = (IDetachableEventController)_waiters[0];
+                _waiters.RemoveAt(0);
+                dec.Resume();
+            }
+        }
 
         /// <summary>
         /// Occurs when this resource has been requested.
@@ -395,80 +450,94 @@ namespace Highpoint.Sage.Materials.Chemistry {
         /// </summary>
         public event ResourceStatusEvent ReleasedEvent;
 
-		#endregion
+        #endregion
 
-		#region Implementation of IResourceManager
-		//		/// <summary>
-		//		/// Unreserves the resource specified by the resource request.
-		//		/// </summary>
-		//		/// <param name="resourceRequest">The IResourceRequest that specifies the resource to unreserve.</param>
-		//		public void Unreserve(Highpoint.Sage.Resources.IResourceRequest resourceRequest) {
-		//			m_resourceManager.Unreserve(resourceRequest);
-		//		}
-		//
-		//		/// <summary>
-		//		/// Releases the resource specified by the resource request.
-		//		/// </summary>
-		//		/// <param name="resourceRequest">The IResourceRequest that specifies the resource to release.</param>
-		//		public void Release(Highpoint.Sage.Resources.IResourceRequest resourceRequest) {
-		//			m_resourceManager.Release(resourceRequest);
-		//		}
+        #region Implementation of IResourceManager
+        //		/// <summary>
+        //		/// Unreserves the resource specified by the resource request.
+        //		/// </summary>
+        //		/// <param name="resourceRequest">The IResourceRequest that specifies the resource to unreserve.</param>
+        //		public void Unreserve(Highpoint.Sage.Resources.IResourceRequest resourceRequest) {
+        //			m_resourceManager.Unreserve(resourceRequest);
+        //		}
+        //
+        //		/// <summary>
+        //		/// Releases the resource specified by the resource request.
+        //		/// </summary>
+        //		/// <param name="resourceRequest">The IResourceRequest that specifies the resource to release.</param>
+        //		public void Release(Highpoint.Sage.Resources.IResourceRequest resourceRequest) {
+        //			m_resourceManager.Release(resourceRequest);
+        //		}
 
-		/// <summary>
-		/// Reserves a resource according to the specified resource request, either blocking until successful, or
-		/// returning &lt;null&gt; if the resource is not immediately available. 
-		/// </summary>
-		/// <param name="resourceRequest">The IResourceRequest that specifies the criteria by which to select the resource.</param>
-		/// <param name="blockAwaitingAcquisition">If true, request will suspend until granted. If false, will return false if unable to fulfill.</param>
-		/// <returns>True if granted, false if not granted.</returns>
-		public bool Reserve(IResourceRequest resourceRequest, bool blockAwaitingAcquisition) {
-			if ( blockAwaitingAcquisition ) {
-				
-				IDetachableEventController dec = Model.Executive.CurrentEventController;
-				if ( dec == null ) throw new ApplicationException("Someone tried to call Reserve(..., true) while not in a detachable event. This is not allowed.");
+        /// <summary>
+        /// Reserves a resource according to the specified resource request, either blocking until successful, or
+        /// returning &lt;null&gt; if the resource is not immediately available. 
+        /// </summary>
+        /// <param name="resourceRequest">The IResourceRequest that specifies the criteria by which to select the resource.</param>
+        /// <param name="blockAwaitingAcquisition">If true, request will suspend until granted. If false, will return false if unable to fulfill.</param>
+        /// <returns>True if granted, false if not granted.</returns>
+        public bool Reserve(IResourceRequest resourceRequest, bool blockAwaitingAcquisition)
+        {
+            if (blockAwaitingAcquisition)
+            {
 
-				dec.SetAbortHandler(resourceRequest.AbortHandler);
-				resourceRequest.ResourceRequestAborting+=m_onResourceRequestAborting;
-				
-				while ( true ) {
-					if ( Reserve(resourceRequest) ) break;
-					m_waiters.Add(dec);
-					dec.Suspend();
+                IDetachableEventController dec = Model.Executive.CurrentEventController;
+                if (dec == null)
+                    throw new ApplicationException("Someone tried to call Reserve(..., true) while not in a detachable event. This is not allowed.");
+
+                dec.SetAbortHandler(resourceRequest.AbortHandler);
+                resourceRequest.ResourceRequestAborting += _onResourceRequestAborting;
+
+                while (true)
+                {
+                    if (Reserve(resourceRequest))
+                        break;
+                    _waiters.Add(dec);
+                    dec.Suspend();
                     dec.ClearAbortHandler();
-				}
-				return true;
-			} else {
-				return Reserve(resourceRequest);
-			}
-		}
+                }
+                return true;
+            }
+            else
+            {
+                return Reserve(resourceRequest);
+            }
+        }
 
-		/// <summary>
-		/// Acquires a resource according to the specified resource request, either blocking until successful, or
-		/// returning &lt;null&gt; if the resource is not immediately available. 
-		/// </summary>
-		/// <param name="resourceRequest">The IResourceRequest that specifies the criteria by which to select the resource.</param>
-		/// <param name="blockAwaitingAcquisition">If true, request will suspend until granted. If false, will return false if unable to fulfill.</param>
-		/// <returns>True if granted, false if not granted.</returns>
-		public bool Acquire(IResourceRequest resourceRequest, bool blockAwaitingAcquisition) {
-			if ( blockAwaitingAcquisition ) {
+        /// <summary>
+        /// Acquires a resource according to the specified resource request, either blocking until successful, or
+        /// returning &lt;null&gt; if the resource is not immediately available. 
+        /// </summary>
+        /// <param name="resourceRequest">The IResourceRequest that specifies the criteria by which to select the resource.</param>
+        /// <param name="blockAwaitingAcquisition">If true, request will suspend until granted. If false, will return false if unable to fulfill.</param>
+        /// <returns>True if granted, false if not granted.</returns>
+        public bool Acquire(IResourceRequest resourceRequest, bool blockAwaitingAcquisition)
+        {
+            if (blockAwaitingAcquisition)
+            {
 
-				IDetachableEventController dec = Model.Executive.CurrentEventController;
-				if ( dec == null ) throw new ApplicationException("Someone tried to call Acquire(..., true) while not in a detachable event. This is not allowed.");
-				
-				dec.SetAbortHandler(resourceRequest.AbortHandler);
-				resourceRequest.ResourceRequestAborting+=m_onResourceRequestAborting;
-				
-				while ( true ) {
-					if ( Acquire(resourceRequest) ) break;
-					m_waiters.Add(dec);
-					dec.Suspend();
+                IDetachableEventController dec = Model.Executive.CurrentEventController;
+                if (dec == null)
+                    throw new ApplicationException("Someone tried to call Acquire(..., true) while not in a detachable event. This is not allowed.");
+
+                dec.SetAbortHandler(resourceRequest.AbortHandler);
+                resourceRequest.ResourceRequestAborting += _onResourceRequestAborting;
+
+                while (true)
+                {
+                    if (Acquire(resourceRequest))
+                        break;
+                    _waiters.Add(dec);
+                    dec.Suspend();
                     dec.ClearAbortHandler();
-				}
-				return true;
-			} else {
-				return Acquire(resourceRequest);
-			}
-		}
+                }
+                return true;
+            }
+            else
+            {
+                return Acquire(resourceRequest);
+            }
+        }
 
         /// <summary>
         /// Fired when a resource request is received.
@@ -505,21 +574,30 @@ namespace Highpoint.Sage.Materials.Chemistry {
         /// </summary>
         /// <value>The access regulator.</value>
         /// <exception cref="System.NotSupportedException">A MaterialResourceItem does not support an access regulator.</exception>
-        public IAccessRegulator AccessRegulator { 
-			set{ throw new NotSupportedException("A MaterialResourceItem does not support an access regulator."); }
-			get{ return null; }
-		}
+        public IAccessRegulator AccessRegulator
+        {
+            set
+            {
+                throw new NotSupportedException("A MaterialResourceItem does not support an access regulator.");
+            }
+            get
+            {
+                return null;
+            }
+        }
 
         /// <summary>
         /// Gets the resources owned by this Resource Manager.
         /// </summary>
         /// <value>The resources.</value>
-        public IList Resources { 
-			get {
-			    ArrayList al = new ArrayList {this};
-			    return al;
-			}
-		}
+        public IList Resources
+        {
+            get
+            {
+                ArrayList al = new ArrayList { this };
+                return al;
+            }
+        }
 
         /// <summary>
         /// Gets a value indicating whether this resource manager supports prioritized requests. Note - MaterialResourceItem does not.
@@ -527,29 +605,29 @@ namespace Highpoint.Sage.Materials.Chemistry {
         /// <value><c>true</c> if [supports prioritized requests]; otherwise, <c>false</c>.</value>
         public bool SupportsPrioritizedRequests => false;
 
-// Some day...
+        // Some day...
 
-		#endregion
+        #endregion
 
-		#region IModelObject Members
+        #region IModelObject Members
 
         /// <summary>
         /// The model that owns this object, or from which this object gets time, etc. data.
         /// </summary>
         /// <value>The model.</value>
-        public IModel Model => m_model;
+        public IModel Model => _model;
 
         #region IHasIdentity Members
 
-		public string Name => m_name;
+        public string Name => _name;
 
-        private string m_description = null;
-		/// <summary>
-		/// A description of this MaterialResourceItem
-		/// </summary>
-		public string Description => m_description ?? m_name;
+        private string _description = null;
+        /// <summary>
+        /// A description of this MaterialResourceItem
+        /// </summary>
+        public string Description => _description ?? _name;
 
-        public Guid Guid => m_guid;
+        public Guid Guid => _guid;
 
         #endregion
 
@@ -561,41 +639,50 @@ namespace Highpoint.Sage.Materials.Chemistry {
         /// The current capacity of this resource - how much 'Available' can be, at its highest value.
         /// </summary>
         /// <value>The capacity.</value>
-        public double Capacity {
-			get {
-				return m_capacity;
-			}
-			set {
-				m_capacity = value;
-			}
-		}
+        public double Capacity
+        {
+            get
+            {
+                return _capacity;
+            }
+            set
+            {
+                _capacity = value;
+            }
+        }
 
         /// <summary>
         /// How much of this resource is currently available to service requests.
         /// </summary>
         /// <value>The available.</value>
-        public double Available {
-			get {
-				return m_material.Mass;
-			}
-			set {
-				Substance substance = (Substance)m_material;
-				// We want to change the mass of material in m_mri.Material.
-				double delta = value - substance.Mass;
-				if ( delta > 0 ) {
-					substance.Add((Substance)MaterialType.CreateMass(delta,m_initialTemperature));
-				    ResourceAdded?.Invoke(Manager,this);
-				} else {
-					substance.Remove(-delta);
-				    ResourceRemoved?.Invoke(Manager,this);
-				}
-			}
-		}
+        public double Available
+        {
+            get
+            {
+                return _material.Mass;
+            }
+            set
+            {
+                Substance substance = (Substance)_material;
+                // We want to change the mass of material in m_mri.Material.
+                double delta = value - substance.Mass;
+                if (delta > 0)
+                {
+                    substance.Add((Substance)MaterialType.CreateMass(delta, _initialTemperature));
+                    ResourceAdded?.Invoke(Manager, this);
+                }
+                else
+                {
+                    substance.Remove(-delta);
+                    ResourceRemoved?.Invoke(Manager, this);
+                }
+            }
+        }
 
-		/// <summary>
-		/// The amount by which it is permissible to overbook this resource.
-		/// </summary>
-		public double PermissibleOverbook { get; set; } = 0.0;
+        /// <summary>
+        /// The amount by which it is permissible to overbook this resource.
+        /// </summary>
+        public double PermissibleOverbook { get; set; } = 0.0;
 
         #endregion
 
@@ -605,23 +692,27 @@ namespace Highpoint.Sage.Materials.Chemistry {
         /// <value>The tag.</value>
         public object Tag { get; set; } = null;
 
-        private void Initialize(){
-			m_capacity = m_initialCapacity;
-			lock (this)
-			{
-			    m_material = MaterialType.CreateMass(m_initialQuantity,m_initialTemperature);
-			}
-			((Substance)m_material).SetMaterialSpecs(MaterialSpecificationGuids);
-		}
+        private void Initialize()
+        {
+            _capacity = _initialCapacity;
+            lock (this)
+            {
+                _material = MaterialType.CreateMass(_initialQuantity, _initialTemperature);
+            }
+            ((Substance)_material).SetMaterialSpecs(MaterialSpecificationGuids);
+        }
 
-		private void m_material_MaterialChanged(IMaterial material, MaterialChangeType type) {
-		    // ReSharper disable once RedundantJumpStatement (Used in diagnostics)
-			if ( type == MaterialChangeType.Temperature ) return;
-			//_Debug.WriteLine(m_model.Executive.Now + " : mixture in " + this.Name + " is now " + m_material + ", after a change of " + type);
-		}
+        private void m_material_MaterialChanged(IMaterial material, MaterialChangeType type)
+        {
+            // ReSharper disable once RedundantJumpStatement (Used in diagnostics)
+            if (type == MaterialChangeType.Temperature)
+                return;
+            //_Debug.WriteLine(m_model.Executive.Now + " : mixture in " + this.Name + " is now " + m_material + ", after a change of " + type);
+        }
 
-        private void OnResourceRequestAborting(IResourceRequest request, IExecutive exec, IDetachableEventController idec) {
-			m_model.AddWarning(new TerminalResourceRequestAbortedWarning(exec,this,request,idec));
-		}
-	}
+        private void OnResourceRequestAborting(IResourceRequest request, IExecutive exec, IDetachableEventController idec)
+        {
+            _model.AddWarning(new TerminalResourceRequestAbortedWarning(exec, this, request, idec));
+        }
+    }
 }
