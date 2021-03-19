@@ -1,26 +1,34 @@
 /* This source code licensed under the GNU Affero General Public License */
-using System;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 
-namespace Highpoint.Sage.Utility {
-	[TestClass]
-	public class HashtableOfListsTester {
+namespace Highpoint.Sage.Utility
+{
+    [TestClass]
+    public class HashtableOfListsTester
+    {
 
-		public HashtableOfListsTester(){Init();}
-        
-		[TestInitialize] 
-		public void Init() {
-		}
-		[TestCleanup]
-		public void destroy() {
-			Debug.WriteLine( "Done." );
-		}
+        public HashtableOfListsTester()
+        {
+            Init();
+        }
+
+        [TestInitialize]
+        public void Init()
+        {
+        }
+        [TestCleanup]
+        public void destroy()
+        {
+            Debug.WriteLine("Done.");
+        }
 
         [TestMethod]
         [Highpoint.Sage.Utility.FieldDescription("Test the HashtableOfLists.")]
-        public void TestHTOL() {
+        public void TestHTOL()
+        {
 
             HashtableOfLists htol = new HashtableOfLists();
 
@@ -44,7 +52,8 @@ namespace Highpoint.Sage.Utility {
 
         [TestMethod]
         [Highpoint.Sage.Utility.FieldDescription("Test the HashtableOfLists.")]
-        public void TestHTOLTemplate() {
+        public void TestHTOLTemplate()
+        {
 
             HashtableOfLists<string, string> htol = new HashtableOfLists<string, string>();
 
@@ -55,12 +64,14 @@ namespace Highpoint.Sage.Utility {
             htol.Add("Dog", "Chihuahua");
 
             Console.WriteLine("\r\nSequential dump.");
-            foreach (string str in htol) {
+            foreach (string str in htol)
+            {
                 Console.WriteLine(str);
             }
 
             Console.WriteLine("\r\nList dump.");
-            foreach (string key in htol.Keys) {
+            foreach (string key in htol.Keys)
+            {
                 Console.WriteLine(key + " --> " + StringOperations.ToCommasAndAndedList(htol[key]));
             }
 
@@ -68,18 +79,21 @@ namespace Highpoint.Sage.Utility {
             htol.Remove("Horse", "Clydesdale");
 
             Console.WriteLine("\r\nSequential dump.");
-            foreach (string str in htol) {
+            foreach (string str in htol)
+            {
                 Console.WriteLine(str);
             }
 
             Console.WriteLine("\r\nList dump.");
-            foreach (string key in htol.Keys) {
+            foreach (string key in htol.Keys)
+            {
                 Console.WriteLine(key + " --> " + StringOperations.ToCommasAndAndedList(htol[key]));
             }
         }
         [TestMethod]
         [Highpoint.Sage.Utility.FieldDescription("Test the HashtableOfLists.")]
-        public void TestSortedHTOLTemplate() {
+        public void TestSortedHTOLTemplate()
+        {
 
             IComparer<String> strComp = Comparer<string>.Default;
             HashtableOfLists<string, string> htol = new HashtableOfLists<string, string>(strComp);
@@ -91,12 +105,14 @@ namespace Highpoint.Sage.Utility {
             htol.Add("Dog", "Chihuahua");
 
             Console.WriteLine("\r\nSequential dump.");
-            foreach (string str in htol) {
+            foreach (string str in htol)
+            {
                 Console.WriteLine(str);
             }
 
             Console.WriteLine("\r\nList dump.");
-            foreach (string key in htol.Keys) {
+            foreach (string key in htol.Keys)
+            {
                 Console.WriteLine(key + " --> " + StringOperations.ToCommasAndAndedList(htol[key]));
             }
 
@@ -104,12 +120,14 @@ namespace Highpoint.Sage.Utility {
             htol.Remove("Horse", "Clydesdale");
 
             Console.WriteLine("\r\nSequential dump.");
-            foreach (string str in htol) {
+            foreach (string str in htol)
+            {
                 Console.WriteLine(str);
             }
 
             Console.WriteLine("\r\nList dump.");
-            foreach (string key in htol.Keys) {
+            foreach (string key in htol.Keys)
+            {
                 Console.WriteLine(key + " --> " + StringOperations.ToCommasAndAndedList(htol[key]));
             }
         }

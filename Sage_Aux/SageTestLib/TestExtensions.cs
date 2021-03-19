@@ -1,35 +1,42 @@
 /* This source code licensed under the GNU Affero General Public License */
 
-using System;
-using System.Linq;
-using System.Collections;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Highpoint.Sage.Utility;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 
-namespace Highpoint.Sage.Utility {
+namespace Highpoint.Sage.Utility
+{
 
     [TestClass]
-    public class ExtensionTester {
-
-        #region Private Fields
-        #endregion Private Fields
-
-        public ExtensionTester() { Init(); }
+    public class ExtensionTester
+    {
+        public ExtensionTester()
+        {
+            Init();
+        }
 
         [TestInitialize]
-        public void Init() { }
+        public void Init()
+        {
+        }
 
         [TestCleanup]
-        public void destroy() { Debug.WriteLine("Done."); }
+        public void destroy()
+        {
+            Debug.WriteLine("Done.");
+        }
 
         /// <summary>
         /// Tests the PercentileGetter extension.
         /// </summary>
         [TestMethod]
         [Highpoint.Sage.Utility.FieldDescription("Tests the Byte XOR extension.")]
-        public void TestByteXOR() {
+        public void TestByteXOR()
+        {
             byte[] ba1 = new byte[] { 0xF0, 0xF0 };
             byte[] ba2 = new byte[] { 0x0F, 0x0F };
             byte[] ba3 = ba1.XOR(ba2);
@@ -48,86 +55,121 @@ namespace Highpoint.Sage.Utility {
 
         [TestMethod]
         [Highpoint.Sage.Utility.FieldDescription("Tests the CommasAndAndedList operations.")]
-        public void TestCommasAndAndedListOperations() {
+        public void TestCommasAndAndedListOperations()
+        {
 
-            List<string> strings = new List<string>(new string[]{"Cat", "Dog", "Horse" ,"Cow"});
+            List<string> strings = new List<string>(new string[] { "Cat", "Dog", "Horse", "Cow" });
             string[] results = new string[]{
                 "Cat",
                 "Cat and Dog",
                 "",
                 "Cat, Dog, Horse and Cow"};
 
-            foreach (int count in new int[] { 1, 2, 4 }) {
+            foreach (int count in new int[] { 1, 2, 4 })
+            {
                 List<string> tmp = new List<string>();
-                for (int i = 0; i < count; i++) { tmp.Add(strings[i]); }
+                for (int i = 0; i < count; i++)
+                {
+                    tmp.Add(strings[i]);
+                }
                 string result = StringOperations.ToCommasAndAndedList(((IEnumerable<string>)tmp));
                 Assert.IsTrue(result.Equals(results[count - 1]));
                 Console.WriteLine(result);
 
             }
 
-            foreach (int count in new int[] { 1, 2, 4 }) {
+            foreach (int count in new int[] { 1, 2, 4 })
+            {
                 ArrayList tmp = new ArrayList();
-                for (int i = 0; i < count; i++) { tmp.Add(strings[i]); }
+                for (int i = 0; i < count; i++)
+                {
+                    tmp.Add(strings[i]);
+                }
                 string result = StringOperations.ToCommasAndAndedList(tmp);
                 Assert.IsTrue(result.Equals(results[count - 1]));
                 Console.WriteLine(result);
             }
 
-            foreach (int count in new int[] { 1, 2, 4 }) {
+            foreach (int count in new int[] { 1, 2, 4 })
+            {
                 List<Thingy> tmp = new List<Thingy>();
-                for (int i = 0; i < count; i++) { tmp.Add(new Thingy(strings[i])); }
+                for (int i = 0; i < count; i++)
+                {
+                    tmp.Add(new Thingy(strings[i]));
+                }
                 string result = StringOperations.ToCommasAndAndedListOfNames(tmp);
                 Assert.IsTrue(result.Equals(results[count - 1]));
                 Console.WriteLine(result);
             }
 
-            foreach (int count in new int[] { 1, 2, 4 }) {
+            foreach (int count in new int[] { 1, 2, 4 })
+            {
                 List<Thingy> tmp = new List<Thingy>();
-                for (int i = 0; i < count; i++) { tmp.Add(new Thingy(strings[i])); }
-                string result = StringOperations.ToCommasAndAndedList(tmp,n=>n.Name);
+                for (int i = 0; i < count; i++)
+                {
+                    tmp.Add(new Thingy(strings[i]));
+                }
+                string result = StringOperations.ToCommasAndAndedList(tmp, n => n.Name);
                 Assert.IsTrue(result.Equals(results[count - 1]));
                 Console.WriteLine(result);
             }
 
         }
 
-        class Thingy : Highpoint.Sage.SimCore.IHasName {
-            private string m_name;
-            public Thingy(string name) { m_name = name; }
-            public string Name { get { return m_name; } }
+        class Thingy : Highpoint.Sage.SimCore.IHasName
+        {
+            private string _name;
+            public Thingy(string name)
+            {
+                _name = name;
+            }
+            public string Name
+            {
+                get
+                {
+                    return _name;
+                }
+            }
         }
     }
 }
 
-namespace Highpoint.Sage.Mathematics {
+namespace Highpoint.Sage.Mathematics
+{
 
     [TestClass]
-    public class ExtensionTester {
+    public class ExtensionTester
+    {
 
-        #region Private Fields
-        #endregion Private Fields
-
-        public ExtensionTester() { Init(); }
+        public ExtensionTester()
+        {
+            Init();
+        }
 
         [TestInitialize]
-        public void Init() { }
+        public void Init()
+        {
+        }
 
         [TestCleanup]
-        public void destroy() { Debug.WriteLine("Done."); }
+        public void destroy()
+        {
+            Debug.WriteLine("Done.");
+        }
 
         /// <summary>
         /// Tests the PercentileGetter extension.
         /// </summary>
         [TestMethod]
         [Highpoint.Sage.Utility.FieldDescription("Tests the PercentileGetter extension.")]
-        public void TestPercentileGetter() {
+        public void TestPercentileGetter()
+        {
             double[] testData = new double[] { -99.9, -.4, .9, 1.1, 3.6, 12.5, 42.2 };
             TestPG(testData, new double[] { 0, 50, 100 }, new double[] { -99.9, 1.1, 42.2 }, false);
             TestPG(testData, new double[] { 0, 50, 100 }, new double[] { -99.9, 1.1, 42.2 }, true);
 
             TestPG(testData, new double[] { 0, 50, 100 }, new double[] { -99.9, 1.1, 42.2 }, false);
-            TestPG(testData, new double[] {10, 60, 95}, new double[] {-40.2, 2.6, 33.29}, true);
+            TestPG(testData, new double[] { 10, 60, 95 }, new double[] { -40.2, 2.6, 33.29 }, true);
 
         }
 
@@ -136,7 +178,8 @@ namespace Highpoint.Sage.Mathematics {
         /// </summary>
         [TestMethod]
         [Highpoint.Sage.Utility.FieldDescription("Tests the  BoundBySigmas extension.")]
-        public void TestSigmaBounding() {
+        public void TestSigmaBounding()
+        {
 
             double[] testData = new double[] { -99.9, -.4, .9, 1.1, 3.6, 12.5, 42.2, 67.8, 123.0 };
             double[] loBound = new double[] { 3, 3, 2, 1, .5, .25 };
@@ -146,17 +189,20 @@ namespace Highpoint.Sage.Mathematics {
             TestSigmaBounding(testData, expecteds, loBound, hiBound);
         }
 
-        private void TestPG(double[] srcData, double[] targets, double[] expecteds, bool interpolate) {
+        private void TestPG(double[] srcData, double[] targets, double[] expecteds, bool interpolate)
+        {
             List<Thingy> thingies = new List<Thingy>();
             Func<Thingy, double> valueGetter = n => n.DoubleValue;
 
-            foreach (double d in srcData) {
+            foreach (double d in srcData)
+            {
                 thingies.Add(new Thingy(d));
             }
 
             Console.WriteLine("Created a list of Thingies, {0}.", StringOperations.ToCommasAndAndedList(thingies.ConvertAll<string>(n => n.ToString())));
 
-            for (int i = 0; i < targets.Length; i++) {
+            for (int i = 0; i < targets.Length; i++)
+            {
                 double result = thingies.GetValueAtPercentile<Thingy>(targets[i], valueGetter, interpolate);
 
                 Console.WriteLine(" > {0} value at percentile {1} was {2} - expected {3}."
@@ -167,10 +213,14 @@ namespace Highpoint.Sage.Mathematics {
             }
         }
 
-        private void TestSigmaBounding(double[] srcData, int[] expecteds, double[] loBounds, double[] hiBounds) {
-            
+        private void TestSigmaBounding(double[] srcData, int[] expecteds, double[] loBounds, double[] hiBounds)
+        {
+
             List<Thingy> thingies = new List<Thingy>();
-            foreach (double d in srcData) { thingies.Add(new Thingy(d)); }
+            foreach (double d in srcData)
+            {
+                thingies.Add(new Thingy(d));
+            }
 
             Console.WriteLine("Created a list of Thingies, {0}.", StringOperations.ToCommasAndAndedList(thingies.ConvertAll<string>(n => n.ToString())));
 
@@ -179,7 +229,8 @@ namespace Highpoint.Sage.Mathematics {
 
             Console.WriteLine("Mean = {0}\r\nStDev = {1}", average, stDev);
 
-            for (int i = 0; i < expecteds.Length; i++) {
+            for (int i = 0; i < expecteds.Length; i++)
+            {
                 object state = null;
                 IEnumerable<Thingy> boundedThingies = thingies.BoundBySigmas<Thingy>(n => n.DoubleValue, loBounds[i], hiBounds[i], ref state);
                 IEnumerable<Thingy> enumerable = boundedThingies as Thingy[] ?? boundedThingies.ToArray();
@@ -188,20 +239,29 @@ namespace Highpoint.Sage.Mathematics {
             }
         }
 
-        class Thingy {
-            private string val;
-            private double dblval;
+        class Thingy
+        {
+            private string _val;
+            private double _dblval;
 
-            public Thingy(double _val) {
-                dblval = _val;
-                val = dblval.ToString();
+            public Thingy(double _val)
+            {
+                _dblval = _val;
+                this._val = _dblval.ToString();
             }
 
-            public override string ToString() {
-                return "\"" + val + "\"";
+            public override string ToString()
+            {
+                return "\"" + _val + "\"";
             }
 
-            public double DoubleValue { get { return dblval; } }
+            public double DoubleValue
+            {
+                get
+                {
+                    return _dblval;
+                }
+            }
         }
     }
 }
