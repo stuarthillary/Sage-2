@@ -1,12 +1,15 @@
 /* This source code licensed under the GNU Affero General Public License */
-using System;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System;
 
-namespace Highpoint.Sage.Utility {
+namespace Highpoint.Sage.Utility
+{
     [TestClass]
-    public class LabelTester {
+    public class LabelTester
+    {
 
-        public void BasicTest() {
+        public void BasicTest()
+        {
             LabelManager lm1 = new LabelManager();
             LabelManager lm2 = new LabelManager();
 
@@ -45,7 +48,7 @@ namespace Highpoint.Sage.Utility {
 
             LabelManager.SetContext("Orange");
             Assert.IsTrue(lm2.Label.Equals("Bob"));
-            
+
         }
     }
 }
