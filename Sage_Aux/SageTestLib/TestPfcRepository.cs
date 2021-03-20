@@ -1,16 +1,20 @@
 ﻿/* This source code licensed under the GNU Affero General Public License */
-using System;
 using Highpoint.Sage.Graphs.PFC;
-using System.Collections;
 using Highpoint.Sage.Utility;
+using System;
+using System.Collections;
 
-namespace SageTestLib {
-    public static class TestPfcRepository {
+namespace SageTestLib
+{
+    public static class TestPfcRepository
+    {
 
-        public static ProcedureFunctionChart CreateStandardPFC(int number) {
+        public static ProcedureFunctionChart CreateStandardPFC(int number)
+        {
             ProcedureFunctionChart pfc = null;
 
-            switch (number) {
+            switch (number)
+            {
                 case 2:
                     pfc = CreateTestPfc();
                     break;
@@ -88,19 +92,20 @@ namespace SageTestLib {
         public static IPfcNode nA, nB, nC, nD, nE, nF, nG, nH, nI, nJ, nK, nL, nM, nN, nO, nP;
 
 
-        public static ProcedureFunctionChart CreateOffsetParallelPFC() {
+        public static ProcedureFunctionChart CreateOffsetParallelPFC()
+        {
             ProcedureFunctionChart pfc = new ProcedureFunctionChart(null, "OffsetParallelPfc");
             IPfcStepNode start = pfc.CreateStep("Start", "", Guid.Empty);
             IPfcStepNode finish = pfc.CreateStep("Finish", "", Guid.Empty);
 
             char name = 'A';
-            A = pfc.CreateStep("Step_" + ( name++ ), "", NextGuid());
-            B = pfc.CreateStep("Step_" + ( name++ ), "", NextGuid());
-            C = pfc.CreateStep("Step_" + ( name++ ), "", NextGuid());
-            D = pfc.CreateStep("Step_" + ( name++ ), "", NextGuid());
-            E = pfc.CreateStep("Step_" + ( name++ ), "", NextGuid());
-            F = pfc.CreateStep("Step_" + ( name++ ), "", NextGuid());
-            G = pfc.CreateStep("Step_" + ( name++ ), "", NextGuid());
+            A = pfc.CreateStep("Step_" + (name++), "", NextGuid());
+            B = pfc.CreateStep("Step_" + (name++), "", NextGuid());
+            C = pfc.CreateStep("Step_" + (name++), "", NextGuid());
+            D = pfc.CreateStep("Step_" + (name++), "", NextGuid());
+            E = pfc.CreateStep("Step_" + (name++), "", NextGuid());
+            F = pfc.CreateStep("Step_" + (name++), "", NextGuid());
+            G = pfc.CreateStep("Step_" + (name++), "", NextGuid());
 
             nA = (IPfcNode)A;
             nB = (IPfcNode)B;
@@ -116,17 +121,18 @@ namespace SageTestLib {
             pfc.Bind(nE, nF);
             pfc.Bind(nF, nG);
             pfc.Bind(nG, finish);
-            pfc.Bind(( (PfcTransition)( (PfcStep)nA ).SuccessorNodes[0] ), nC);
-            pfc.Bind(nC, ( (PfcTransition)( (PfcStep)nE ).SuccessorNodes[0] ));
-            pfc.Bind(( (PfcTransition)( (PfcStep)nB ).SuccessorNodes[0] ), nD);
-            pfc.Bind(nD, ( (PfcTransition)( (PfcStep)nF ).SuccessorNodes[0] ));
+            pfc.Bind(((PfcTransition)((PfcStep)nA).SuccessorNodes[0]), nC);
+            pfc.Bind(nC, ((PfcTransition)((PfcStep)nE).SuccessorNodes[0]));
+            pfc.Bind(((PfcTransition)((PfcStep)nB).SuccessorNodes[0]), nD);
+            pfc.Bind(nD, ((PfcTransition)((PfcStep)nF).SuccessorNodes[0]));
 
             pfc.UpdateStructure();
 
             return pfc;
         }
 
-        public static ProcedureFunctionChart CreateTestPfc() {
+        public static ProcedureFunctionChart CreateTestPfc()
+        {
 
             ProcedureFunctionChart pfc = new ProcedureFunctionChart(new Highpoint.Sage.SimCore.Model("Test model", Guid.NewGuid()), "SFC 1");
             ((PfcElementFactory)pfc.ElementFactory).SetRepeatable(Guid.Empty); // Ensures Guids are repeatable.
@@ -193,7 +199,8 @@ namespace SageTestLib {
             return pfc;
         }
 
-        public static ProcedureFunctionChart CreateTestPfc2() {
+        public static ProcedureFunctionChart CreateTestPfc2()
+        {
 
             ProcedureFunctionChart pfc = new ProcedureFunctionChart(new Highpoint.Sage.SimCore.Model("Test model", Guid.NewGuid()), "SFC 1");
 
@@ -226,13 +233,15 @@ namespace SageTestLib {
             pfc.BindParallelConvergent(new IPfcNode[] { nF, nC }, nG);
 
             PfcLinkElementList links = new PfcLinkElementList(pfc.Links);
-            links.Sort(new Comparison<IPfcLinkElement>(delegate(IPfcLinkElement a, IPfcLinkElement b) {
+            links.Sort(new Comparison<IPfcLinkElement>(delegate (IPfcLinkElement a, IPfcLinkElement b)
+            {
                 return Comparer.Default.Compare(a.Name, b.Name);
             }));
 
 
             System.Reflection.BindingFlags bf = System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.FlattenHierarchy | System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance;
-            foreach (IPfcLinkElement link in links) {
+            foreach (IPfcLinkElement link in links)
+            {
                 typeof(PfcElement).GetFields(bf);
                 typeof(PfcElement).GetField("_guid", bf).SetValue((PfcElement)link, NextGuid()); // Totally cheating.
             }
@@ -242,7 +251,8 @@ namespace SageTestLib {
             return pfc;
         }
 
-        public static ProcedureFunctionChart CreateTestPfc3() {
+        public static ProcedureFunctionChart CreateTestPfc3()
+        {
 
             ProcedureFunctionChart pfc = new ProcedureFunctionChart(new Highpoint.Sage.SimCore.Model("Test model", Guid.NewGuid()), "SFC 1");
 
@@ -288,13 +298,15 @@ namespace SageTestLib {
             pfc.BindParallelConvergent(new IPfcNode[] { nH, nI, nJ, nK }, nL);
 
             PfcLinkElementList links = new PfcLinkElementList(pfc.Links);
-            links.Sort(new Comparison<IPfcLinkElement>(delegate(IPfcLinkElement a, IPfcLinkElement b) {
+            links.Sort(new Comparison<IPfcLinkElement>(delegate (IPfcLinkElement a, IPfcLinkElement b)
+            {
                 return Comparer.Default.Compare(a.Name, b.Name);
             }));
 
 
             System.Reflection.BindingFlags bf = System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.FlattenHierarchy | System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance;
-            foreach (IPfcLinkElement link in links) {
+            foreach (IPfcLinkElement link in links)
+            {
                 typeof(PfcElement).GetFields(bf);
                 typeof(PfcElement).GetField("_guid", bf).SetValue((PfcElement)link, NextGuid()); // Totally cheating.
             }
@@ -304,7 +316,8 @@ namespace SageTestLib {
             return pfc;
         }
 
-        public static ProcedureFunctionChart CreateTestPfc4() {
+        public static ProcedureFunctionChart CreateTestPfc4()
+        {
 
             ProcedureFunctionChart pfc = new ProcedureFunctionChart(new Highpoint.Sage.SimCore.Model("Test model", Guid.NewGuid()), "SFC 1");
 
@@ -334,13 +347,15 @@ namespace SageTestLib {
             pfc.Bind(nD, nE.PredecessorNodes[0]);
 
             PfcLinkElementList links = new PfcLinkElementList(pfc.Links);
-            links.Sort(new Comparison<IPfcLinkElement>(delegate(IPfcLinkElement a, IPfcLinkElement b) {
+            links.Sort(new Comparison<IPfcLinkElement>(delegate (IPfcLinkElement a, IPfcLinkElement b)
+            {
                 return Comparer.Default.Compare(a.Name, b.Name);
             }));
 
 
             System.Reflection.BindingFlags bf = System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.FlattenHierarchy | System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance;
-            foreach (IPfcLinkElement link in links) {
+            foreach (IPfcLinkElement link in links)
+            {
                 typeof(PfcElement).GetFields(bf);
                 typeof(PfcElement).GetField("_guid", bf).SetValue((PfcElement)link, NextGuid()); // Totally cheating.
             }
@@ -350,7 +365,8 @@ namespace SageTestLib {
             return pfc;
         }
 
-        public static ProcedureFunctionChart CreateTestPfc5() {
+        public static ProcedureFunctionChart CreateTestPfc5()
+        {
 
             // Flip-flop pattern.
 
@@ -383,13 +399,15 @@ namespace SageTestLib {
             pfc.BindParallelConvergent(new IPfcNode[] { nD, nE }, nF);
 
             PfcLinkElementList links = new PfcLinkElementList(pfc.Links);
-            links.Sort(new Comparison<IPfcLinkElement>(delegate(IPfcLinkElement a, IPfcLinkElement b) {
+            links.Sort(new Comparison<IPfcLinkElement>(delegate (IPfcLinkElement a, IPfcLinkElement b)
+            {
                 return Comparer.Default.Compare(a.Name, b.Name);
             }));
 
 
             System.Reflection.BindingFlags bf = System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.FlattenHierarchy | System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance;
-            foreach (IPfcLinkElement link in links) {
+            foreach (IPfcLinkElement link in links)
+            {
                 typeof(PfcElement).GetFields(bf);
                 typeof(PfcElement).GetField("_guid", bf).SetValue((PfcElement)link, NextGuid()); // Totally cheating.
             }
@@ -401,7 +419,8 @@ namespace SageTestLib {
             return pfc;
         }
 
-        public static ProcedureFunctionChart CreateRandomPFC(int nSteps, int seed) {
+        public static ProcedureFunctionChart CreateRandomPFC(int nSteps, int seed)
+        {
 
             Guid mask = GuidOps.FromString(string.Format("{0}, {1}", nSteps, seed));
             Guid seedGuid = GuidOps.FromString(string.Format("{0}, {1}", seed, nSteps));
@@ -422,11 +441,13 @@ namespace SageTestLib {
             Console.WriteLine("Seed = {0}.", seed);
 
             Random r = new Random(seed);
-            while (pfc.Steps.Count < nSteps) {
+            while (pfc.Steps.Count < nSteps)
+            {
 
                 double steeringValue = r.NextDouble();
 
-                if (steeringValue < .5) {
+                if (steeringValue < .5)
+                {
                     // Insert a step in series.
                     IPfcLinkElement link = pfc.Links[r.Next(0, pfc.Links.Count - 1)];
                     IPfcStepNode stepNode = pfc.CreateStep();
@@ -435,11 +456,15 @@ namespace SageTestLib {
                     //Console.WriteLine("Inserted {0} between {1} and {2}.", stepNode.Name, link.Predecessor.Name, link.Successor.Name);
                     link.Detach();
 
-                } else if (steeringValue < .666) {
+                }
+                else if (steeringValue < .666)
+                {
                     // Insert a step in parallel.
-                    for (int i = 0; i < 50; i++) { // Try, but give up if don't find suitable step.
+                    for (int i = 0; i < 50; i++)
+                    { // Try, but give up if don't find suitable step.
                         IPfcStepNode target = pfc.Steps[r.Next(0, pfc.Steps.Count - 1)];
-                        if (target.PredecessorNodes.Count == 1 && target.SuccessorNodes.Count == 1) {
+                        if (target.PredecessorNodes.Count == 1 && target.SuccessorNodes.Count == 1)
+                        {
                             IPfcStepNode stepNode = pfc.CreateStep();
                             pfc.Bind(target.PredecessorNodes[0], stepNode);
                             pfc.Bind(stepNode, target.SuccessorNodes[0]);
@@ -448,12 +473,16 @@ namespace SageTestLib {
                         }
                     }
 
-                } else if (steeringValue < .833) {
+                }
+                else if (steeringValue < .833)
+                {
                     // Insert a branch
-                    for (int i = 0; i < 50; i++) { // Try, but give up if don't find suitable step.
+                    for (int i = 0; i < 50; i++)
+                    { // Try, but give up if don't find suitable step.
                         IPfcStepNode step = pfc.Steps[r.Next(0, pfc.Steps.Count - 1)];
-                        if (step.PredecessorNodes.Count == 1 && step.SuccessorNodes.Count == 1) {
-                            IPfcStepNode entryStep = pfc.CreateStep(step.Name+"_IN",null,Guid.Empty);
+                        if (step.PredecessorNodes.Count == 1 && step.SuccessorNodes.Count == 1)
+                        {
+                            IPfcStepNode entryStep = pfc.CreateStep(step.Name + "_IN", null, Guid.Empty);
                             IPfcStepNode exitStep = pfc.CreateStep(step.Name + "_OUT", null, Guid.Empty);
                             IPfcStepNode leftStep = pfc.CreateStep(step.Name + "_LFT", null, Guid.Empty);
                             IPfcStepNode rightStep = pfc.CreateStep(step.Name + "_RGT", null, Guid.Empty);
@@ -464,16 +493,20 @@ namespace SageTestLib {
                             pfc.Bind(rightStep, exitStep);
                             pfc.Bind(exitStep, step.SuccessorNodes[0]);
                             pfc.Unbind(step.PredecessorNodes[0], step);
-                            pfc.Unbind(step,step.SuccessorNodes[0]);
+                            pfc.Unbind(step, step.SuccessorNodes[0]);
                             //Console.WriteLine("Inserted a branch in place of {0}.", step.Name);
                             break;
                         }
                     }
 
-                } else {
-                    for (int i = 0; i < 50; i++) { // Try, but give up if don't find suitable step.
+                }
+                else
+                {
+                    for (int i = 0; i < 50; i++)
+                    { // Try, but give up if don't find suitable step.
                         IPfcTransitionNode trans = pfc.Transitions[r.Next(0, pfc.Transitions.Count - 1)];
-                        if (trans.PredecessorNodes.Count == 1 && trans.SuccessorNodes.Count == 1) {
+                        if (trans.PredecessorNodes.Count == 1 && trans.SuccessorNodes.Count == 1)
+                        {
                             IPfcStepNode successor = (IPfcStepNode)trans.SuccessorNodes[0];
                             IPfcStepNode subject = pfc.CreateStep();
                             pfc.Bind(trans, subject);
@@ -548,15 +581,17 @@ namespace SageTestLib {
             return pfc;
 
         }
-       
-        private static Guid s_guid = new Guid("{00000000-0000-0000-0000-000000000001}");
 
-        public static Guid NextGuid() {
-            s_guid = Highpoint.Sage.Utility.GuidOps.Increment(s_guid);
-            return s_guid;
+        private static Guid guid = new Guid("{00000000-0000-0000-0000-000000000001}");
+
+        public static Guid NextGuid()
+        {
+            guid = Highpoint.Sage.Utility.GuidOps.Increment(guid);
+            return guid;
         }
 
-        public static ProcedureFunctionChart CreateLoopTestPfc() {
+        public static ProcedureFunctionChart CreateLoopTestPfc()
+        {
 
             ProcedureFunctionChart pfc = new ProcedureFunctionChart(new Highpoint.Sage.SimCore.Model("Test model", Guid.NewGuid()), "SFC 1");
 

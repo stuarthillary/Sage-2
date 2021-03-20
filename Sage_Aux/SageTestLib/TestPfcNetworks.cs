@@ -1,27 +1,34 @@
 /* This source code licensed under the GNU Affero General Public License */
+using Highpoint.Sage.SimCore;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections;
-using Highpoint.Sage.SimCore;
-using System.Xml;
 using System.IO;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System.Xml;
 
-namespace Highpoint.Sage.Graphs.PFC {
+namespace Highpoint.Sage.Graphs.PFC
+{
 
     [TestClass]
-    public class PFCGraphTester {
+    public class PFCGraphTester
+    {
 
-        private enum LinkSuperType { ParallelConvergent, SeriesConvergent, ParallelDivergent, SeriesDivergent }
-        private bool m_runSFCs = false;
-        private bool m_testSerializationToo = true;
-        private string m_pfcTestFileName;
+        private enum LinkSuperType
+        {
+            ParallelConvergent, SeriesConvergent, ParallelDivergent, SeriesDivergent
+        }
+        private readonly bool _runSFCs = false;
+        private readonly bool _testSerializationToo = true;
+        private readonly string _pfcTestFileName;
 
-        public PFCGraphTester() {
-            m_pfcTestFileName = Path.GetTempFileName();
+        public PFCGraphTester()
+        {
+            _pfcTestFileName = Path.GetTempFileName();
         }
 
         [TestMethod]
-        public void Test_SeriesConvergentStepStep() {
+        public void Test_SeriesConvergentStepStep()
+        {
             string shouldBe =
 @"{S_Alice-->[L_000(SFC 1.Root)]-->T_000}
 {T_000-->[L_001(SFC 1.Root)]-->S_Edna}
@@ -32,12 +39,13 @@ namespace Highpoint.Sage.Graphs.PFC {
 {S_David-->[L_006(SFC 1.Root)]-->T_003}
 {T_003-->[L_007(SFC 1.Root)]-->S_Edna}
 ";
-            _TestComplexLink(LinkSuperType.SeriesConvergent, PfcElementType.Step, PfcElementType.Step, shouldBe);
+            testComplexLink(LinkSuperType.SeriesConvergent, PfcElementType.Step, PfcElementType.Step, shouldBe);
 
         }
 
         [TestMethod]
-        public void Test_SeriesConvergentStepTransition() {
+        public void Test_SeriesConvergentStepTransition()
+        {
             string shouldBe =
 @"{S_000-->[L_000(SFC 1.Root)]-->T_Edna}
 {S_Alice-->[L_001(SFC 1.Root)]-->T_000}
@@ -49,24 +57,26 @@ namespace Highpoint.Sage.Graphs.PFC {
 {S_David-->[L_007(SFC 1.Root)]-->T_003}
 {T_003-->[L_008(SFC 1.Root)]-->S_000}
 ";
-            _TestComplexLink(LinkSuperType.SeriesConvergent, PfcElementType.Step, PfcElementType.Transition, shouldBe);
+            testComplexLink(LinkSuperType.SeriesConvergent, PfcElementType.Step, PfcElementType.Transition, shouldBe);
 
         }
 
         [TestMethod]
-        public void Test_SeriesConvergentTransitionStep() {
+        public void Test_SeriesConvergentTransitionStep()
+        {
             string shouldBe =
 @"{T_Alice-->[L_000(SFC 1.Root)]-->S_Edna}
 {T_Bob-->[L_001(SFC 1.Root)]-->S_Edna}
 {T_Charley-->[L_002(SFC 1.Root)]-->S_Edna}
 {T_David-->[L_003(SFC 1.Root)]-->S_Edna}
 ";
-            _TestComplexLink(LinkSuperType.SeriesConvergent, PfcElementType.Transition, PfcElementType.Step, shouldBe);
+            testComplexLink(LinkSuperType.SeriesConvergent, PfcElementType.Transition, PfcElementType.Step, shouldBe);
 
         }
 
         [TestMethod]
-        public void Test_SeriesConvergentTransitionTransition() {
+        public void Test_SeriesConvergentTransitionTransition()
+        {
             string shouldBe =
 @"{S_000-->[L_000(SFC 1.Root)]-->T_Edna}
 {T_Alice-->[L_001(SFC 1.Root)]-->S_000}
@@ -74,12 +84,13 @@ namespace Highpoint.Sage.Graphs.PFC {
 {T_Charley-->[L_003(SFC 1.Root)]-->S_000}
 {T_David-->[L_004(SFC 1.Root)]-->S_000}
 ";
-            _TestComplexLink(LinkSuperType.SeriesConvergent, PfcElementType.Transition, PfcElementType.Transition, shouldBe);
+            testComplexLink(LinkSuperType.SeriesConvergent, PfcElementType.Transition, PfcElementType.Transition, shouldBe);
 
         }
 
         [TestMethod]
-        public void Test_ParallelConvergentStepStep() {
+        public void Test_ParallelConvergentStepStep()
+        {
             string shouldBe =
 @"{T_000-->[L_000(SFC 1.Root)]-->S_Edna}
 {S_Alice-->[L_001(SFC 1.Root)]-->T_000}
@@ -87,24 +98,26 @@ namespace Highpoint.Sage.Graphs.PFC {
 {S_Charley-->[L_003(SFC 1.Root)]-->T_000}
 {S_David-->[L_004(SFC 1.Root)]-->T_000}
 ";
-            _TestComplexLink(LinkSuperType.ParallelConvergent, PfcElementType.Step, PfcElementType.Step, shouldBe);
+            testComplexLink(LinkSuperType.ParallelConvergent, PfcElementType.Step, PfcElementType.Step, shouldBe);
 
         }
 
         [TestMethod]
-        public void Test_ParallelConvergentStepTransition() {
+        public void Test_ParallelConvergentStepTransition()
+        {
             string shouldBe =
 @"{S_Alice-->[L_000(SFC 1.Root)]-->T_Edna}
 {S_Bob-->[L_001(SFC 1.Root)]-->T_Edna}
 {S_Charley-->[L_002(SFC 1.Root)]-->T_Edna}
 {S_David-->[L_003(SFC 1.Root)]-->T_Edna}
 ";
-            _TestComplexLink(LinkSuperType.ParallelConvergent, PfcElementType.Step, PfcElementType.Transition, shouldBe);
+            testComplexLink(LinkSuperType.ParallelConvergent, PfcElementType.Step, PfcElementType.Transition, shouldBe);
 
         }
 
         [TestMethod]
-        public void Test_ParallelConvergentTransitionStep() {
+        public void Test_ParallelConvergentTransitionStep()
+        {
             string shouldBe =
 @"{T_000-->[L_000(SFC 1.Root)]-->S_Edna}
 {T_Alice-->[L_001(SFC 1.Root)]-->S_000}
@@ -116,12 +129,13 @@ namespace Highpoint.Sage.Graphs.PFC {
 {T_David-->[L_007(SFC 1.Root)]-->S_003}
 {S_003-->[L_008(SFC 1.Root)]-->T_000}
 ";
-            _TestComplexLink(LinkSuperType.ParallelConvergent, PfcElementType.Transition, PfcElementType.Step, shouldBe);
+            testComplexLink(LinkSuperType.ParallelConvergent, PfcElementType.Transition, PfcElementType.Step, shouldBe);
 
         }
 
         [TestMethod]
-        public void Test_ParallelConvergentTransitionTransition() {
+        public void Test_ParallelConvergentTransitionTransition()
+        {
             string shouldBe =
 @"{T_Alice-->[L_000(SFC 1.Root)]-->S_000}
 {S_000-->[L_001(SFC 1.Root)]-->T_Edna}
@@ -132,12 +146,13 @@ namespace Highpoint.Sage.Graphs.PFC {
 {T_David-->[L_006(SFC 1.Root)]-->S_003}
 {S_003-->[L_007(SFC 1.Root)]-->T_Edna}
 ";
-            _TestComplexLink(LinkSuperType.ParallelConvergent, PfcElementType.Transition, PfcElementType.Transition, shouldBe);
+            testComplexLink(LinkSuperType.ParallelConvergent, PfcElementType.Transition, PfcElementType.Transition, shouldBe);
 
         }
 
         [TestMethod]
-        public void Test_ParallelDivergentStepStep() {
+        public void Test_ParallelDivergentStepStep()
+        {
             string shouldBe =
 @"{S_Alice-->[L_000(SFC 1.Root)]-->T_000}
 {T_000-->[L_001(SFC 1.Root)]-->S_Bob}
@@ -145,12 +160,13 @@ namespace Highpoint.Sage.Graphs.PFC {
 {T_000-->[L_003(SFC 1.Root)]-->S_David}
 {T_000-->[L_004(SFC 1.Root)]-->S_Edna}
 ";
-            _TestComplexLink(LinkSuperType.ParallelDivergent, PfcElementType.Step, PfcElementType.Step, shouldBe);
+            testComplexLink(LinkSuperType.ParallelDivergent, PfcElementType.Step, PfcElementType.Step, shouldBe);
 
         }
 
         [TestMethod]
-        public void Test_ParallelDivergentStepTransition() {
+        public void Test_ParallelDivergentStepTransition()
+        {
             string shouldBe =
 @"{S_Alice-->[L_000(SFC 1.Root)]-->T_000}
 {T_000-->[L_001(SFC 1.Root)]-->S_000}
@@ -162,24 +178,26 @@ namespace Highpoint.Sage.Graphs.PFC {
 {T_000-->[L_007(SFC 1.Root)]-->S_003}
 {S_003-->[L_008(SFC 1.Root)]-->T_Edna}
 ";
-            _TestComplexLink(LinkSuperType.ParallelDivergent, PfcElementType.Step, PfcElementType.Transition, shouldBe);
+            testComplexLink(LinkSuperType.ParallelDivergent, PfcElementType.Step, PfcElementType.Transition, shouldBe);
 
         }
 
         [TestMethod]
-        public void Test_ParallelDivergentTransitionStep() {
+        public void Test_ParallelDivergentTransitionStep()
+        {
             string shouldBe =
 @"{T_Alice-->[L_000(SFC 1.Root)]-->S_Bob}
 {T_Alice-->[L_001(SFC 1.Root)]-->S_Charley}
 {T_Alice-->[L_002(SFC 1.Root)]-->S_David}
 {T_Alice-->[L_003(SFC 1.Root)]-->S_Edna}
 ";
-            _TestComplexLink(LinkSuperType.ParallelDivergent, PfcElementType.Transition, PfcElementType.Step, shouldBe);
+            testComplexLink(LinkSuperType.ParallelDivergent, PfcElementType.Transition, PfcElementType.Step, shouldBe);
 
         }
 
         [TestMethod]
-        public void Test_ParallelDivergentTransitionTransition() {
+        public void Test_ParallelDivergentTransitionTransition()
+        {
             string shouldBe =
 @"{T_Alice-->[L_000(SFC 1.Root)]-->S_000}
 {S_000-->[L_001(SFC 1.Root)]-->T_Bob}
@@ -190,12 +208,13 @@ namespace Highpoint.Sage.Graphs.PFC {
 {T_Alice-->[L_006(SFC 1.Root)]-->S_003}
 {S_003-->[L_007(SFC 1.Root)]-->T_Edna}
 ";
-            _TestComplexLink(LinkSuperType.ParallelDivergent, PfcElementType.Transition, PfcElementType.Transition, shouldBe);
+            testComplexLink(LinkSuperType.ParallelDivergent, PfcElementType.Transition, PfcElementType.Transition, shouldBe);
 
         }
 
         [TestMethod]
-        public void Test_SeriesDivergentStepStep() {
+        public void Test_SeriesDivergentStepStep()
+        {
             string shouldBe =
 @"{S_Alice-->[L_000(SFC 1.Root)]-->T_000}
 {T_000-->[L_001(SFC 1.Root)]-->S_Bob}
@@ -206,24 +225,26 @@ namespace Highpoint.Sage.Graphs.PFC {
 {S_Alice-->[L_006(SFC 1.Root)]-->T_003}
 {T_003-->[L_007(SFC 1.Root)]-->S_Edna}
 ";
-            _TestComplexLink(LinkSuperType.SeriesDivergent, PfcElementType.Step, PfcElementType.Step, shouldBe);
+            testComplexLink(LinkSuperType.SeriesDivergent, PfcElementType.Step, PfcElementType.Step, shouldBe);
 
         }
 
         [TestMethod]
-        public void Test_SeriesDivergentStepTransition() {
+        public void Test_SeriesDivergentStepTransition()
+        {
             string shouldBe =
 @"{S_Alice-->[L_000(SFC 1.Root)]-->T_Bob}
 {S_Alice-->[L_001(SFC 1.Root)]-->T_Charley}
 {S_Alice-->[L_002(SFC 1.Root)]-->T_David}
 {S_Alice-->[L_003(SFC 1.Root)]-->T_Edna}
 ";
-            _TestComplexLink(LinkSuperType.SeriesDivergent, PfcElementType.Step, PfcElementType.Transition, shouldBe);
+            testComplexLink(LinkSuperType.SeriesDivergent, PfcElementType.Step, PfcElementType.Transition, shouldBe);
 
         }
 
         [TestMethod]
-        public void Test_SeriesDivergentTransitionStep() {
+        public void Test_SeriesDivergentTransitionStep()
+        {
             string shouldBe =
 @"{T_Alice-->[L_000(SFC 1.Root)]-->S_000}
 {S_000-->[L_001(SFC 1.Root)]-->T_000}
@@ -235,12 +256,13 @@ namespace Highpoint.Sage.Graphs.PFC {
 {S_000-->[L_007(SFC 1.Root)]-->T_003}
 {T_003-->[L_008(SFC 1.Root)]-->S_Edna}
 ";
-            _TestComplexLink(LinkSuperType.SeriesDivergent, PfcElementType.Transition, PfcElementType.Step, shouldBe);
+            testComplexLink(LinkSuperType.SeriesDivergent, PfcElementType.Transition, PfcElementType.Step, shouldBe);
 
         }
 
         [TestMethod]
-        public void Test_SeriesDivergentTransitionTransition() {
+        public void Test_SeriesDivergentTransitionTransition()
+        {
             string shouldBe =
 @"{T_Alice-->[L_000(SFC 1.Root)]-->S_000}
 {S_000-->[L_001(SFC 1.Root)]-->T_Bob}
@@ -248,50 +270,55 @@ namespace Highpoint.Sage.Graphs.PFC {
 {S_000-->[L_003(SFC 1.Root)]-->T_David}
 {S_000-->[L_004(SFC 1.Root)]-->T_Edna}
 ";
-            _TestComplexLink(LinkSuperType.SeriesDivergent, PfcElementType.Transition, PfcElementType.Transition, shouldBe);
+            testComplexLink(LinkSuperType.SeriesDivergent, PfcElementType.Transition, PfcElementType.Transition, shouldBe);
 
         }
 
         [TestMethod]
-        public void Test_SimpleBindingStepStep() {
+        public void Test_SimpleBindingStepStep()
+        {
             string shouldBe =
 @"{S_Alice-->[L_000(SFC 1.Root)]-->T_000}
 {T_000-->[L_001(SFC 1.Root)]-->S_Bob}
 ";
-            _TestSimpleLink(PfcElementType.Step, PfcElementType.Step, shouldBe);
+            testSimpleLink(PfcElementType.Step, PfcElementType.Step, shouldBe);
 
         }
 
         [TestMethod]
-        public void Test_SimpleBindingStepTransition() {
+        public void Test_SimpleBindingStepTransition()
+        {
             string shouldBe =
 @"{S_Alice-->[L_000(SFC 1.Root)]-->T_Bob}
 ";
-            _TestSimpleLink(PfcElementType.Step, PfcElementType.Transition, shouldBe);
+            testSimpleLink(PfcElementType.Step, PfcElementType.Transition, shouldBe);
 
         }
 
         [TestMethod]
-        public void Test_SimpleBindingTransitionStep() {
+        public void Test_SimpleBindingTransitionStep()
+        {
             string shouldBe =
 @"{T_Alice-->[L_000(SFC 1.Root)]-->S_Bob}
 ";
-            _TestSimpleLink(PfcElementType.Transition, PfcElementType.Step, shouldBe);
+            testSimpleLink(PfcElementType.Transition, PfcElementType.Step, shouldBe);
 
         }
 
         [TestMethod]
-        public void Test_SimpleBindingTransitionTransition() {
+        public void Test_SimpleBindingTransitionTransition()
+        {
             string shouldBe =
 @"{T_Alice-->[L_000(SFC 1.Root)]-->S_000}
 {S_000-->[L_001(SFC 1.Root)]-->T_Bob}
 ";
-            _TestSimpleLink(PfcElementType.Transition, PfcElementType.Transition, shouldBe);
+            testSimpleLink(PfcElementType.Transition, PfcElementType.Transition, shouldBe);
 
         }
 
         [TestMethod]
-        public void Test_SynchronizerConstruct_Transitions() {
+        public void Test_SynchronizerConstruct_Transitions()
+        {
             Model model = new Model("SFC Test 1");
             ProcedureFunctionChart pfc = new ProcedureFunctionChart(model, "SFC 1", "", Guid.NewGuid());
 
@@ -312,12 +339,14 @@ namespace Highpoint.Sage.Graphs.PFC {
             Console.WriteLine("After a synchronization of transitions, structure is \r\n" + structureString);
             Assert.AreEqual(structureString, shouldBe, "Structure should have been\r\n" + shouldBe + "\r\nbut it was\r\n" + structureString + "\r\ninstead.");
 
-            if (m_runSFCs) {
+            if (_runSFCs)
+            {
 
                 TestEvaluator testEvaluator = new TestEvaluator(new IPfcTransitionNode[] { t0, t1, t2, t3, t4, t5, t6, t7 });
                 testEvaluator.NextExpectedActivations = new IPfcTransitionNode[] { t0, t1, t2, t3, t4, t5, t6, t7 };
 
-                foreach (IPfcNode ilinkable in new IPfcTransitionNode[] { t0, t1, t2, t3 }) {
+                foreach (IPfcNode ilinkable in new IPfcTransitionNode[] { t0, t1, t2, t3 })
+                {
                     Console.WriteLine("Incrementing " + ilinkable.Name + ".");
                     //ilinkable.Increment();
                     throw new ApplicationException("PFCs are not currently executable.");
@@ -329,7 +358,8 @@ namespace Highpoint.Sage.Graphs.PFC {
         }
 
         [TestMethod]
-        public void Test_SynchronizerConstruct_Steps() {
+        public void Test_SynchronizerConstruct_Steps()
+        {
             Model model = new Model("SFC Test 1");
             ProcedureFunctionChart pfc = new ProcedureFunctionChart(model, "SFC 1", "", Guid.NewGuid());
 
@@ -351,14 +381,16 @@ namespace Highpoint.Sage.Graphs.PFC {
             Console.WriteLine("After a synchronization of steps, structure is \r\n" + structureString);
             Assert.AreEqual(structureString, shouldBe, "Structure should have been\r\n" + shouldBe + "\r\nbut it was\r\n" + structureString + "\r\ninstead.");
 
-            if (m_runSFCs) {
+            if (_runSFCs)
+            {
 
                 TestEvaluator testEvaluator = new TestEvaluator(new IPfcStepNode[] { t0, t1, t2, t3, t4, t5, t6, t7 });
                 pfc.Synchronize(new IPfcStepNode[] { t0, t1, t2, t3 }, new IPfcStepNode[] { t4, t5, t6, t7 });
 
                 testEvaluator.NextExpectedActivations = new IPfcStepNode[] { t0, t1, t2, t3, t4, t5, t6, t7 };
 
-                foreach (IPfcNode ilinkable in new IPfcStepNode[] { t0, t1, t2, t3 }) {
+                foreach (IPfcNode ilinkable in new IPfcStepNode[] { t0, t1, t2, t3 })
+                {
                     Console.WriteLine("Incrementing " + ilinkable.Name + ".");
                     //ilinkable.Increment();
                     throw new ApplicationException("PFCs are not currently executable.");
@@ -370,7 +402,8 @@ namespace Highpoint.Sage.Graphs.PFC {
         }
 
         [TestMethod]
-        public void Test_InsertStepAndTransition() {
+        public void Test_InsertStepAndTransition()
+        {
             Model model = new Model("SFC Test 1");
             ProcedureFunctionChart pfc = new ProcedureFunctionChart(model, "SFC 1", "", Guid.NewGuid());
 
@@ -405,7 +438,8 @@ namespace Highpoint.Sage.Graphs.PFC {
         }
 
         [TestMethod]
-        public void Test_RemoveStep() {
+        public void Test_RemoveStep()
+        {
             string testName = "PFC With Simultaneous Branch";
 
             IModel model = new Model(testName);
@@ -486,7 +520,8 @@ namespace Highpoint.Sage.Graphs.PFC {
         }
 
         [TestMethod]
-        public void Test_InsertStepIntoLoop() {
+        public void Test_InsertStepIntoLoop()
+        {
             string testName = "PFC with loop gets the loop extended";
 
             /*
@@ -563,14 +598,16 @@ namespace Highpoint.Sage.Graphs.PFC {
 
         #region Delegated test methods
 
-        private void _TestComplexLink(LinkSuperType superType, PfcElementType inType, PfcElementType outType, string shouldBe) {
+        private void testComplexLink(LinkSuperType superType, PfcElementType inType, PfcElementType outType, string shouldBe)
+        {
             string testName = superType.ToString() + " from " + inType.ToString() + " to " + outType.ToString();
             Model model = new Model(testName);
 
             ProcedureFunctionChart pfc = new ProcedureFunctionChart(model, "SFC 1", "", Guid.NewGuid());
 
             IPfcNode n0, n1, n2, n3, n4;
-            switch (superType) {
+            switch (superType)
+            {
                 case LinkSuperType.ParallelConvergent:
                     n0 = CreateNode(pfc, "Alice", inType);
                     n1 = CreateNode(pfc, "Bob", inType);
@@ -612,8 +649,9 @@ namespace Highpoint.Sage.Graphs.PFC {
             Console.WriteLine("After a " + testName + ", structure is \r\n" + structureString);
             Assert.AreEqual(StripCRLF(structureString), StripCRLF(shouldBe), "Structure should have been\r\n" + shouldBe + "\r\nbut it was\r\n" + structureString + "\r\ninstead.");
 
-            if (m_testSerializationToo) {
-                _TestSerialization(pfc, shouldBe, testName);
+            if (_testSerializationToo)
+            {
+                testSerialization(pfc, shouldBe, testName);
             }
 
         }
@@ -623,7 +661,8 @@ namespace Highpoint.Sage.Graphs.PFC {
             return structureString.Replace("\r", "").Replace("\n", "");
         }
 
-        private void _TestSimpleLink(PfcElementType inType, PfcElementType outType, string shouldBe) {
+        private void testSimpleLink(PfcElementType inType, PfcElementType outType, string shouldBe)
+        {
             string testName = "Simple link from " + inType.ToString() + " to " + outType.ToString();
             Model model = new Model(testName);
 
@@ -639,13 +678,15 @@ namespace Highpoint.Sage.Graphs.PFC {
             Console.WriteLine("After a " + testName + ", structure is \r\n" + structureString);
             Assert.AreEqual(StripCRLF(structureString), StripCRLF(shouldBe), "Structure should have been\r\n" + shouldBe + "\r\nbut it was\r\n" + structureString + "\r\ninstead.");
 
-            if (m_testSerializationToo) {
-                _TestSerialization(pfc, shouldBe, testName);
+            if (_testSerializationToo)
+            {
+                testSerialization(pfc, shouldBe, testName);
             }
 
         }
 
-        private void _TestSerialization(ProcedureFunctionChart pfc, string shouldBe, string testName) {
+        private void testSerialization(ProcedureFunctionChart pfc, string shouldBe, string testName)
+        {
 
             #region Store the Pfc to a file.
 
@@ -670,19 +711,19 @@ namespace Highpoint.Sage.Graphs.PFC {
             XmlDocument doc = new XmlDocument();
             doc.InnerXml = sb.ToString();
 
-            doc.Save(m_pfcTestFileName);
+            doc.Save(_pfcTestFileName);
 
             #endregion Store the Pfc to a file.
 
             #region Load the Pfc from a file.
 
             ProcedureFunctionChart pfc2 = new ProcedureFunctionChart();
-            FileStream fs = new FileStream(m_pfcTestFileName, FileMode.Open);
+            FileStream fs = new FileStream(_pfcTestFileName, FileMode.Open);
             XmlReader tr = System.Xml.XmlReader.Create(fs);
             pfc2.ReadXml(tr);
             tr.Close();
             fs.Close();
-            File.Delete(m_pfcTestFileName);
+            File.Delete(_pfcTestFileName);
 
             Console.WriteLine(PfcDiagnostics.GetStructure(pfc2));
 
@@ -694,7 +735,8 @@ namespace Highpoint.Sage.Graphs.PFC {
 
         }
 
-        private void _TestStepToStepBinding() {
+        private void testStepToStepBinding()
+        {
             string testName = "Step-to-Step binding, maintaining SFC Compliance";
 
             Model model = new Model("SFC Test 1");
@@ -711,7 +753,8 @@ namespace Highpoint.Sage.Graphs.PFC {
 
         }
 
-        private void _TestTransitionToTransitionBinding() {
+        private void testTransitionToTransitionBinding()
+        {
             string testName = "Transition-to-Transition binding, maintaining SFC Compliance";
 
             Model model = new Model("SFC Test 1");
@@ -728,8 +771,10 @@ namespace Highpoint.Sage.Graphs.PFC {
 
         }
 
-        private IPfcNode CreateNode(ProcedureFunctionChart pfc, string name, PfcElementType inType) {
-            switch (inType) {
+        private IPfcNode CreateNode(ProcedureFunctionChart pfc, string name, PfcElementType inType)
+        {
+            switch (inType)
+            {
                 case PfcElementType.Link:
                     break;
                 case PfcElementType.Transition:
@@ -746,45 +791,64 @@ namespace Highpoint.Sage.Graphs.PFC {
 
         #endregion Delegated test methods
 
-        class Selector {
-            private IPfcTransitionNode[] m_outbounds = null;
+        class Selector
+        {
+            private IPfcTransitionNode[] _outbounds = null;
             private int i;
-            public Selector(IPfcTransitionNode[] outbounds) {
-                m_outbounds = outbounds;
+            public Selector(IPfcTransitionNode[] outbounds)
+            {
+                _outbounds = outbounds;
                 i = 0;
             }
 
-            public IPfcTransitionNode OutboundSelector() {
-                if (i >= m_outbounds.Length) { i = 0; }
-                return m_outbounds[i++];
+            public IPfcTransitionNode OutboundSelector()
+            {
+                if (i >= _outbounds.Length)
+                {
+                    i = 0;
+                }
+                return _outbounds[i++];
             }
         }
 
-        class TestEvaluator {
-            private Queue m_nextExpected;
-            private ArrayList m_linkablesToMonitor;
+        class TestEvaluator
+        {
+            private Queue _nextExpected;
+            private ArrayList _linkablesToMonitor;
 
-            public TestEvaluator(IPfcNode[] linkablesToMonitor) {
-                m_nextExpected = new Queue();
-                m_linkablesToMonitor = new ArrayList(linkablesToMonitor);
-                foreach (IPfcNode t in linkablesToMonitor) {
+            public TestEvaluator(IPfcNode[] linkablesToMonitor)
+            {
+                _nextExpected = new Queue();
+                _linkablesToMonitor = new ArrayList(linkablesToMonitor);
+                foreach (IPfcNode t in linkablesToMonitor)
+                {
                     //t.NodeActivated += new ILinkableEvent(OnActivationHappened);
                 }
             }
 
-            public IPfcNode NextExpectedActivation { set { m_nextExpected.Enqueue(value); } }
-            public IPfcNode[] NextExpectedActivations {
-                set {
-                    Assert.IsTrue(m_nextExpected.Count == 0, "We are adding new expected activations, but have not yet observed all of the previously expected ones. This is an error.");
-                    foreach (IPfcNode t in value) {
-                        m_nextExpected.Enqueue(t);
+            public IPfcNode NextExpectedActivation
+            {
+                set
+                {
+                    _nextExpected.Enqueue(value);
+                }
+            }
+            public IPfcNode[] NextExpectedActivations
+            {
+                set
+                {
+                    Assert.IsTrue(_nextExpected.Count == 0, "We are adding new expected activations, but have not yet observed all of the previously expected ones. This is an error.");
+                    foreach (IPfcNode t in value)
+                    {
+                        _nextExpected.Enqueue(t);
                     }
                 }
             }
 
-            private void OnActivationHappened(IPfcNode whoActivated) {
-                Assert.IsTrue(m_nextExpected.Count > 0, "Unexpected activation occurred on " + whoActivated.Name + ".");
-                IPfcNode t = (IPfcNode)m_nextExpected.Dequeue();
+            private void onActivationHappened(IPfcNode whoActivated)
+            {
+                Assert.IsTrue(_nextExpected.Count > 0, "Unexpected activation occurred on " + whoActivated.Name + ".");
+                IPfcNode t = (IPfcNode)_nextExpected.Dequeue();
                 Assert.AreEqual(t, whoActivated, "" + whoActivated.Name + " activated, but we were expecting " + t.Name + " to do so. This is an error.");
                 Console.WriteLine("Activation happened with " + t.Name + ".");
             }

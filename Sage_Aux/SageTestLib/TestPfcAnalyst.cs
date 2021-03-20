@@ -1,26 +1,29 @@
 /* This source code licensed under the GNU Affero General Public License */
-using System;
-using System.IO;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Collections;
 using Highpoint.Sage.Graphs.PFC;
 using Highpoint.Sage.SimCore;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using PfcAnalyst = Highpoint.Sage.Graphs.PFC.PfcAnalyst;
 using Highpoint.Sage.Utility;
-using pfcs = SageTestLib.TestPfcRepository;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Xml;
+using PfcAnalyst = Highpoint.Sage.Graphs.PFC.PfcAnalyst;
+using pfcs = SageTestLib.TestPfcRepository;
 
-namespace PFCDemoMaterial {
+namespace PFCDemoMaterial
+{
 
     [TestClass]
-    public class PfcAnalystTester {
+    public class PfcAnalystTester
+    {
 
         [TestMethod]
-        public void TestPrePostTransitionLink() {
+        public void TestPrePostTransitionLink()
+        {
 
             ProcedureFunctionChart pfc = pfcs.CreateTestPfc();
 
@@ -43,7 +46,8 @@ namespace PFCDemoMaterial {
         }
 
         [TestMethod]
-        public void TestSoleSuccessor() {
+        public void TestSoleSuccessor()
+        {
 
             ProcedureFunctionChart pfc = pfcs.CreateTestPfc();
 
@@ -58,7 +62,8 @@ namespace PFCDemoMaterial {
         }
 
         [TestMethod]
-        public void TestHasParallelPath() {
+        public void TestHasParallelPath()
+        {
 
             ProcedureFunctionChart pfc = pfcs.CreateTestPfc();
 
@@ -71,7 +76,8 @@ namespace PFCDemoMaterial {
         }
 
         [TestMethod]
-        public void TestHasAlternatePath() {
+        public void TestHasAlternatePath()
+        {
 
             ProcedureFunctionChart pfc = pfcs.CreateTestPfc();
 
@@ -84,7 +90,8 @@ namespace PFCDemoMaterial {
         }
 
         [TestMethod]
-        public void TestIsLastElementOnTypesOfPaths() {
+        public void TestIsLastElementOnTypesOfPaths()
+        {
 
 
             #region Straight-thru test segment.
@@ -93,11 +100,14 @@ namespace PFCDemoMaterial {
             IPfcTransitionNode trans = null;
             #region Find the solo transition between nodes B and N.
 
-            foreach (IPfcTransitionNode _trans in pfc.Transitions) {
-                if (_trans.PredecessorNodes.Count == 0 || _trans.SuccessorNodes.Count == 0) {
+            foreach (IPfcTransitionNode _trans in pfc.Transitions)
+            {
+                if (_trans.PredecessorNodes.Count == 0 || _trans.SuccessorNodes.Count == 0)
+                {
                     continue;
                 }
-                if (_trans.PredecessorNodes[0].Equals(pfcs.nB) && _trans.SuccessorNodes[0].Equals(pfcs.nN)) {
+                if (_trans.PredecessorNodes[0].Equals(pfcs.nB) && _trans.SuccessorNodes[0].Equals(pfcs.nN))
+                {
                     trans = _trans;
                 }
             }
@@ -131,7 +141,7 @@ namespace PFCDemoMaterial {
 
             trans = pfc.Transitions["T_002"];
 
-            Assert.IsTrue(PfcAnalyst.IsLastElementOnAlternatePath(trans),"Loopback transition should be indicated as last element on an series-divergent path, but is not.");
+            Assert.IsTrue(PfcAnalyst.IsLastElementOnAlternatePath(trans), "Loopback transition should be indicated as last element on an series-divergent path, but is not.");
             Assert.IsTrue(!PfcAnalyst.IsLastElementOnParallelPath(trans), "Loopback transition should not be indicated as last element on a parallel-divergent path, but is.");
             Assert.IsTrue(PfcAnalyst.IsLastElementOnPath(trans), "Loopback transition should be indicated as last element on an alternate path, but is not.");
 
@@ -140,7 +150,8 @@ namespace PFCDemoMaterial {
         }
 
         [TestMethod]
-        public void TestIsJoinElement_Methods() {
+        public void TestIsJoinElement_Methods()
+        {
 
             ProcedureFunctionChart pfc = pfcs.CreateTestPfc();
             IPfcElement element = PfcAnalyst.GetJoinNodeForParallelPath(pfcs.nJ);
@@ -177,26 +188,30 @@ namespace PFCDemoMaterial {
         }
 
         [TestMethod]
-        public void TestFindLegalTargets() {
+        public void TestFindLegalTargets()
+        {
 
             ProcedureFunctionChart pfc = pfcs.CreateTestPfc();
             Console.WriteLine("\r\n\r\n\r\n" + PfcDiagnostics.GetStructure(pfc));
 
             IPfcNode[] testNodes = new IPfcNode[] { pfcs.nG, pfcs.nI, pfcs.nB, pfcs.nN, pfcs.nD, pfc.Transitions["T_000"], pfc.Transitions["T_014"], pfc.Transitions["T_005"], pfc.Transitions["T_011"] };
 
-            foreach (IPfcNode origin in testNodes) {
+            foreach (IPfcNode origin in testNodes)
+            {
                 List<IPfcNode> nodes;
                 //Console.WriteLine("\r\n\r\n\r\n" + PfcDiagnostics.GetStructure(pfc));
                 nodes = PfcAnalyst.GetPermissibleTargetsForLinkFrom(origin);
                 Console.WriteLine("From node " + origin.Name + ", all legal targets are...");
-                foreach (IPfcNode node in nodes) {
+                foreach (IPfcNode node in nodes)
+                {
                     Console.WriteLine(node.Name);
                 }
             }
         }
 
         [TestMethod]
-        public void TestSpecificTargetLegality() {
+        public void TestSpecificTargetLegality()
+        {
 
             ProcedureFunctionChart pfc = pfcs.CreateTestPfc();
             Console.WriteLine("\r\n\r\n\r\n" + PfcDiagnostics.GetStructure(pfc));
@@ -204,12 +219,13 @@ namespace PFCDemoMaterial {
             IPfcNode originNode = pfcs.nG;
             IPfcNode targetNode = pfcs.nO;
 
-            Console.WriteLine("Binding nG to nO " + (PfcAnalyst.IsTargetNodeLegal(originNode,targetNode)?"is":"is not") + " legal.");
+            Console.WriteLine("Binding nG to nO " + (PfcAnalyst.IsTargetNodeLegal(originNode, targetNode) ? "is" : "is not") + " legal.");
 
         }
 
         [TestMethod]
-        public void TestUnbindTransitionAndStep() {
+        public void TestUnbindTransitionAndStep()
+        {
             // Create initial pfc
             Model model = new Model();
             ProcedureFunctionChart pfc = new ProcedureFunctionChart(model);
@@ -241,7 +257,8 @@ namespace PFCDemoMaterial {
         }
 
         [TestMethod]
-        public void Test_AddNewStepAndTransition() {
+        public void Test_AddNewStepAndTransition()
+        {
             // Create initial pfc
 
             /*
@@ -291,7 +308,8 @@ namespace PFCDemoMaterial {
         }
 
         [TestMethod]
-        public void Test_GetPermissibleAlternateBranchTargets() {
+        public void Test_GetPermissibleAlternateBranchTargets()
+        {
             // Create a PFC that supports forward and backward branches
 
             /*
@@ -339,7 +357,8 @@ namespace PFCDemoMaterial {
         }
 
         [TestMethod]
-        public void Test_GetExistingJoinStepForAlternateBranch() {
+        public void Test_GetExistingJoinStepForAlternateBranch()
+        {
             // Create a PFC with an alternate branch
 
             /*
@@ -388,7 +407,8 @@ namespace PFCDemoMaterial {
         }
 
         [TestMethod]
-        public void Test_GetConvergenceNodeFor() {
+        public void Test_GetConvergenceNodeFor()
+        {
             // Create a PFC with an alternate branch
 
             /*
@@ -437,7 +457,8 @@ namespace PFCDemoMaterial {
         }
 
         [TestMethod]
-        public void Test_GetDivergenceNodeFor() {
+        public void Test_GetDivergenceNodeFor()
+        {
             // Create a PFC with an alternate branch
 
             /*
@@ -485,7 +506,8 @@ namespace PFCDemoMaterial {
         }
 
         [TestMethod]
-        public void Test_SimpleDeletion() {
+        public void Test_SimpleDeletion()
+        {
             ProcedureFunctionChart pfc = pfcs.CreateTestPfc();
 
             string structureString;
@@ -504,7 +526,8 @@ namespace PFCDemoMaterial {
         }
 
         [TestMethod]
-        public void Test_SimpleDeletion2() {
+        public void Test_SimpleDeletion2()
+        {
             ProcedureFunctionChart pfc = pfcs.CreateTestPfc();
 
             string structureString;
@@ -526,7 +549,8 @@ namespace PFCDemoMaterial {
         }
 
         [TestMethod]
-        public void Test_SimpleDeletion3() {
+        public void Test_SimpleDeletion3()
+        {
             ProcedureFunctionChart pfc = pfcs.CreateTestPfc();
 
             string structureString;
@@ -599,7 +623,8 @@ namespace PFCDemoMaterial {
         }
 #endif
         [TestMethod]
-        public void Test_DeepNonLoopingPath() {
+        public void Test_DeepNonLoopingPath()
+        {
 
             //          BEGIN
             //            |
@@ -621,7 +646,7 @@ namespace PFCDemoMaterial {
             IModel model = new Model(testName);
 
             ProcedureFunctionChart pfc = new ProcedureFunctionChart(model, testName);
-            ( (PfcElementFactory)pfc.ElementFactory ).SetRepeatable(Guid.Empty);
+            ((PfcElementFactory)pfc.ElementFactory).SetRepeatable(Guid.Empty);
 
             IPfcNode beginStep = pfc.CreateStep("BEGIN", string.Empty, Guid.Empty);
             IPfcNode step1 = pfc.CreateStep("STEP1", string.Empty, Guid.Empty);
@@ -652,14 +677,16 @@ namespace PFCDemoMaterial {
 
             Console.WriteLine(PfcAnalyst.AssignWeightsForBroadestNonLoopingPath(pfc));
 
-            foreach (PfcLink link in pfc.Links) {
+            foreach (PfcLink link in pfc.Links)
+            {
                 Console.WriteLine("Link from {0} to {1} has priority {2}.", link.Predecessor.Name, link.Successor.Name, link.Priority);
             }
 
         }
 
         [TestMethod]
-        public void Test_SelfLoopStructuralLegality() {
+        public void Test_SelfLoopStructuralLegality()
+        {
 
             //  BEGIN
             //    |
@@ -703,12 +730,13 @@ namespace PFCDemoMaterial {
 
             PfcValidator validator = new PfcValidator(pfc);
 
-            Assert.IsTrue(validator.PfcIsValid(),"This PFC should be valid.");
+            Assert.IsTrue(validator.PfcIsValid(), "This PFC should be valid.");
 
         }
 
         [TestMethod]
-        public void Test_LoopbackWithinAParallelBranch() {
+        public void Test_LoopbackWithinAParallelBranch()
+        {
 
             //        START
             //          |
@@ -779,7 +807,7 @@ namespace PFCDemoMaterial {
 
             // BULK TEST FOR AUTOMATIC TESTING.
             List<IPfcNode> results = PfcAnalyst.GetPermissibleTargetsForLinkFrom(step5);
-            results.Sort((node1, node2) => Comparer<string>.Default.Compare(node1.Name,node2.Name));
+            results.Sort((node1, node2) => Comparer<string>.Default.Compare(node1.Name, node2.Name));
 
             string resultString = Highpoint.Sage.Utility.StringOperations.ToCommasAndAndedListOfNames(new List<IHasName>(results.ToArray()));
             Console.WriteLine(resultString);
@@ -879,7 +907,8 @@ namespace PFCDemoMaterial {
         }
 
         [TestMethod]
-        public void Test_LoopbackUsingParallelDivergence() {
+        public void Test_LoopbackUsingParallelDivergence()
+        {
 
             //   START    -----
             //     |      |   |
@@ -929,51 +958,61 @@ namespace PFCDemoMaterial {
         /// breadth-first traversal order.
         /// </summary>
         [TestMethod]
-        public void Test_PfcUpdateStructure() {
+        public void Test_PfcUpdateStructure()
+        {
             ProcedureFunctionChart pfc = pfcs.CreateTestPfc();
             pfc.UpdateStructure();
 
             string s = PfcDiagnostics.GetStructure(pfc);
 
             StringWriter sw = new StringWriter();
-            foreach (IPfcNode node in pfc.Nodes) {
+            foreach (IPfcNode node in pfc.Nodes)
+            {
                 sw.WriteLine(node.Name + " : " + node.GraphOrdinal);
             }
             string resultString = sw.GetStringBuilder().ToString();
             Console.WriteLine(resultString);
-            Assert.AreEqual("Step_A : 0\r\nT_000 : 1\r\nStep_B : 2\r\nT_001 : 3\r\nT_002 : 4\r\nT_014 : 5\r\nStep_C : 6\r\nStep_F : 7\r\nT_003 : 8\r\nT_005 : 9\r\nStep_D : 10\r\nStep_G : 11\r\nT_004 : 12\r\nT_006 : 13\r\nStep_E : 14\r\nStep_H : 15\r\nStep_I : 16\r\nStep_P : 17\r\nT_011 : 18\r\nT_007 : 19\r\nT_008 : 20\r\nStep_J : 21\r\nStep_K : 22\r\nT_009 : 23\r\nStep_L : 24\r\nT_010 : 25\r\nStep_M : 26\r\nT_012 : 27\r\nStep_N : 28\r\nT_013 : 29\r\nStep_O : 30\r\n",resultString);
+            Assert.AreEqual("Step_A : 0\r\nT_000 : 1\r\nStep_B : 2\r\nT_001 : 3\r\nT_002 : 4\r\nT_014 : 5\r\nStep_C : 6\r\nStep_F : 7\r\nT_003 : 8\r\nT_005 : 9\r\nStep_D : 10\r\nStep_G : 11\r\nT_004 : 12\r\nT_006 : 13\r\nStep_E : 14\r\nStep_H : 15\r\nStep_I : 16\r\nStep_P : 17\r\nT_011 : 18\r\nT_007 : 19\r\nT_008 : 20\r\nStep_J : 21\r\nStep_K : 22\r\nT_009 : 23\r\nStep_L : 24\r\nT_010 : 25\r\nStep_M : 26\r\nT_012 : 27\r\nStep_N : 28\r\nT_013 : 29\r\nStep_O : 30\r\n", resultString);
         }
 
 
         [TestMethod]
-        public void Test_LoopingPfcUpdateStructure() {
+        public void Test_LoopingPfcUpdateStructure()
+        {
             ProcedureFunctionChart pfc = pfcs.CreateLoopTestPfc();
             pfc.UpdateStructure();
 
 
             StringWriter sw = new StringWriter();
-            foreach (IPfcNode node in pfc.Nodes) {
+            foreach (IPfcNode node in pfc.Nodes)
+            {
                 sw.WriteLine(node.Name + " : " + node.GraphOrdinal);
             }
             string resultString = sw.GetStringBuilder().ToString();
             Console.WriteLine(resultString);
-            Assert.AreEqual(resultString,"Step_A : 0\r\nT_000 : 1\r\nStep_B : 2\r\nT_001 : 3\r\nT_002 : 4\r\nStep_C : 5\r\n");
+            Assert.AreEqual(resultString, "Step_A : 0\r\nT_000 : 1\r\nStep_B : 2\r\nT_001 : 3\r\nT_002 : 4\r\nStep_C : 5\r\n");
         }
 
         [TestMethod]
-        public void Test_ComplexLoopingPfcUpdateStructure() {
+        public void Test_ComplexLoopingPfcUpdateStructure()
+        {
             int nFailures = 0;
-            for (int i = 0; i < 20; i++) {
-                try {
+            for (int i = 0; i < 20; i++)
+            {
+                try
+                {
                     _Test_ComplexLoopingPfcUpdateStructure();
-                } catch {
+                }
+                catch
+                {
                     nFailures++;
                 }
             }
             Assert.AreEqual(0, nFailures, "There were " + nFailures + " failures, and should have been none.");
         }
 
-        public void _Test_ComplexLoopingPfcUpdateStructure() {
+        public void _Test_ComplexLoopingPfcUpdateStructure()
+        {
             //        START
             //          |
             //      ____+________
@@ -1019,7 +1058,8 @@ namespace PFCDemoMaterial {
             pfc.UpdateStructure();
 
             StringWriter sw = new StringWriter();
-            foreach (IPfcNode node in pfc.Nodes) {
+            foreach (IPfcNode node in pfc.Nodes)
+            {
                 sw.WriteLine(node.Name + " : " + node.GraphOrdinal);// + ", and Guid = " + node.Guid.ToString());
             }
             string resultString = sw.GetStringBuilder().ToString();
@@ -1028,19 +1068,25 @@ namespace PFCDemoMaterial {
         }
 
         [TestMethod]
-        public void Test_ComplexSeriesBranchingPfcUpdateStructure() {
+        public void Test_ComplexSeriesBranchingPfcUpdateStructure()
+        {
             int nFailures = 0;
-            for (int i = 0; i < 20; i++) {
-                try {
+            for (int i = 0; i < 20; i++)
+            {
+                try
+                {
                     _Test_ComplexSeriesBranchingPfcUpdateStructure();
-                } catch {
+                }
+                catch
+                {
                     nFailures++;
                 }
             }
             Assert.AreEqual(0, nFailures, "There were " + nFailures + " failures, and should have been none.");
         }
 
-        public void _Test_ComplexSeriesBranchingPfcUpdateStructure() {
+        public void _Test_ComplexSeriesBranchingPfcUpdateStructure()
+        {
             //        START
             //          |
             //      ____|______
@@ -1078,11 +1124,15 @@ namespace PFCDemoMaterial {
             pfc.UpdateStructure();
 
             StringWriter sw = new StringWriter();
-            foreach (IPfcNode node in pfc.Nodes) {
+            foreach (IPfcNode node in pfc.Nodes)
+            {
                 sw.Write(node.Name + " : " + node.GraphOrdinal);
-                if (node.ElementType == PfcElementType.Transition) {
+                if (node.ElementType == PfcElementType.Transition)
+                {
                     sw.WriteLine(" - from " + node.PredecessorNodes[0].Name + " to " + node.SuccessorNodes[0].Name + " )");
-                } else {
+                }
+                else
+                {
                     sw.WriteLine();
                 }
             }
@@ -1093,7 +1143,8 @@ namespace PFCDemoMaterial {
         }
 
         [TestMethod]
-        public void Test_LinkPrioritization() {
+        public void Test_LinkPrioritization()
+        {
             //        START
             //          |  
             //  L0  ____|_____ L2
@@ -1110,7 +1161,7 @@ namespace PFCDemoMaterial {
             IModel model = new Model(testName);
 
             string primaryPath = null;
-            
+
             ProcedureFunctionChart pfc = new ProcedureFunctionChart(model, testName);
 
             IPfcNode startStep = pfc.CreateStep("START", string.Empty, Guid.NewGuid());
@@ -1126,7 +1177,7 @@ namespace PFCDemoMaterial {
             pfc.MakeLinkPrimary(step1.Successors[0]); // L4 <-- Priority MaxValue.
             pfc.UpdateStructure();
             primaryPath = PfcAnalyst.GetPrimaryPathAsString(startStep, true);
-            Assert.AreEqual(primaryPath,"START, STEP1 and FINISH");
+            Assert.AreEqual(primaryPath, "START, STEP1 and FINISH");
 
             step2.Predecessors[0].Priority = 1;
             step2.Predecessors[0].Predecessor.Predecessors[0].Priority = 1;
@@ -1134,7 +1185,7 @@ namespace PFCDemoMaterial {
             step1.Predecessors[0].Predecessor.Predecessors[0].Priority = 0;
             pfc.UpdateStructure();
             primaryPath = PfcAnalyst.GetPrimaryPathAsString(startStep, true);
-            Assert.AreEqual(primaryPath,"START, STEP2 and FINISH");
+            Assert.AreEqual(primaryPath, "START, STEP2 and FINISH");
 
             step1.Predecessors[0].Priority = 1;
             step1.Predecessors[0].Predecessor.Predecessors[0].Priority = 1;
@@ -1142,22 +1193,23 @@ namespace PFCDemoMaterial {
             step2.Predecessors[0].Predecessor.Predecessors[0].Priority = 0;
             pfc.UpdateStructure();
             primaryPath = PfcAnalyst.GetPrimaryPathAsString(startStep, true);
-            Assert.AreEqual(primaryPath,"START, STEP1 and FINISH");
+            Assert.AreEqual(primaryPath, "START, STEP1 and FINISH");
 
             pfc = pfcs.CreateTestPfc();
             pfc.UpdateStructure();
             primaryPath = PfcAnalyst.GetPrimaryPathAsString(pfcs.nA, true);
-            Assert.AreEqual(primaryPath,"Step_A, Step_B, Step_C, Step_D, Step_E, Step_N and Step_O");
+            Assert.AreEqual(primaryPath, "Step_A, Step_B, Step_C, Step_D, Step_E, Step_N and Step_O");
 
             pfcs.nF.PredecessorNodes[0].Predecessors[0].Priority = 1;
             pfc.UpdateStructure();
             primaryPath = PfcAnalyst.GetPrimaryPathAsString(pfcs.nA, true);
-            Assert.AreEqual(primaryPath,"Step_A, Step_B, Step_F, Step_G, Step_H, Step_J, Step_L, Step_M, Step_N and Step_O");
+            Assert.AreEqual(primaryPath, "Step_A, Step_B, Step_F, Step_G, Step_H, Step_J, Step_L, Step_M, Step_N and Step_O");
 
         }
 
         [TestMethod]
-        public void Test_InfiniteLoopError() {
+        public void Test_InfiniteLoopError()
+        {
             string testName = "Test infinite loop error.";
 
             ProcedureFunctionChart pfc = new ProcedureFunctionChart(null, testName);
@@ -1186,7 +1238,8 @@ namespace PFCDemoMaterial {
         }
 
         [TestMethod]
-        public void Test_OffSetParallelism() {
+        public void Test_OffSetParallelism()
+        {
             string testName = "Test offset parallelism.";
 
             ProcedureFunctionChart pfc = new ProcedureFunctionChart(null, testName);
@@ -1194,13 +1247,13 @@ namespace PFCDemoMaterial {
             IPfcStepNode finish = pfc.CreateStep("Finish", "", Guid.Empty);
 
             char name = 'A';
-            pfcs.A = pfc.CreateStep("Step_" + ( name++ ), "", pfcs.NextGuid());
-            pfcs.B = pfc.CreateStep("Step_" + ( name++ ), "", pfcs.NextGuid());
-            pfcs.C = pfc.CreateStep("Step_" + ( name++ ), "", pfcs.NextGuid());
-            pfcs.D = pfc.CreateStep("Step_" + ( name++ ), "", pfcs.NextGuid());
-            pfcs.E = pfc.CreateStep("Step_" + ( name++ ), "", pfcs.NextGuid());
-            pfcs.F = pfc.CreateStep("Step_" + ( name++ ), "", pfcs.NextGuid());
-            pfcs.G = pfc.CreateStep("Step_" + ( name++ ), "", pfcs.NextGuid());
+            pfcs.A = pfc.CreateStep("Step_" + (name++), "", pfcs.NextGuid());
+            pfcs.B = pfc.CreateStep("Step_" + (name++), "", pfcs.NextGuid());
+            pfcs.C = pfc.CreateStep("Step_" + (name++), "", pfcs.NextGuid());
+            pfcs.D = pfc.CreateStep("Step_" + (name++), "", pfcs.NextGuid());
+            pfcs.E = pfc.CreateStep("Step_" + (name++), "", pfcs.NextGuid());
+            pfcs.F = pfc.CreateStep("Step_" + (name++), "", pfcs.NextGuid());
+            pfcs.G = pfc.CreateStep("Step_" + (name++), "", pfcs.NextGuid());
 
             pfcs.nA = (IPfcNode)pfcs.A;
             pfcs.nB = (IPfcNode)pfcs.B;
@@ -1216,19 +1269,24 @@ namespace PFCDemoMaterial {
             pfc.Bind(pfcs.nE, pfcs.nF);
             pfc.Bind(pfcs.nF, pfcs.nG);
             pfc.Bind(pfcs.nG, finish);
-            pfc.Bind(( (PfcTransition)( (PfcStep)pfcs.nA ).SuccessorNodes[0] ), pfcs.nC);
-            pfc.Bind(pfcs.nC, ( (PfcTransition)( (PfcStep)pfcs.nE ).SuccessorNodes[0] ));
-            pfc.Bind(( (PfcTransition)( (PfcStep)pfcs.nB ).SuccessorNodes[0] ), pfcs.nD);
-            pfc.Bind(pfcs.nD, ( (PfcTransition)( (PfcStep)pfcs.nF ).SuccessorNodes[0] ));
+            pfc.Bind(((PfcTransition)((PfcStep)pfcs.nA).SuccessorNodes[0]), pfcs.nC);
+            pfc.Bind(pfcs.nC, ((PfcTransition)((PfcStep)pfcs.nE).SuccessorNodes[0]));
+            pfc.Bind(((PfcTransition)((PfcStep)pfcs.nB).SuccessorNodes[0]), pfcs.nD);
+            pfc.Bind(pfcs.nD, ((PfcTransition)((PfcStep)pfcs.nF).SuccessorNodes[0]));
 
             pfc.UpdateStructure();
 
-            if (m_dumpStructure) {
+            if (m_dumpStructure)
+            {
                 PfcNodeList nodes = pfc.Nodes;
                 nodes.Sort(
                         new Comparison<IPfcNode>(
-                            delegate(IPfcNode n1, IPfcNode n2) { return Comparer.Default.Compare(n1.GraphOrdinal, n2.GraphOrdinal); }));
-                foreach (PfcNode node in nodes) {
+                            delegate (IPfcNode n1, IPfcNode n2)
+                            {
+                                return Comparer.Default.Compare(n1.GraphOrdinal, n2.GraphOrdinal);
+                            }));
+                foreach (PfcNode node in nodes)
+                {
                     Console.WriteLine("{0} goes to {1}", node.Name, Highpoint.Sage.Utility.StringOperations.ToCommasAndAndedList(node.SuccessorNodes, n => n.Name));
                 }
             }
@@ -1240,7 +1298,8 @@ namespace PFCDemoMaterial {
         }
 
         [TestMethod]
-        public void Test_Validator() {
+        public void Test_Validator()
+        {
             //ProcedureFunctionChart pfc = CreateLoopTestPfc();
             ProcedureFunctionChart pfc = pfcs.CreateTestPfc();
             PfcValidator pfcv = new PfcValidator(pfc);
@@ -1251,7 +1310,8 @@ namespace PFCDemoMaterial {
         private static bool m_dumpStructure = true;
 
         [TestMethod]
-        public void Test_ValidatorFromStoredPFC() {
+        public void Test_ValidatorFromStoredPFC()
+        {
             int nReps = 1000000;
             int nSteps = 8;
             int randomNumber = -1;
@@ -1263,57 +1323,62 @@ namespace PFCDemoMaterial {
             PfcValidator.Diagnostics = m_dumpStructure;
 
             int[] cases = new int[] { 2, 3, 4, 5, 98 };
-            
+
             //int[] cases = new int[] { 99 }; // Mass-random testing.
-            foreach (int _case in cases) {
-                for (int i = 0; i < nReps; i++) {
+            foreach (int _case in cases)
+            {
+                for (int i = 0; i < nReps; i++)
+                {
                     //try {
-                        ProcedureFunctionChart pfc;
-                        switch (_case) {
-                            case 2:
-                                pfc = pfcs.CreateTestPfc();
-                                i = nReps;
-                                break;
-                            case 3:
-                                pfc = pfcs.CreateTestPfc2();
-                                i = nReps;
-                                break;
-                            case 4:
-                                pfc = pfcs.CreateTestPfc3();
-                                i = nReps;
-                                break;
-                            case 5:
-                                pfc = pfcs.CreateTestPfc4();
-                                i = nReps;
-                                break;
-                            case 98:
-                                pfc = pfcs.CreateStandardPFC(_case);
-                                i = nReps;
-                                break;
-                            case 99:
-                                PfcValidator.Diagnostics = m_dumpStructure = false;
-                                nSteps = i / 50;
-                                if (nSteps < 8) nSteps = 8;
-                                //nSteps = 24;
-                                Console.WriteLine("------------------ Case {0}, {1} steps in PFC ------------------", i, nSteps);
-                                randomNumber = randomNumGen.Next();
-                                pfc = pfcs.CreateRandomPFC(nSteps, randomNumber);
-                                break;
-                            default:
-                                pfc = null;
-                                break;
-                        }
+                    ProcedureFunctionChart pfc;
+                    switch (_case)
+                    {
+                        case 2:
+                            pfc = pfcs.CreateTestPfc();
+                            i = nReps;
+                            break;
+                        case 3:
+                            pfc = pfcs.CreateTestPfc2();
+                            i = nReps;
+                            break;
+                        case 4:
+                            pfc = pfcs.CreateTestPfc3();
+                            i = nReps;
+                            break;
+                        case 5:
+                            pfc = pfcs.CreateTestPfc4();
+                            i = nReps;
+                            break;
+                        case 98:
+                            pfc = pfcs.CreateStandardPFC(_case);
+                            i = nReps;
+                            break;
+                        case 99:
+                            PfcValidator.Diagnostics = m_dumpStructure = false;
+                            nSteps = i / 50;
+                            if (nSteps < 8)
+                                nSteps = 8;
+                            //nSteps = 24;
+                            Console.WriteLine("------------------ Case {0}, {1} steps in PFC ------------------", i, nSteps);
+                            randomNumber = randomNumGen.Next();
+                            pfc = pfcs.CreateRandomPFC(nSteps, randomNumber);
+                            break;
+                        default:
+                            pfc = null;
+                            break;
+                    }
 
-                        pfc.UpdateStructure();
-                        if (PfcValidator.Diagnostics) {
-                            DumpStructure(pfc);
-                        }
+                    pfc.UpdateStructure();
+                    if (PfcValidator.Diagnostics)
+                    {
+                        DumpStructure(pfc);
+                    }
 
-                        Stopwatch sw = new Stopwatch();
-                        sw.Start();
-                        PfcValidator pfcv = new PfcValidator(pfc);
+                    Stopwatch sw = new Stopwatch();
+                    sw.Start();
+                    PfcValidator pfcv = new PfcValidator(pfc);
 
-                        Assert.IsTrue(pfcv.PfcIsValid(), "case", randomNumber);
+                    Assert.IsTrue(pfcv.PfcIsValid(), "case", randomNumber);
                 }
             }
 
@@ -1323,9 +1388,11 @@ namespace PFCDemoMaterial {
         }
 
         [TestMethod]
-        public void TestBroadestNonLoopbackPath() {
+        public void TestBroadestNonLoopbackPath()
+        {
 
-            foreach (int _case in Enumerable.Range(84, 15)) {
+            foreach (int _case in Enumerable.Range(84, 15))
+            {
                 Console.WriteLine("Testing case {0}:", _case);
                 ProcedureFunctionChart pfc = pfcs.CreateStandardPFC(_case);
                 DumpStructure(pfc);
@@ -1333,9 +1400,11 @@ namespace PFCDemoMaterial {
                 List<IPfcNode> path = PfcAnalyst.GetNodesOnBroadestNonLoopingPath(pfc, restoreOldLinkPriorities: false);
                 Console.WriteLine("Executed path is : " + StringOperations.ToCommasAndAndedList(path, n => n.Name));
 
-                foreach (PfcNode node in pfc.Nodes.OrderBy(n => n.GraphOrdinal)) {
+                foreach (PfcNode node in pfc.Nodes.OrderBy(n => n.GraphOrdinal))
+                {
                     Console.WriteLine("Node {0} has graph ordinal {1}.", node.Name, node.GraphOrdinal);
-                    foreach (PfcLink link in node.Successors.OrderByDescending(n => n.Priority)) {
+                    foreach (PfcLink link in node.Successors.OrderByDescending(n => n.Priority))
+                    {
                         Console.WriteLine("\tLink to {0} has priority {1}.", link.Successor.Name, link.Priority);
                     }
                 }
@@ -1343,13 +1412,18 @@ namespace PFCDemoMaterial {
 
         }
 
-        private void DumpStructure(ProcedureFunctionChart pfc) {
+        private void DumpStructure(ProcedureFunctionChart pfc)
+        {
             pfc.UpdateStructure();
             PfcNodeList nodes = pfc.Nodes;
             nodes.Sort(
                     new Comparison<IPfcNode>(
-                        delegate(IPfcNode n1, IPfcNode n2) { return Comparer.Default.Compare(n1.GraphOrdinal, n2.GraphOrdinal); }));
-            foreach (PfcNode node in nodes) {
+                        delegate (IPfcNode n1, IPfcNode n2)
+                        {
+                            return Comparer.Default.Compare(n1.GraphOrdinal, n2.GraphOrdinal);
+                        }));
+            foreach (PfcNode node in nodes)
+            {
                 Console.WriteLine("{0} goes to {1}", node.Name, Highpoint.Sage.Utility.StringOperations.ToCommasAndAndedList(node.SuccessorNodes, n => n.Name));
             }
         }
