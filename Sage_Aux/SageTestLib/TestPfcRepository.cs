@@ -234,7 +234,7 @@ namespace SageTestLib {
             System.Reflection.BindingFlags bf = System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.FlattenHierarchy | System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance;
             foreach (IPfcLinkElement link in links) {
                 typeof(PfcElement).GetFields(bf);
-                typeof(PfcElement).GetField("m_guid", bf).SetValue((PfcElement)link, NextGuid()); // Totally cheating.
+                typeof(PfcElement).GetField("_guid", bf).SetValue((PfcElement)link, NextGuid()); // Totally cheating.
             }
 
             #endregion Create Structure
@@ -296,7 +296,7 @@ namespace SageTestLib {
             System.Reflection.BindingFlags bf = System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.FlattenHierarchy | System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance;
             foreach (IPfcLinkElement link in links) {
                 typeof(PfcElement).GetFields(bf);
-                typeof(PfcElement).GetField("m_guid", bf).SetValue((PfcElement)link, NextGuid()); // Totally cheating.
+                typeof(PfcElement).GetField("_guid", bf).SetValue((PfcElement)link, NextGuid()); // Totally cheating.
             }
 
             #endregion Create Structure
@@ -342,7 +342,7 @@ namespace SageTestLib {
             System.Reflection.BindingFlags bf = System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.FlattenHierarchy | System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance;
             foreach (IPfcLinkElement link in links) {
                 typeof(PfcElement).GetFields(bf);
-                typeof(PfcElement).GetField("m_guid", bf).SetValue((PfcElement)link, NextGuid()); // Totally cheating.
+                typeof(PfcElement).GetField("_guid", bf).SetValue((PfcElement)link, NextGuid()); // Totally cheating.
             }
 
             #endregion Create Structure
@@ -391,7 +391,7 @@ namespace SageTestLib {
             System.Reflection.BindingFlags bf = System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.FlattenHierarchy | System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance;
             foreach (IPfcLinkElement link in links) {
                 typeof(PfcElement).GetFields(bf);
-                typeof(PfcElement).GetField("m_guid", bf).SetValue((PfcElement)link, NextGuid()); // Totally cheating.
+                typeof(PfcElement).GetField("_guid", bf).SetValue((PfcElement)link, NextGuid()); // Totally cheating.
             }
 
             //pfc.Bind(nD, pfc.Nodes["T_005"]);
