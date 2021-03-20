@@ -1,24 +1,29 @@
 /* This source code licensed under the GNU Affero General Public License */
 
-using System;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System.Diagnostics;
 using Highpoint.Sage.Mathematics;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System;
+using System.Diagnostics;
 
-namespace SageTestLib {
+namespace SageTestLib
+{
 
     [TestClass]
-    public class zTestRationalizer {
+    public class zTestRationalizer
+    {
         [TestInitialize]
-        public void Init() {
+        public void Init()
+        {
         }
         [TestCleanup]
-        public void destroy() {
+        public void destroy()
+        {
             Debug.WriteLine("Done.");
         }
         [TestMethod]
         [Highpoint.Sage.Utility.FieldDescription("This test checks the basic function of a rationalizer to five digits, and fractions up to ninths.")]
-        public void TestBaseFunctionality() {
+        public void TestBaseFunctionality()
+        {
             Rationalizer r = new Rationalizer(9, 5); // Up to ninths, out to 5 places.
 
             double[][] testVals = new double[][]{
@@ -42,18 +47,21 @@ namespace SageTestLib {
                 new double[]{-12.34, -12.34}};
 
             bool failure = false;
-            foreach (double[] testVal in testVals) {
+            foreach (double[] testVal in testVals)
+            {
                 double ratVal = r.Rationalize(testVal[0]);
                 Console.WriteLine("{0} rationalizes to 5 places as {1}, which {2} the expected value of {3}.",
                     testVal[0],
                     ratVal,
-                    ratVal==testVal[1]?"matches":"does not match",
+                    ratVal == testVal[1] ? "matches" : "does not match",
                     testVal[1]);
-                if (ratVal != testVal[1]) {
+                if (ratVal != testVal[1])
+                {
                     failure = true;
                 }
             }
-            if (failure) {
+            if (failure)
+            {
                 Debug.Assert(false, "Rationalization test failed.");
             }
         }

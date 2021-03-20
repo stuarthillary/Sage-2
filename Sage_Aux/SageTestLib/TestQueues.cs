@@ -1,49 +1,57 @@
 /* This source code licensed under the GNU Affero General Public License */
-using System;
-using System.Diagnostics;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Highpoint.Sage.SimCore;
-using Highpoint.Sage.Mathematics;
+using Highpoint.Sage.ItemBased.Connectors;
 using Highpoint.Sage.ItemBased.Ports;
 using Highpoint.Sage.ItemBased.SinksAndSources;
-using Highpoint.Sage.ItemBased.Connectors;
+using Highpoint.Sage.Mathematics;
+using Highpoint.Sage.Persistence;
 using Highpoint.Sage.Resources;
+using Highpoint.Sage.SimCore;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Text;
-using Highpoint.Sage.Persistence;
 
-namespace Highpoint.Sage.ItemBased.Queues {
+namespace Highpoint.Sage.ItemBased.Queues
+{
 
     /// <summary>
     /// Summary description for zTestQueues.
     /// </summary>
     [TestClass]
-    public class QueueTester {
+    public class QueueTester
+    {
 
         #region MSTest Goo
         [TestInitialize]
-        public void Init() { }
+        public void Init()
+        {
+        }
         [TestCleanup]
-        public void destroy() {
+        public void destroy()
+        {
             Debug.WriteLine("Done.");
         }
         #endregion
 
-        private Model m_model;
+        private Model _model;
 
-        public QueueTester() { }
+        public QueueTester()
+        {
+        }
 
         [TestMethod]
-        public void TestQueueBasics() {
+        public void TestQueueBasics()
+        {
 
-            m_model = new Model();
-            m_model.RandomServer = new Randoms.RandomServer(54321, 100);
+            _model = new Model();
+            _model.RandomServer = new Randoms.RandomServer(54321, 100);
 
             ItemSource itemFactory = CreateItemGenerator("Item_", 500, 5.0, 3.0);
-            IQueue q1 = new Queue(m_model, "Queue1", Guid.NewGuid(), 10);
-            IQueue q2 = new Queue(m_model, "Queue2", Guid.NewGuid(), 10);
-            IQueue q3 = new Queue(m_model, "Queue3", Guid.NewGuid(), 10);
+            IQueue q1 = new Queue(_model, "Queue1", Guid.NewGuid(), 10);
+            IQueue q2 = new Queue(_model, "Queue2", Guid.NewGuid(), 10);
+            IQueue q3 = new Queue(_model, "Queue3", Guid.NewGuid(), 10);
 
             ConnectorFactory.Connect(itemFactory.Output, q1.Input);
             ConnectorFactory.Connect(q1.Output, q2.Input);
@@ -57,7 +65,7 @@ namespace Highpoint.Sage.ItemBased.Queues {
 
             q3.Output.PortDataPresented += new PortDataEvent(Output_PortDataPresented);
 
-            m_model.Start();
+            _model.Start();
 
 
         }
@@ -105,68 +113,102 @@ namespace Highpoint.Sage.ItemBased.Queues {
             Console.WriteLine(model2String);
             System.Diagnostics.Debug.Assert(model2String.Equals(model1String));
         }
-#endif
-        private string GetModelObjectDumpString(IModel model) {
+
+        private string GetModelObjectDumpString(IModel model)
+        {
             List<IModelObject> modelObjects = new List<IModelObject>();
-            foreach (IModelObject imo in model.ModelObjects.Values) {
+            foreach (IModelObject imo in model.ModelObjects.Values)
+            {
                 modelObjects.Add(imo);
             }
 
             modelObjects.Sort(new Comparison<IModelObject>(IMOCompareByGuid));
 
             StringBuilder sb = new StringBuilder();
-            modelObjects.ForEach(delegate(IModelObject imo) { sb.Append(imo.Name + "|" + imo.Guid + "|" + imo.Description + "||"); });
+            modelObjects.ForEach(delegate (IModelObject imo)
+            {
+                sb.Append(imo.Name + "|" + imo.Guid + "|" + imo.Description + "||");
+            });
 
             return sb.ToString();
         }
 
-        private static int IMOCompareByGuid(IModelObject imo1, IModelObject imo2) {
+        private static int IMOCompareByGuid(IModelObject imo1, IModelObject imo2)
+        {
             return Utility.GuidOps.Compare(imo1.Guid, imo2.Guid);
         }
 
-        private void InitializationManager_InitializationBeginning(int generation) {
+        private void InitializationManager_InitializationBeginning(int generation)
+        {
             Console.WriteLine("Initialization beginning.");
         }
 
-        private void InitializationManager_InitializationCompleted(int generation) {
+        private void InitializationManager_InitializationCompleted(int generation)
+        {
             Console.WriteLine("Initialization completing.");
         }
-
+#endif
+        
         #region >>> Creation Helper APIs <<<
-        private ItemSource CreateItemGenerator(string rootName, int numItems, double mean, double stdev) {
-            IDoubleDistribution dist = new NormalDistribution(m_model, "Item Generator", Guid.NewGuid(), mean, stdev);
+        private ItemSource CreateItemGenerator(string rootName, int numItems, double mean, double stdev)
+        {
+            IDoubleDistribution dist = new NormalDistribution(_model, "Item Generator", Guid.NewGuid(), mean, stdev);
             IPeriodicity periodicity = new Periodicity(dist, Periodicity.Units.Minutes);
             bool autoStart = true;
-            Ticker ticker = new Ticker(m_model, periodicity, autoStart, numItems);
-            ObjectSource newItem = new ObjectSource(new Item.ItemFactory(m_model, "Item_", Guid.NewGuid()).NewItem);
-            return new ItemSource(m_model, rootName, Guid.NewGuid(), newItem, ticker);
+            Ticker ticker = new Ticker(_model, periodicity, autoStart, numItems);
+            ObjectSource newItem = new ObjectSource(new Item.ItemFactory(_model, "Item_", Guid.NewGuid()).NewItem);
+            return new ItemSource(_model, rootName, Guid.NewGuid(), newItem, ticker);
         }
         #endregion
 
-        class Item : IModelObject {
+        class Item : IModelObject
+        {
 
-            private Item(Model model, string name, Guid guid) {
-                m_model = model;
-                m_name = name;
-                m_guid = guid;
-                if (m_model != null)
-                    m_model.ModelObjects.Add(guid, this);
+            private Item(Model model, string name, Guid guid)
+            {
+                _model = model;
+                _name = name;
+                _guid = guid;
+                if (_model != null)
+                    _model.ModelObjects.Add(guid, this);
             }
 
             #region Implementation of IModelObject
-            private string m_name = null;
-            public string Name { get { return m_name; } }
-            private string m_description = null;
+            private string _name = null;
+            public string Name
+            {
+                get
+                {
+                    return _name;
+                }
+            }
+            private string _description = null;
             /// <summary>
             /// A description of this Item.
             /// </summary>
-            public string Description {
-                get { return m_description == null ? m_name : m_description; }
+            public string Description
+            {
+                get
+                {
+                    return _description ?? _name;
+                }
             }
-            private Guid m_guid = Guid.Empty;
-            public Guid Guid { get { return m_guid; } }
-            private Model m_model = null;
-            public IModel Model { get { return m_model; } }
+            private Guid _guid = Guid.Empty;
+            public Guid Guid
+            {
+                get
+                {
+                    return _guid;
+                }
+            }
+            private Model _model = null;
+            public IModel Model
+            {
+                get
+                {
+                    return _model;
+                }
+            }
 
             /// <summary>
             /// Initializes the fields that feed the properties of this IModelObject identity.
@@ -175,16 +217,20 @@ namespace Highpoint.Sage.ItemBased.Queues {
             /// <param name="name">The IModelObject's new name value.</param>
             /// <param name="description">The IModelObject's new description value.</param>
             /// <param name="guid">The IModelObject's new GUID value.</param>
-            public void InitializeIdentity(IModel model, string name, string description, Guid guid) {
-                if (Model == null && Guid.Equals(Guid.Empty)) {
-                    m_model = (Model)model;
-                    m_name = name;
-                    m_description = description;
-                    m_guid = guid;
+            public void InitializeIdentity(IModel model, string name, string description, Guid guid)
+            {
+                if (Model == null && Guid.Equals(Guid.Empty))
+                {
+                    _model = (Model)model;
+                    _name = name;
+                    _description = description;
+                    _guid = guid;
 
-                } else {
-                    string identity = "Model=" + ( Model == null ? "<null>" : ( Model.Name == null ? Model.Guid.ToString() : Model.Name ) ) +
-                        ", Name=" + ( Name == null ? "<null>" : Name ) + ", Description=" + ( Description == null ? "<null>" : Description ) +
+                }
+                else
+                {
+                    string identity = "Model=" + (Model == null ? "<null>" : (Model.Name == null ? Model.Guid.ToString() : Model.Name)) +
+                        ", Name=" + (Name == null ? "<null>" : Name) + ", Description=" + (Description == null ? "<null>" : Description) +
                         ", Guid=" + Guid.ToString();
 
                     throw new ApplicationException("Cannot call InitializeIdentity(...) on an IModelObject that is already initialized. " +
@@ -194,34 +240,59 @@ namespace Highpoint.Sage.ItemBased.Queues {
 
             #endregion
 
-            public class ItemFactory : IModelObject {
-                private int m_itemNumber = 0;
-                public ItemFactory(Model model, string name, Guid guid) {
-                    m_model = model;
-                    m_name = name;
-                    m_guid = guid;
-                    if (m_model != null)
-                        m_model.ModelObjects.Add(guid, this);
+            public class ItemFactory : IModelObject
+            {
+                private int _itemNumber = 0;
+                public ItemFactory(Model model, string name, Guid guid)
+                {
+                    _model = model;
+                    _name = name;
+                    _guid = guid;
+                    if (_model != null)
+                        _model.ModelObjects.Add(guid, this);
                 }
 
-                public object NewItem() {
-                    return new Item(m_model, m_name + ( m_itemNumber++ ), Guid.NewGuid());
+                public object NewItem()
+                {
+                    return new Item(_model, _name + (_itemNumber++), Guid.NewGuid());
                 }
 
                 #region Implementation of IModelObject
-                private string m_name = null;
-                public string Name { get { return m_name; } }
-                private string m_description = null;
+                private string _name = null;
+                public string Name
+                {
+                    get
+                    {
+                        return _name;
+                    }
+                }
+                private string _description = null;
                 /// <summary>
                 /// A description of this Item Factory.
                 /// </summary>
-                public string Description {
-                    get { return m_description == null ? m_name : m_description; }
+                public string Description
+                {
+                    get
+                    {
+                        return _description == null ? _name : _description;
+                    }
                 }
-                private Guid m_guid = Guid.Empty;
-                public Guid Guid { get { return m_guid; } }
-                private Model m_model = null;
-                public IModel Model { get { return m_model; } }
+                private Guid _guid = Guid.Empty;
+                public Guid Guid
+                {
+                    get
+                    {
+                        return _guid;
+                    }
+                }
+                private Model _model = null;
+                public IModel Model
+                {
+                    get
+                    {
+                        return _model;
+                    }
+                }
                 /// <summary>
                 /// Initializes the fields that feed the properties of this IModelObject identity.
                 /// </summary>
@@ -229,16 +300,20 @@ namespace Highpoint.Sage.ItemBased.Queues {
                 /// <param name="name">The IModelObject's new name value.</param>
                 /// <param name="description">The IModelObject's new description value.</param>
                 /// <param name="guid">The IModelObject's new GUID value.</param>
-                public void InitializeIdentity(IModel model, string name, string description, Guid guid) {
-                    if (Model == null && Guid.Equals(Guid.Empty)) {
-                        m_model = (Model)model;
-                        m_name = name;
-                        m_description = description;
-                        m_guid = guid;
+                public void InitializeIdentity(IModel model, string name, string description, Guid guid)
+                {
+                    if (Model == null && Guid.Equals(Guid.Empty))
+                    {
+                        _model = (Model)model;
+                        _name = name;
+                        _description = description;
+                        _guid = guid;
 
-                    } else {
-                        string identity = "Model=" + ( Model == null ? "<null>" : ( Model.Name == null ? Model.Guid.ToString() : Model.Name ) ) +
-                            ", Name=" + ( Name == null ? "<null>" : Name ) + ", Description=" + ( Description == null ? "<null>" : Description ) +
+                    }
+                    else
+                    {
+                        string identity = "Model=" + (Model == null ? "<null>" : (Model.Name == null ? Model.Guid.ToString() : Model.Name)) +
+                            ", Name=" + (Name == null ? "<null>" : Name) + ", Description=" + (Description == null ? "<null>" : Description) +
                             ", Guid=" + Guid.ToString();
 
                         throw new ApplicationException("Cannot call InitializeIdentity(...) on an IModelObject that is already initialized. " +
@@ -250,22 +325,33 @@ namespace Highpoint.Sage.ItemBased.Queues {
             }
         }
 
-        private void Output_PortDataPresented(object data, IPort where) {
+        private void Output_PortDataPresented(object data, IPort where)
+        {
             Item p = (Item)data;
-            Console.WriteLine(p.Model.Executive.Now + " : " + ( ( (IModelObject)where.Owner ).Name ) + "." + p.Name + " created.");
+            Console.WriteLine(p.Model.Executive.Now + " : " + (((IModelObject)where.Owner).Name) + "." + p.Name + " created.");
         }
 
-        private void Queue_LevelChangedEvent(int previous, int current, IQueue queue) {
+        private void Queue_LevelChangedEvent(int previous, int current, IQueue queue)
+        {
             Console.WriteLine("Queue level in " + queue.Name + " is now " + current);
         }
 
-        public interface IGenerator : IModelObject { }
-        public interface IActivity : IModelObject { }
-        public interface IDecision : IModelObject { }
-        public interface ICompletion : IModelObject { }
+        public interface IGenerator : IModelObject
+        {
+        }
+        public interface IActivity : IModelObject
+        {
+        }
+        public interface IDecision : IModelObject
+        {
+        }
+        public interface ICompletion : IModelObject
+        {
+        }
 
-        public interface IConstructionFacade { // Will be implemented by DIModel.
-            
+        public interface IConstructionFacade
+        { // Will be implemented by DIModel.
+
             // Note: IModel has ModelObjectCollection that can return any IModelObject by Guid.
 
             event ModelObjectEvent DIModelObjectAdded;
@@ -275,9 +361,9 @@ namespace Highpoint.Sage.ItemBased.Queues {
             bool RemoveQueue(Guid guid);
 
             IConnector Connect(IPort from, IPort to);
-            IConnector Connect(IPortOwner from, string fromPortName, IPortOwner to, string toPortName );
+            IConnector Connect(IPortOwner from, string fromPortName, IPortOwner to, string toPortName);
             bool Disconnect(IConnector connector);
-            
+
             IGenerator AddGenerator(string name, string distributionType, params object[] distroParameters);
             bool RemoveGenerator(Guid guid);
 
@@ -294,29 +380,31 @@ namespace Highpoint.Sage.ItemBased.Queues {
             bool RemoveResource(Guid guid);
         }
 
-        public class DIModel : IModel, IConstructionFacade {
+        public class DIModel : IModel, IConstructionFacade
+        {
 
             #region Private Fields
-            private string m_name = null;
-            private Guid m_guid = Guid.Empty;
-            private IModel m_model = null;
-            private string m_description = null;
-            private System.Collections.Hashtable m_parameters;
-            private ulong m_randomSeed;
-            private Randoms.RandomServer m_randomServer;
-            private ModelObjectDictionary m_modelObjectDictionary;
-            private ModelConfig m_modelConfig;
-            private IExecutive m_executive;
-            private ArrayList m_modelWarnings;
-            private ArrayList m_modelErrors;
-            private ArrayList m_errorHandlers;
-            private StateMachine m_stateMachine;
+            private string _name = null;
+            private Guid _guid = Guid.Empty;
+            private IModel _model = null;
+            private string _description = null;
+            private System.Collections.Hashtable _parameters;
+            private ulong _randomSeed;
+            private Randoms.RandomServer _randomServer;
+            private ModelObjectDictionary _modelObjectDictionary;
+            private ModelConfig _modelConfig;
+            private IExecutive _executive;
+            private ArrayList _modelWarnings;
+            private ArrayList _modelErrors;
+            private ArrayList _errorHandlers;
+            private StateMachine _stateMachine;
             #endregion
 
             /// <summary>
             /// The states of this model.
             /// </summary>
-            public enum State {
+            public enum State
+            {
                 /// <summary>
                 /// The model is raw if it contains objects that have not been initialized.
                 /// </summary>
@@ -334,7 +422,8 @@ namespace Highpoint.Sage.ItemBased.Queues {
             /// <summary>
             /// Initializes a new instance of the <see cref="DESModel"/> class.
             /// </summary>
-            public DIModel() {
+            public DIModel()
+            {
                 PopulatePrivateFields();
             }
 
@@ -345,17 +434,19 @@ namespace Highpoint.Sage.ItemBased.Queues {
             /// <param name="guid">The Guid for this object. Required to be unique in a given Application Context.</param>
             /// <param name="description">The description for this model. Typically used for human-readable representations.</param>
             /// <param name="randomSeed">The random seed with which the Random Server will be initialized.</param>
-            public DIModel(string name, Guid guid, string description, ulong randomSeed) {
+            public DIModel(string name, Guid guid, string description, ulong randomSeed)
+            {
                 PopulatePrivateFields();
             }
 
             [Initializer(InitializationType.PreRun, "_Initialize")]
             public void Initialize(IModel model, string name, string description, Guid guid,
                 [InitializerArg(0, "Random Seed", RefType.Owned, typeof(ulong), "The random seed to be used by this model.")]
-			ulong randomSeed,
+            ulong randomSeed,
                 [InitializerArg(1, "Other Model Objects", RefType.Owned, typeof(IModelObject), "We'll get more specific...")]
-			Guid[] otherModelObjects
-               ) {
+            Guid[] otherModelObjects
+               )
+            {
 
                 InitializeIdentity(model, name, description, guid);
 
@@ -369,25 +460,27 @@ namespace Highpoint.Sage.ItemBased.Queues {
             /// </summary>
             /// <param name="model">The model in which the initialization is taking place.</param>
             /// <param name="p">The array of objects that take part in this round of initialization.</param>
-            public void _Initialize(IModel model, object[] p) {
-                m_randomSeed = (ulong)p[0];
-                m_randomServer = new Highpoint.Sage.Randoms.RandomServer(m_randomSeed, 0);
+            public void _Initialize(IModel model, object[] p)
+            {
+                _randomSeed = (ulong)p[0];
+                _randomServer = new Highpoint.Sage.Randoms.RandomServer(_randomSeed, 0);
             }
 
             /// <summary>
             /// Populates the private fields of this model, inasmuch as they may be independent of initialization parameters.
             /// </summary>
             /// <param name="randomSeed">The random seed.</param>
-            private void PopulatePrivateFields() {
-                m_parameters = new Hashtable();
-                m_modelObjectDictionary = new ModelObjectDictionary();
-                m_modelConfig = new ModelConfig("Sage");
-                m_executive = ExecFactory.Instance.CreateExecutive();
-                m_modelWarnings = new ArrayList();
-                m_modelErrors = new ArrayList();
-                m_errorHandlers = new ArrayList();
-                m_stateMachine = CreateStateMachine();
-                m_stateMachine.InboundTransitionHandler(State.Complete).AddCommitEvent(new CommitTransitionEvent(OnModelCompleted), Double.MaxValue);
+            private void PopulatePrivateFields()
+            {
+                _parameters = new Hashtable();
+                _modelObjectDictionary = new ModelObjectDictionary();
+                _modelConfig = new ModelConfig("Sage");
+                _executive = ExecFactory.Instance.CreateExecutive();
+                _modelWarnings = new ArrayList();
+                _modelErrors = new ArrayList();
+                _errorHandlers = new ArrayList();
+                _stateMachine = CreateStateMachine();
+                _stateMachine.InboundTransitionHandler(State.Complete).AddCommitEvent(new CommitTransitionEvent(OnModelCompleted), Double.MaxValue);
                 AddService(new InitializationManager(DIModel.State.Raw, DIModel.State.Initialized));
             }
 
@@ -395,8 +488,10 @@ namespace Highpoint.Sage.ItemBased.Queues {
             /// Called when the model has completed.
             /// </summary>
             /// <param name="model">The model.</param>
-            private void OnModelCompleted(IModel model, object userData) {
-                if (Completed != null) {
+            private void OnModelCompleted(IModel model, object userData)
+            {
+                if (Completed != null)
+                {
                     Completed(this);
                 }
             }
@@ -405,7 +500,8 @@ namespace Highpoint.Sage.ItemBased.Queues {
             /// Creates the state machine for this model.
             /// </summary>
             /// <returns>The state machine.</returns>
-            private StateMachine CreateStateMachine() {
+            private StateMachine CreateStateMachine()
+            {
                 bool[,] transitionMatrix = new bool[3, 3] { {
                     //         RAW    INI    CMP   
                     /* RAW */  false, true , false },{
@@ -435,25 +531,36 @@ namespace Highpoint.Sage.ItemBased.Queues {
             /// Gets the random seed in use by this model.
             /// </summary>
             /// <value>The random seed in use by this model.</value>
-            public ulong RandomSeed {
-                get { return m_randomSeed; }
+            public ulong RandomSeed
+            {
+                get
+                {
+                    return _randomSeed;
+                }
             }
 
             /// <summary>
             /// Gets the random server.
             /// </summary>
             /// <value>The random server.</value>
-            public Highpoint.Sage.Randoms.RandomServer RandomServer {
-                get { return m_randomServer; }
+            public Highpoint.Sage.Randoms.RandomServer RandomServer
+            {
+                get
+                {
+                    return _randomServer;
+                }
             }
 
-            private ExecController m_execController = null;
-            public ExecController ExecutiveController {
-                get {
-                    if (m_execController == null) {
-                        m_execController = new ExecController(this.Executive, 2, 7, this);
+            private ExecController _execController = null;
+            public ExecController ExecutiveController
+            {
+                get
+                {
+                    if (_execController == null)
+                    {
+                        _execController = new ExecController(this.Executive, 2, 7, this);
                     }
-                    return m_execController;
+                    return _execController;
                 }
             }
 
@@ -464,16 +571,21 @@ namespace Highpoint.Sage.ItemBased.Queues {
             /// garbage collection. Code can call Remove(...) to explicitly remove the object.
             /// </summary>
             /// <value></value>
-            public ModelObjectDictionary ModelObjects {
-                get { return m_modelObjectDictionary; }
+            public ModelObjectDictionary ModelObjects
+            {
+                get
+                {
+                    return _modelObjectDictionary;
+                }
             }
 
             /// <summary>
             /// Adds a model object to this model's ModelObjects collection.
             /// </summary>
             /// <param name="modelObject">The model object.</param>
-            public void AddModelObject(IModelObject modelObject) {
-                m_modelObjectDictionary.Add(modelObject.Guid, modelObject);
+            public void AddModelObject(IModelObject modelObject)
+            {
+                _modelObjectDictionary.Add(modelObject.Guid, modelObject);
             }
 
             /// <summary>
@@ -481,35 +593,48 @@ namespace Highpoint.Sage.ItemBased.Queues {
             /// app.config file.
             /// </summary>
             /// <value></value>
-            public ModelConfig ModelConfig {
+            public ModelConfig ModelConfig
+            {
                 [DebuggerStepThrough]
-                get { return m_modelConfig; }
+                get
+                {
+                    return _modelConfig;
+                }
             }
 
             /// <summary>
             /// Provides access to the executive being used by this model.
             /// </summary>
             /// <value></value>
-            public IExecutive Executive {
+            public IExecutive Executive
+            {
                 [DebuggerStepThrough]
-                get { return m_executive; }
+                get
+                {
+                    return _executive;
+                }
             }
 
             /// <summary>
             /// An collection of all of the warnings currently applicable to this model.
             /// </summary>
             /// <value></value>
-            public System.Collections.ICollection Warnings {
+            public System.Collections.ICollection Warnings
+            {
                 [DebuggerStepThrough]
-                get { return m_modelWarnings; }
+                get
+                {
+                    return _modelWarnings;
+                }
             }
 
             /// <summary>
             /// Adds a warning to this model, e.g. a 'GenericModelWarning'...
             /// </summary>
             /// <param name="theWarning">The warning to be added.</param>
-            public void AddWarning(IModelWarning theWarning) {
-                m_modelWarnings.Add(theWarning);
+            public void AddWarning(IModelWarning theWarning)
+            {
+                _modelWarnings.Add(theWarning);
             }
 
             /// <summary>
@@ -518,15 +643,17 @@ namespace Highpoint.Sage.ItemBased.Queues {
             /// <returns>
             /// Returns true if this model has any active warnings - otherwise, false.
             /// </returns>
-            public bool HasWarnings() {
-                return m_modelWarnings.Count > 0;
+            public bool HasWarnings()
+            {
+                return _modelWarnings.Count > 0;
             }
 
             /// <summary>
             /// Clears all of the warnings applicable to this model.
             /// </summary>
-            public void ClearAllWarnings() {
-                m_modelWarnings.Clear();
+            public void ClearAllWarnings()
+            {
+                _modelWarnings.Clear();
             }
 
             /// <summary>
@@ -546,24 +673,30 @@ namespace Highpoint.Sage.ItemBased.Queues {
             /// any errors currently in existence in the model.
             /// </summary>
             /// <param name="theErrorHandler">The error handler delegate that is to receive notification of the error events.</param>
-            public void AddErrorHandler(IErrorHandler theErrorHandler) {
-                m_errorHandlers.Add(theErrorHandler);
+            public void AddErrorHandler(IErrorHandler theErrorHandler)
+            {
+                _errorHandlers.Add(theErrorHandler);
             }
 
             /// <summary>
             /// Removes an error handler from the model.
             /// </summary>
             /// <param name="theErrorHandler">The error handler to be removed from the model.</param>
-            public void RemoveErrorHandler(IErrorHandler theErrorHandler) {
-                m_errorHandlers.Remove(theErrorHandler);
+            public void RemoveErrorHandler(IErrorHandler theErrorHandler)
+            {
+                _errorHandlers.Remove(theErrorHandler);
             }
 
             /// <summary>
             /// A collection of the errors in the model.
             /// </summary>
             /// <value></value>
-            public System.Collections.ICollection Errors {
-                get { return ArrayList.ReadOnly(m_modelErrors); }
+            public System.Collections.ICollection Errors
+            {
+                get
+                {
+                    return ArrayList.ReadOnly(_modelErrors);
+                }
             }
 
             /// <summary>
@@ -576,17 +709,21 @@ namespace Highpoint.Sage.ItemBased.Queues {
             /// <returns>
             /// True if the error was successfully added to the model, false if it was cleared by a handler.
             /// </returns>
-            public bool AddError(IModelError theError) {
+            public bool AddError(IModelError theError)
+            {
 
-                foreach (IErrorHandler ieh in m_errorHandlers) {
-                    if (ieh.HandleError(theError)) {
+                foreach (IErrorHandler ieh in _errorHandlers)
+                {
+                    if (ieh.HandleError(theError))
+                    {
                         return false;
                     }
                 }
 
-                m_modelErrors.Add(theError);
+                _modelErrors.Add(theError);
 
-                if (ErrorHappened != null) {
+                if (ErrorHappened != null)
+                {
                     ErrorHappened(theError);
                 }
                 return true;
@@ -596,9 +733,11 @@ namespace Highpoint.Sage.ItemBased.Queues {
             /// Removes the error from the model's collection of errors.
             /// </summary>
             /// <param name="theError">The error to be removed from the model.</param>
-            public void RemoveError(IModelError theError) {
-                m_modelErrors.Remove(theError);
-                if (ErrorCleared != null) {
+            public void RemoveError(IModelError theError)
+            {
+                _modelErrors.Remove(theError);
+                if (ErrorCleared != null)
+                {
                     ErrorCleared(theError);
                 }
             }
@@ -607,18 +746,23 @@ namespace Highpoint.Sage.ItemBased.Queues {
             /// Removes all errors whose target is the specified object.
             /// </summary>
             /// <param name="target">The object for whom all errors are to be removed.</param>
-            public void ClearAllErrorsFor(object target) {
+            public void ClearAllErrorsFor(object target)
+            {
                 ArrayList toBeCleared = new ArrayList();
-                foreach (IModelError ime in m_modelErrors) {
-                    if (target == null || target.Equals(ime.Target)) {
+                foreach (IModelError ime in _modelErrors)
+                {
+                    if (target == null || target.Equals(ime.Target))
+                    {
                         toBeCleared.Add(ime);
                         break; // No need to keep trying to clear once someone has indicated that they have cleared it.
                     }
                 }
 
-                foreach (IModelError ime in toBeCleared) {
+                foreach (IModelError ime in toBeCleared)
+                {
                     RemoveError(ime);
-                    if (ErrorCleared != null) {
+                    if (ErrorCleared != null)
+                    {
                         ErrorCleared(ime);
                     }
                 }
@@ -628,18 +772,22 @@ namespace Highpoint.Sage.ItemBased.Queues {
             /// Returns true if the model has errors.
             /// </summary>
             /// <returns>true if the model has errors.</returns>
-            public bool HasErrors() {
-                return m_modelErrors.Count > 0;
+            public bool HasErrors()
+            {
+                return _modelErrors.Count > 0;
             }
 
             /// <summary>
             /// Provides a string that summarizes all of the errors currently active in this model.
             /// </summary>
             /// <value></value>
-            public string ErrorSummary {
-                get {
+            public string ErrorSummary
+            {
+                get
+                {
                     System.Text.StringBuilder sb = new System.Text.StringBuilder();
-                    foreach (IModelError ime in m_modelErrors) {
+                    foreach (IModelError ime in _modelErrors)
+                    {
                         sb.Append(ime.ToString());
                         sb.Append("\r\n");
                     }
@@ -653,41 +801,63 @@ namespace Highpoint.Sage.ItemBased.Queues {
             /// is sure what they are doing.
             /// </summary>
             /// <value></value>
-            public StateMachine StateMachine {
+            public StateMachine StateMachine
+            {
                 [DebuggerStepThrough]
-                get {
-                    return m_stateMachine;
+                get
+                {
+                    return _stateMachine;
                 }
-                set {
-                    if (StateMachine == null) {
-                        m_stateMachine = value;
-                    } else {
+                set
+                {
+                    if (StateMachine == null)
+                    {
+                        _stateMachine = value;
+                    }
+                    else
+                    {
                         throw new InvalidOperationException("Attempting to replace an existing (rather than simply install a new) state machine. This is not supported.)");
                     }
                 }
             }
 
-            public bool IsRunning { get; set; }
-            public bool IsPaused { get; set; }
-            public bool IsCompleted { get; set; }
-            public bool IsReady { get; set; }
+            public bool IsRunning
+            {
+                get; set;
+            }
+            public bool IsPaused
+            {
+                get; set;
+            }
+            public bool IsCompleted
+            {
+                get; set;
+            }
+            public bool IsReady
+            {
+                get; set;
+            }
 
             /// <summary>
             /// Starts the model.
             /// </summary>
-            public void Start() {
+            public void Start()
+            {
 
-                if (!m_stateMachine.State.Equals(DIModel.State.Initialized)) {
-                    m_stateMachine.DoTransition(DIModel.State.Initialized);
+                if (!_stateMachine.State.Equals(DIModel.State.Initialized))
+                {
+                    _stateMachine.DoTransition(DIModel.State.Initialized);
                 }
 
-                if (Starting != null) {
+                if (Starting != null)
+                {
                     Starting(this);
                 }
 
-                m_stateMachine.DoTransition(DIModel.State.Complete);
+                _stateMachine.DoTransition(DIModel.State.Complete);
 
-                if (Stopping != null) {
+                if (Stopping != null)
+                {
                     Stopping(this);
                 }
             }
@@ -695,22 +865,25 @@ namespace Highpoint.Sage.ItemBased.Queues {
             /// <summary>
             /// Pauses execution of this model after completion of the running callback of the current event.
             /// </summary>
-            public virtual void Pause() {
-                m_model.Pause();
+            public virtual void Pause()
+            {
+                _model.Pause();
             }
 
             /// <summary>
             /// Resumes execution of this model. Ignored if the model is not already paused.
             /// </summary>
-            public virtual void Resume() {
-                m_model.Resume();
+            public virtual void Resume()
+            {
+                _model.Resume();
             }
 
             /// <summary>
             /// Aborts the model.
             /// </summary>
-            public void Abort() {
-                m_executive.EventList.Clear();
+            public void Abort()
+            {
+                _executive.EventList.Clear();
             }
 
             /// <summary>
@@ -746,8 +919,12 @@ namespace Highpoint.Sage.ItemBased.Queues {
             /// Gets the parameters dictionary.
             /// </summary>
             /// <value>The parameters.</value>
-            public System.Collections.IDictionary Parameters {
-                get { return m_parameters; }
+            public System.Collections.IDictionary Parameters
+            {
+                get
+                {
+                    return _parameters;
+                }
             }
 
             #endregion
@@ -758,25 +935,53 @@ namespace Highpoint.Sage.ItemBased.Queues {
             /// The IModel to which this object belongs.
             /// </summary>
             /// <value>The model.</value>
-            public IModel Model { [DebuggerStepThrough] get { return m_model; } }
+            public IModel Model
+            {
+                [DebuggerStepThrough]
+                get
+                {
+                    return _model;
+                }
+            }
 
             /// <summary>
             /// The name by which this model is known. Typically not required to be unique.
             /// </summary>
             /// <value>The model's name.</value>
-            public string Name { [DebuggerStepThrough]get { return m_name; } }
+            public string Name
+            {
+                [DebuggerStepThrough]
+                get
+                {
+                    return _name;
+                }
+            }
 
             /// <summary>
             /// The description for this model. Typically used for human-readable representations.
             /// </summary>
             /// <value>The model's description.</value>
-            public string Description { [DebuggerStepThrough] get { return ( ( m_description == null ) ? ( "No description for " + m_name ) : m_description ); } }
+            public string Description
+            {
+                [DebuggerStepThrough]
+                get
+                {
+                    return ((_description == null) ? ("No description for " + _name) : _description);
+                }
+            }
 
             /// <summary>
             /// The Guid for this model. Required to be unique in a given Application Context.
             /// </summary>
             /// <value>The model's Guid.</value>
-            public Guid Guid { [DebuggerStepThrough] get { return m_guid; } }
+            public Guid Guid
+            {
+                [DebuggerStepThrough]
+                get
+                {
+                    return _guid;
+                }
+            }
 
             /// <summary>
             /// Initializes the fields that feed the properties of this IModelObject identity.
@@ -785,12 +990,16 @@ namespace Highpoint.Sage.ItemBased.Queues {
             /// <param name="name">The IModelObject's new name value.</param>
             /// <param name="description">The IModelObject's new description value.</param>
             /// <param name="guid">The IModelObject's new GUID value.</param>
-            public void InitializeIdentity(IModel model, string name, string description, Guid guid) {
-                IMOHelper.Initialize(ref m_model, model, ref m_name, name, ref m_description, description, ref m_guid, guid);
+            public void InitializeIdentity(IModel model, string name, string description, Guid guid)
+            {
+                IMOHelper.Initialize(ref _model, model, ref _name, name, ref _description, description, ref _guid, guid);
             }
             #endregion
 
-            public DeserializationContext DeserializationContext { get; set; }
+            public DeserializationContext DeserializationContext
+            {
+                get; set;
+            }
 
             #region ConstructionFacade Members
 
@@ -800,63 +1009,78 @@ namespace Highpoint.Sage.ItemBased.Queues {
             public event ModelObjectEvent DIModelObjectRemoved;
 #pragma warning restore 67
 
-            public IQueue AddQueue(string name, int maxDepth) {
+            public IQueue AddQueue(string name, int maxDepth)
+            {
                 throw new Exception("The method or operation is not implemented.");
             }
 
-            public bool RemoveQueue(Guid guid) {
+            public bool RemoveQueue(Guid guid)
+            {
                 throw new Exception("The method or operation is not implemented.");
             }
 
-            public IConnector Connect(IPort from, IPort to) {
+            public IConnector Connect(IPort from, IPort to)
+            {
                 throw new Exception("The method or operation is not implemented.");
             }
 
-            public IConnector Connect(IPortOwner from, string fromPortName, IPortOwner to, string toPortName) {
+            public IConnector Connect(IPortOwner from, string fromPortName, IPortOwner to, string toPortName)
+            {
                 throw new Exception("The method or operation is not implemented.");
             }
 
-            public bool Disconnect(IConnector connector) {
+            public bool Disconnect(IConnector connector)
+            {
                 throw new Exception("The method or operation is not implemented.");
             }
 
-            public IGenerator AddGenerator(string name, string distributionType, params object[] distroParameters) {
+            public IGenerator AddGenerator(string name, string distributionType, params object[] distroParameters)
+            {
                 throw new Exception("The method or operation is not implemented.");
             }
 
-            public bool RemoveGenerator(Guid guid) {
+            public bool RemoveGenerator(Guid guid)
+            {
                 throw new Exception("The method or operation is not implemented.");
             }
 
-            public IGenerator AddActivity(string name, params object[] otherStuff) {
+            public IGenerator AddActivity(string name, params object[] otherStuff)
+            {
                 throw new Exception("The method or operation is not implemented.");
             }
 
-            public bool RemoveActivity(Guid guid) {
+            public bool RemoveActivity(Guid guid)
+            {
                 throw new Exception("The method or operation is not implemented.");
             }
 
-            public IDecision AddDecision(string name, params object[] otherStuff) {
+            public IDecision AddDecision(string name, params object[] otherStuff)
+            {
                 throw new Exception("The method or operation is not implemented.");
             }
 
-            public bool RemoveDecision(Guid guid) {
+            public bool RemoveDecision(Guid guid)
+            {
                 throw new Exception("The method or operation is not implemented.");
             }
 
-            public ICompletion AddCompletion(string name, params object[] otherStuff) {
+            public ICompletion AddCompletion(string name, params object[] otherStuff)
+            {
                 throw new Exception("The method or operation is not implemented.");
             }
 
-            public bool RemoveCompletion(Guid guid) {
+            public bool RemoveCompletion(Guid guid)
+            {
                 throw new Exception("The method or operation is not implemented.");
             }
 
-            public IResource AddResource(string name, params object[] otherStuff) {
+            public IResource AddResource(string name, params object[] otherStuff)
+            {
                 throw new Exception("The method or operation is not implemented.");
             }
 
-            public bool RemoveResource(Guid guid) {
+            public bool RemoveResource(Guid guid)
+            {
                 throw new Exception("The method or operation is not implemented.");
             }
 
@@ -867,7 +1091,8 @@ namespace Highpoint.Sage.ItemBased.Queues {
             #region IModel Members
 
 
-            public void Reset() {
+            public void Reset()
+            {
                 throw new Exception("The method or operation is not implemented.");
             }
 
@@ -879,22 +1104,28 @@ namespace Highpoint.Sage.ItemBased.Queues {
             #endregion
 
 
-            ExecController IModel.ExecutiveController {
-                get {
+            ExecController IModel.ExecutiveController
+            {
+                get
+                {
                     throw new NotImplementedException();
                 }
-                set {
+                set
+                {
                     throw new NotImplementedException();
                 }
             }
 
-            public void ClearAllErrors() {
+            public void ClearAllErrors()
+            {
                 throw new NotImplementedException();
             }
 
-            public virtual void Dispose() {
+            public virtual void Dispose()
+            {
                 Executive.Dispose();
-                if (this.ExecutiveController != null) {
+                if (this.ExecutiveController != null)
+                {
                     this.ExecutiveController.Dispose();
                 }
             }
