@@ -507,7 +507,7 @@ namespace Highpoint.Sage.Graphs
             bool hasVm = (_vm != null);
             if (hasVm)
                 _vm.Suspend();
-            Edge retval = AddLigature(slaveEdge.PostVertex, PostVertex);
+			Edge retval = AddLigature(PostVertex,slaveEdge.PostVertex);
             if (StructureChangeHandler != null)
                 StructureChangeHandler(this, StructureChangeType.AddCofinish, false);
             if (hasVm)
