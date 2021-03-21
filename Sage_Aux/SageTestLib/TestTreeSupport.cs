@@ -1,12 +1,12 @@
 /* This source code licensed under the GNU Affero General Public License */
 //#define PREANNOUNCE
 
-using System;
-using System.Text;
-using System.Collections;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Text;
 
 namespace Highpoint.Sage.Utility
 {
@@ -246,7 +246,7 @@ Charlie
 Dingus";
 
         #endregion
-    
+
 
         [TestMethod]
         public void TestCreateCircularTree()
@@ -288,12 +288,18 @@ Dingus";
             bob.AddChild(george);
 
             string s = string.Empty;
-            bob.ForEachChild(delegate (ITreeNode<Activity> activity) { s += activity.Payload.Name; });
+            bob.ForEachChild(delegate (ITreeNode<Activity> activity)
+            {
+                s += activity.Payload.Name;
+            });
             Assert.IsTrue(s.Equals("EthelFrankGeorge"));
 
             s = string.Empty;
             bob.SortChildren(new Comparison<ITreeNode<Activity>>(ReverseSortTreeNodeActivities));
-            bob.ForEachChild(delegate (ITreeNode<Activity> activity) { s += activity.Payload.Name; });
+            bob.ForEachChild(delegate (ITreeNode<Activity> activity)
+            {
+                s += activity.Payload.Name;
+            });
             Assert.IsTrue(s.Equals("GeorgeFrankEthel"));
 
             Console.WriteLine(s);
@@ -306,7 +312,7 @@ Dingus";
         }
 
         [TestMethod]
-        
+
         public void TestNodeRemoval()
         {
 
@@ -319,13 +325,13 @@ Dingus";
             ITreeNode<string> frank = charlie.AddChild("Frank");
             ITreeNode<string> george = dingus.AddChild("George");
 
-            Assert.AreEqual(bob.Parent,alice, "\"bob\"'s parent should be \"alice\", but isn't.");
+            Assert.AreEqual(bob.Parent, alice, "\"bob\"'s parent should be \"alice\", but isn't.");
             Assert.IsTrue(alice.HasChild(bob), "\"alice\"'s children should include \"bob\", but doesn't.");
             Assert.IsTrue(alice.RemoveChild(bob), "\"alice\" failed to remove existing child \"bob\"");
             Assert.IsFalse(alice.HasChild(bob), "\"alice\"'s children should not include \"bob\", but still does.");
             Assert.AreEqual(bob.Parent, null, "\"bob\"'s parent should be null, but isn't.");
 
-            Assert.IsFalse(dingus.RemoveChild(bob),"\"dingus\" claimed success in removing existing child \"bob\"");
+            Assert.IsFalse(dingus.RemoveChild(bob), "\"dingus\" claimed success in removing existing child \"bob\"");
 
         }
 
@@ -371,7 +377,7 @@ Dingus";
             Assert.AreEqual(StripCRLF(sb.ToString()), StripCRLF(REQUIRED_ITERATIONSTRING2), "Expected \"" + REQUIRED_ITERATIONSTRING2 + "\", but got \"" + sb.ToString() + "\" instead.");
         }
 
-        private string StripCRLF(string structureString) =>  structureString.Replace("\r", "").Replace("\n", "");
+        private string StripCRLF(string structureString) => structureString.Replace("\r", "").Replace("\n", "");
 
         #region REQUIRED_ITERATIONSTRING2
         private static string REQUIRED_ITERATIONSTRING2 =
@@ -405,32 +411,35 @@ Dingus
 
         class StringWrapper
         {
-            private string m_string = null;
+            private readonly string _string = null;
             public StringWrapper(string s)
             {
-                m_string = s;
+                _string = s;
             }
             public override string ToString()
             {
-                return m_string;
+                return _string;
             }
         }
 
         class Activity : TreeNode<Activity>, IComparable<Activity>
         {
 
-            private string m_name = null;
+            private readonly string _name = null;
 
             public Activity(string name)
                 : base(default(Activity))
             {
-                m_name = name;
+                _name = name;
                 SetPayload(this);
             }
 
             public string Name
             {
-                get { return m_name; }
+                get
+                {
+                    return _name;
+                }
             }
 
 
@@ -446,30 +455,29 @@ Dingus
 
         class Activity2 : ITreeNode<Activity2>
         {
-
-            TreeNode<Activity2> m_treeNode;
-            private string m_name = null;
+            private readonly TreeNode<Activity2> _treeNode;
+            private readonly string _name = null;
 
             public Activity2(string name)
             {
-                m_name = name;
-                m_treeNode = new TreeNode<Activity2>(this);
+                _name = name;
+                _treeNode = new TreeNode<Activity2>(this);
 
 #if PREANNOUNCE
-            //m_treeNode.AboutToGainChild += new TreeNodeEvent<Activity2>(m_treeNode_AboutToGainChild);
-            //m_treeNode.AboutToGainParent += new TreeNodeEvent<Activity2>(m_treeNode_AboutToGainParent);
-            //m_treeNode.AboutToLoseChild += new TreeNodeEvent<Activity2>(m_treeNode_AboutToLoseChild);
-            //m_treeNode.AboutToLoseParent += new TreeNodeEvent<Activity2>(m_treeNode_AboutToLoseParent);
+            //_treeNode.AboutToGainChild += new TreeNodeEvent<Activity2>(treeNode_AboutToGainChild);
+            //_treeNode.AboutToGainParent += new TreeNodeEvent<Activity2>(treeNode_AboutToGainParent);
+            //_treeNode.AboutToLoseChild += new TreeNodeEvent<Activity2>(treeNode_AboutToLoseChild);
+            //_treeNode.AboutToLoseParent += new TreeNodeEvent<Activity2>(treeNode_AboutToLoseParent);
 #endif
-                m_treeNode.GainedChild += new TreeNodeEvent<Activity2>(m_treeNode_GainedChild);
-                m_treeNode.GainedParent += new TreeNodeEvent<Activity2>(m_treeNode_GainedParent);
-                m_treeNode.LostChild += new TreeNodeEvent<Activity2>(m_treeNode_LostChild);
-                m_treeNode.LostParent += new TreeNodeEvent<Activity2>(m_treeNode_LostParent);
-                m_treeNode.SubtreeChanged += new TreeChangeEvent<Activity2>(m_treeNode_SubtreeChanged);
-                m_treeNode.ChildrenResorted += new TreeNodeEvent<Activity2>(m_treeNode_ChildrenResorted);
+                _treeNode.GainedChild += new TreeNodeEvent<Activity2>(treeNode_GainedChild);
+                _treeNode.GainedParent += new TreeNodeEvent<Activity2>(treeNode_GainedParent);
+                _treeNode.LostChild += new TreeNodeEvent<Activity2>(treeNode_LostChild);
+                _treeNode.LostParent += new TreeNodeEvent<Activity2>(treeNode_LostParent);
+                _treeNode.SubtreeChanged += new TreeChangeEvent<Activity2>(treeNode_SubtreeChanged);
+                _treeNode.ChildrenResorted += new TreeNodeEvent<Activity2>(treeNode_ChildrenResorted);
             }
 
-            void m_treeNode_ChildrenResorted(ITreeNode<Activity2> self, ITreeNode<Activity2> subject)
+            void treeNode_ChildrenResorted(ITreeNode<Activity2> self, ITreeNode<Activity2> subject)
             {
                 if (ChildrenResorted != null)
                 {
@@ -477,7 +485,7 @@ Dingus
                 }
             }
 
-            void m_treeNode_SubtreeChanged(SubtreeChangeType changeType, ITreeNode<Activity2> where)
+            void treeNode_SubtreeChanged(SubtreeChangeType changeType, ITreeNode<Activity2> where)
             {
                 if (SubtreeChanged != null)
                 {
@@ -485,7 +493,7 @@ Dingus
                 }
             }
 
-            void m_treeNode_LostParent(ITreeNode<Activity2> self, ITreeNode<Activity2> subject)
+            void treeNode_LostParent(ITreeNode<Activity2> self, ITreeNode<Activity2> subject)
             {
                 if (LostParent != null)
                 {
@@ -493,7 +501,7 @@ Dingus
                 }
             }
 
-            void m_treeNode_LostChild(ITreeNode<Activity2> self, ITreeNode<Activity2> subject)
+            void treeNode_LostChild(ITreeNode<Activity2> self, ITreeNode<Activity2> subject)
             {
                 if (LostChild != null)
                 {
@@ -501,7 +509,7 @@ Dingus
                 }
             }
 
-            void m_treeNode_GainedParent(ITreeNode<Activity2> self, ITreeNode<Activity2> subject)
+            void treeNode_GainedParent(ITreeNode<Activity2> self, ITreeNode<Activity2> subject)
             {
                 if (GainedParent != null)
                 {
@@ -509,7 +517,7 @@ Dingus
                 }
             }
 
-            void m_treeNode_GainedChild(ITreeNode<Activity2> self, ITreeNode<Activity2> subject)
+            void treeNode_GainedChild(ITreeNode<Activity2> self, ITreeNode<Activity2> subject)
             {
                 if (GainedChild != null)
                 {
@@ -518,25 +526,25 @@ Dingus
             }
 
 #if PREANNOUNCE
-        void m_treeNode_AboutToLoseParent(ITreeNode<Activity2> self, ITreeNode<Activity2> subject) {
+        void treeNode_AboutToLoseParent(ITreeNode<Activity2> self, ITreeNode<Activity2> subject) {
             if (AboutToLoseParent != null) {
                 AboutToLoseParent(self.Payload, subject.Payload);
             }
         }
 
-        void m_treeNode_AboutToLoseChild(ITreeNode<Activity2> self, ITreeNode<Activity2> subject) {
+        void treeNode_AboutToLoseChild(ITreeNode<Activity2> self, ITreeNode<Activity2> subject) {
             if (AboutToLoseChild != null) {
                 AboutToLoseChild(self.Payload, subject.Payload);
             }
         }
 
-        void m_treeNode_AboutToGainParent(ITreeNode<Activity2> self, ITreeNode<Activity2> subject) {
+        void treeNode_AboutToGainParent(ITreeNode<Activity2> self, ITreeNode<Activity2> subject) {
             if (AboutToGainParent != null) {
                 AboutToGainParent(self.Payload, subject.Payload);
             }
         }
 
-        void m_treeNode_AboutToGainChild(ITreeNode<Activity2> self, ITreeNode<Activity2> subject) {
+        void treeNode_AboutToGainChild(ITreeNode<Activity2> self, ITreeNode<Activity2> subject) {
             if (AboutToGainChild != null) {
                 AboutToGainChild(self.Payload, subject.Payload);
             }
@@ -545,12 +553,15 @@ Dingus
 
             public string Name
             {
-                get { return m_name; }
+                get
+                {
+                    return _name;
+                }
             }
 
             public override string ToString()
             {
-                return m_name;
+                return _name;
             }
 
             #region ITreeNode<Activity2> Members
@@ -576,118 +587,139 @@ Dingus
 
             public ITreeNode<Activity2> Root
             {
-                get { return m_treeNode.Root; }
+                get
+                {
+                    return _treeNode.Root;
+                }
             }
 
             public Activity2 Payload
             {
-                get { return m_treeNode.Payload; }
+                get
+                {
+                    return _treeNode.Payload;
+                }
             }
 
             public ITreeNode<Activity2> Parent
             {
-                get { return m_treeNode.Parent; }
-                set { m_treeNode.Parent = value; }
+                get
+                {
+                    return _treeNode.Parent;
+                }
+                set
+                {
+                    _treeNode.Parent = value;
+                }
             }
 
             public IEnumerable<ITreeNode<Activity2>> Children
             {
-                get { return m_treeNode.Children; }
+                get
+                {
+                    return _treeNode.Children;
+                }
             }
 
             public IEnumerable<ITreeNode<Activity2>> DescendantNodesBreadthFirst(bool includeSelf)
             {
-                return m_treeNode.DescendantNodesBreadthFirst(includeSelf);
+                return _treeNode.DescendantNodesBreadthFirst(includeSelf);
             }
 
             public IEnumerable<ITreeNode<Activity2>> DescendantNodesDepthFirst(bool includeSelf)
             {
-                return m_treeNode.DescendantNodesDepthFirst(includeSelf);
+                return _treeNode.DescendantNodesDepthFirst(includeSelf);
             }
 
             public IEnumerable<Activity2> DescendantsBreadthFirst(bool includeSelf)
             {
-                return m_treeNode.DescendantsBreadthFirst(includeSelf);
+                return _treeNode.DescendantsBreadthFirst(includeSelf);
             }
 
             public IEnumerable<Activity2> DescendantsDepthFirst(bool includeSelf)
             {
-                return m_treeNode.DescendantsDepthFirst(includeSelf);
+                return _treeNode.DescendantsDepthFirst(includeSelf);
             }
 
             public IEnumerable<Activity2> Siblings(bool includeSelf)
             {
-                return m_treeNode.Siblings(includeSelf);
+                return _treeNode.Siblings(includeSelf);
             }
 
             public bool IsChildOf(ITreeNode<Activity2> possibleParentNode)
             {
-                return m_treeNode.IsChildOf(possibleParentNode);
+                return _treeNode.IsChildOf(possibleParentNode);
             }
 
             public ITreeNodeEventController<Activity2> MyEventController
             {
-                get { return m_treeNode.MyEventController; }
+                get
+                {
+                    return _treeNode.MyEventController;
+                }
             }
 
             public void SetParent(ITreeNode<Activity2> newParent, bool skipStructureChecking, bool childAlreadyAdded = false)
             {
-                m_treeNode.SetParent(newParent, skipStructureChecking, childAlreadyAdded);
+                _treeNode.SetParent(newParent, skipStructureChecking, childAlreadyAdded);
             }
 
             public ITreeNode<Activity2> AddChild(Activity2 newChild, bool skipStructuralChecking = false)
             {
-                return m_treeNode.AddChild(newChild, skipStructuralChecking);
+                return _treeNode.AddChild(newChild, skipStructuralChecking);
             }
 
             public ITreeNode<Activity2> AddChild(ITreeNode<Activity2> newChildNode, bool skipStructuralChecking = false)
             {
-                return m_treeNode.AddChild(newChildNode, skipStructuralChecking);
+                return _treeNode.AddChild(newChildNode, skipStructuralChecking);
             }
 
             public bool RemoveChild(Activity2 existingChild)
             {
-                return m_treeNode.RemoveChild(existingChild);
+                return _treeNode.RemoveChild(existingChild);
             }
 
             public bool RemoveChild(ITreeNode<Activity2> existingChild)
             {
-                return m_treeNode.RemoveChild(existingChild);
+                return _treeNode.RemoveChild(existingChild);
             }
 
             public void SortChildren(Comparison<ITreeNode<Activity2>> comparison)
             {
-                m_treeNode.SortChildren(comparison);
+                _treeNode.SortChildren(comparison);
             }
 
             public void SortChildren(IComparer<ITreeNode<Activity2>> comparer)
             {
-                m_treeNode.SortChildren(comparer);
+                _treeNode.SortChildren(comparer);
             }
 
             public bool HasChild(ITreeNode<Activity2> possibleChild)
             {
-                return m_treeNode.HasChild(possibleChild);
+                return _treeNode.HasChild(possibleChild);
             }
 
             public bool HasChild(Activity2 possibleChild)
             {
-                return m_treeNode.HasChild(possibleChild);
+                return _treeNode.HasChild(possibleChild);
             }
 
             public void ForEachChild(Action<Activity2> action)
             {
-                m_treeNode.ForEachChild(action);
+                _treeNode.ForEachChild(action);
             }
 
             public void ForEachChild(Action<ITreeNode<Activity2>> action)
             {
-                m_treeNode.ForEachChild(action);
+                _treeNode.ForEachChild(action);
             }
 
             public IEnumerable<Activity2> ChildNodes
             {
-                get { return m_treeNode.ChildNodes; }
+                get
+                {
+                    return _treeNode.ChildNodes;
+                }
             }
 
             #endregion
