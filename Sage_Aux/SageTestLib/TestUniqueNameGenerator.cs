@@ -1,12 +1,11 @@
 ﻿/* This source code licensed under the GNU Affero General Public License */
 
-using System;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Highpoint.Sage.Utility
 {
     [TestClass]
-    public class UniqueNameGeneratorTester 
+    public class UniqueNameGeneratorTester
     {
         [TestMethod]
         public void TestUniqueNameGenerator()
