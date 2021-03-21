@@ -1,43 +1,54 @@
 /* This source code licensed under the GNU Affero General Public License */
 
+using Highpoint.Sage.SimCore;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections;
 using System.Diagnostics;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Highpoint.Sage.SimCore;
 
-namespace Highpoint.Sage.Graphs.Tasks {
+namespace Highpoint.Sage.Graphs.Tasks
+{
 
     [TestClass]
-    public class TaskTester {
+    public class TaskTester
+    {
 
-        private Random m_random = new Random();
+        private readonly Random _random = new Random();
 
-        public TaskTester(){Init();}
-        
-		[TestInitialize] 
-		public void Init() {}
-		[TestCleanup]
-		public void destroy() {
-			Debug.WriteLine( "Done." );
-		}
-		
-		[TestMethod]
-		[Highpoint.Sage.Utility.FieldDescription("This test runs a parent task, which spans over the length of the five child tasks running in a sequence.")]
-		public void TestChildSequencing(){
+        public TaskTester()
+        {
+            Init();
+        }
+
+        [TestInitialize]
+        public void Init()
+        {
+        }
+        [TestCleanup]
+        public void destroy()
+        {
+            Debug.WriteLine("Done.");
+        }
+
+        [TestMethod]
+        [Highpoint.Sage.Utility.FieldDescription("This test runs a parent task, which spans over the length of the five child tasks running in a sequence.")]
+        public void TestChildSequencing()
+        {
             Model model = new Model();
             model.AddService<ITaskManagementService>(new TaskManagementService());
 
-            TestTask parent = new TestTask(model,"Parent");
+            TestTask parent = new TestTask(model, "Parent");
 
             TaskProcessor tp = new TaskProcessor(model, "TP", parent) { KeepGraphContexts = true };
-		    model.GetService<ITaskManagementService>().AddTaskProcessor(tp);
-            
+            model.GetService<ITaskManagementService>().AddTaskProcessor(tp);
+
 
             TestTask[] children = new TestTask[5];
-            for ( int i = 0 ; i < children.Length ; i++ ) {
-                children[i] = new TestTask(model,"Child"+i,TimeSpan.FromHours(i));
-                if ( i > 0 ) children[i].AddPredecessor(children[i-1]);
+            for (int i = 0; i < children.Length; i++)
+            {
+                children[i] = new TestTask(model, "Child" + i, TimeSpan.FromHours(i));
+                if (i > 0)
+                    children[i].AddPredecessor(children[i - 1]);
                 parent.AddChildEdge(children[i]);
             }
 
@@ -56,107 +67,111 @@ namespace Highpoint.Sage.Graphs.Tasks {
             Assert.AreEqual(new DateTime(1, 1, 1, 6, 0, 0), children[3].GetFinishTime(gc), "Child task 4 did't finish at the correct time.");
             Assert.AreEqual(new DateTime(1, 1, 1, 10, 0, 0), children[4].GetFinishTime(gc), "Child task 5 did't finish at the correct time.");
             Assert.AreEqual(new DateTime(1, 1, 1, 10, 0, 0), parent.GetFinishTime(gc), "Parent task did't finish at the correct time.");
-        
-		}
+
+        }
 
         // Ta(4 hr) -> Tb(1 hr)
         // Tc(1 hr) -> Td(1 hr) Check to see that Td starts at T=1.
         [TestMethod]
-		[Highpoint.Sage.Utility.FieldDescription("Checks to see that Td starts at T=1")]
-		public void TestPlainGraph(){
+        [Highpoint.Sage.Utility.FieldDescription("Checks to see that Td starts at T=1")]
+        public void TestPlainGraph()
+        {
 
             TestGraph1 tg1 = new TestGraph1();
 
-            tg1.model.Start();
+            tg1.Model.Start();
 
-            Assert.IsTrue(tg1.ta.GetStartTime(tg1.GraphContext).Equals(new DateTime(1,1,1,0,0,0)),"Task A did not start at 12AM 1/1/1");
-            Assert.IsTrue(tg1.ta.GetFinishTime(tg1.GraphContext).Equals(new DateTime(1,1,1,4,0,0)),"Task A did not finish at 4AM 1/1/1");
+            Assert.IsTrue(tg1.Ta.GetStartTime(tg1.GraphContext).Equals(new DateTime(1, 1, 1, 0, 0, 0)), "Task A did not start at 12AM 1/1/1");
+            Assert.IsTrue(tg1.Ta.GetFinishTime(tg1.GraphContext).Equals(new DateTime(1, 1, 1, 4, 0, 0)), "Task A did not finish at 4AM 1/1/1");
 
-            Assert.IsTrue(tg1.tb.GetStartTime(tg1.GraphContext).Equals(new DateTime(1,1,1,4,0,0)),"Task B did not start at 4AM 1/1/1");
-            Assert.IsTrue(tg1.tb.GetFinishTime(tg1.GraphContext).Equals(new DateTime(1,1,1,5,0,0)),"Task B did not finish at 5AM 1/1/1");
+            Assert.IsTrue(tg1.Tb.GetStartTime(tg1.GraphContext).Equals(new DateTime(1, 1, 1, 4, 0, 0)), "Task B did not start at 4AM 1/1/1");
+            Assert.IsTrue(tg1.Tb.GetFinishTime(tg1.GraphContext).Equals(new DateTime(1, 1, 1, 5, 0, 0)), "Task B did not finish at 5AM 1/1/1");
 
-            Assert.IsTrue(tg1.tc.GetStartTime(tg1.GraphContext).Equals(new DateTime(1,1,1,0,0,0)),"Task C did not start at 12AM 1/1/1");
-            Assert.IsTrue(tg1.tc.GetFinishTime(tg1.GraphContext).Equals(new DateTime(1,1,1,1,0,0)),"Task C did not finish at 1AM 1/1/1");
+            Assert.IsTrue(tg1.Tc.GetStartTime(tg1.GraphContext).Equals(new DateTime(1, 1, 1, 0, 0, 0)), "Task C did not start at 12AM 1/1/1");
+            Assert.IsTrue(tg1.Tc.GetFinishTime(tg1.GraphContext).Equals(new DateTime(1, 1, 1, 1, 0, 0)), "Task C did not finish at 1AM 1/1/1");
 
-            Assert.IsTrue(tg1.td.GetStartTime(tg1.GraphContext).Equals(new DateTime(1,1,1,1,0,0)),"Task D did not start at 1AM 1/1/1");
-            Assert.IsTrue(tg1.td.GetFinishTime(tg1.GraphContext).Equals(new DateTime(1,1,1,2,0,0)),"Task D did not start at 1AM 1/1/1");
+            Assert.IsTrue(tg1.Td.GetStartTime(tg1.GraphContext).Equals(new DateTime(1, 1, 1, 1, 0, 0)), "Task D did not start at 1AM 1/1/1");
+            Assert.IsTrue(tg1.Td.GetFinishTime(tg1.GraphContext).Equals(new DateTime(1, 1, 1, 2, 0, 0)), "Task D did not start at 1AM 1/1/1");
 
-            Assert.IsTrue(tg1.parent.GetStartTime(tg1.GraphContext).Equals(new DateTime(1,1,1,0,0,0)),"Task parent did not start at 12AM 1/1/1");
-            Assert.IsTrue(tg1.parent.GetFinishTime(tg1.GraphContext).Equals(new DateTime(1,1,1,5,0,0)),"Task parent did not finish at 5AM 1/1/1");
+            Assert.IsTrue(tg1.Parent.GetStartTime(tg1.GraphContext).Equals(new DateTime(1, 1, 1, 0, 0, 0)), "Task parent did not start at 12AM 1/1/1");
+            Assert.IsTrue(tg1.Parent.GetFinishTime(tg1.GraphContext).Equals(new DateTime(1, 1, 1, 5, 0, 0)), "Task parent did not finish at 5AM 1/1/1");
 
-            Assert.IsTrue(tg1.follow.GetStartTime(tg1.GraphContext).Equals(new DateTime(1,1,1,5,0,0)),"Task follow did not start at 5AM 1/1/1");
-            Assert.IsTrue(tg1.follow.GetFinishTime(tg1.GraphContext).Equals(new DateTime(1,1,1,5,0,0)),"Task follow did not finish at 5AM 1/1/1");
+            Assert.IsTrue(tg1.Follow.GetStartTime(tg1.GraphContext).Equals(new DateTime(1, 1, 1, 5, 0, 0)), "Task follow did not start at 5AM 1/1/1");
+            Assert.IsTrue(tg1.Follow.GetFinishTime(tg1.GraphContext).Equals(new DateTime(1, 1, 1, 5, 0, 0)), "Task follow did not finish at 5AM 1/1/1");
 
         }
 
         // Ta(4 hr) -> Tb(1 hr)
         // Tc(1 hr) -> Td(1 hr) (Td costart-slaved to Tb, so it starts at t=4, not t=1.)
         [TestMethod]
-		[Highpoint.Sage.Utility.FieldDescription("Checks Td costart-slaved to Tb, so it starts at t=4, not t=1.")]
-		public void TestCoStart(){
+        [Highpoint.Sage.Utility.FieldDescription("Checks Td costart-slaved to Tb, so it starts at t=4, not t=1.")]
+        public void TestCoStart()
+        {
 
             TestGraph1 tg1 = new TestGraph1();
-            tg1.tb.AddCostart(tg1.td);
+            tg1.Tb.AddCostart(tg1.Td);
 
-            tg1.model.Start();
+            tg1.Model.Start();
 
-            Assert.IsTrue(tg1.tb.GetStartTime(tg1.GraphContext).Equals(new DateTime(1,1,1,4,0,0)),"Task B did not start at 4AM 1/1/1");
+            Assert.IsTrue(tg1.Tb.GetStartTime(tg1.GraphContext).Equals(new DateTime(1, 1, 1, 4, 0, 0)), "Task B did not start at 4AM 1/1/1");
 
-            Assert.IsTrue(tg1.td.GetStartTime(tg1.GraphContext).Equals(new DateTime(1,1,1,4,0,0)),"Task D did not start at 4AM 1/1/1");
+            Assert.IsTrue(tg1.Td.GetStartTime(tg1.GraphContext).Equals(new DateTime(1, 1, 1, 4, 0, 0)), "Task D did not start at 4AM 1/1/1");
 
         }
 
         // Ta(4 hr) -> Tb(1 hr)
         // Tc(1 hr) -> Td(1 hr) (Tc cofinish-slaved to Ta, so it ends at t=4, not t=1.)
         [TestMethod]
-		[Highpoint.Sage.Utility.FieldDescription("Checks Tc cofinish-slaved to Ta, so it ends at t=4, not t=1.")]
-		public void TestCoFinish(){
+        [Highpoint.Sage.Utility.FieldDescription("Checks Tc cofinish-slaved to Ta, so it ends at t=4, not t=1.")]
+        public void TestCoFinish()
+        {
 
             TestGraph1 tg1 = new TestGraph1();
-            tg1.ta.AddCofinish(tg1.tc);
+            tg1.Ta.AddCofinish(tg1.Tc);
 
-            tg1.model.Start();
+            tg1.Model.Start();
 
-            Assert.IsTrue(tg1.ta.GetFinishTime(tg1.GraphContext).Equals(new DateTime(1,1,1,4,0,0)),"Task A did not finish at 4AM 1/1/1");
+            Assert.IsTrue(tg1.Ta.GetFinishTime(tg1.GraphContext).Equals(new DateTime(1, 1, 1, 4, 0, 0)), "Task A did not finish at 4AM 1/1/1");
 
-            Assert.IsTrue(tg1.tc.GetFinishTime(tg1.GraphContext).Equals(new DateTime(1,1,1,4,0,0)),"Task C did not finish at 4AM 1/1/1");
+            Assert.IsTrue(tg1.Tc.GetFinishTime(tg1.GraphContext).Equals(new DateTime(1, 1, 1, 4, 0, 0)), "Task C did not finish at 4AM 1/1/1");
 
-		}
+        }
 
         // Ta(4 hr) -> Tb(1 hr)
         // Tc(1 hr) -> Td(1 hr) (Tc.finish synched to Ta.finish, so tb and td start at t=4.)
-        [TestMethod] 
-		[Highpoint.Sage.Utility.FieldDescription("Checks if two tasks can be synchronized to start at the the same time.")]
-		public void TestSynchroStart(){
+        [TestMethod]
+        [Highpoint.Sage.Utility.FieldDescription("Checks if two tasks can be synchronized to start at the the same time.")]
+        public void TestSynchroStart()
+        {
 
-			TestGraph1 tg1 = new TestGraph1();
-			TestGraph1 tg2 = new TestGraph1();
-			// Synchronize tb and td
-			VertexSynchronizer vs1 = new VertexSynchronizer(tg1.model.Executive,new Vertex[]{tg1.tb.PreVertex,tg1.td.PreVertex},ExecEventType.Detachable);
-			// Synchronize tb and tc
-			VertexSynchronizer vs2 = new VertexSynchronizer(tg2.model.Executive,new Vertex[]{tg2.tb.PreVertex,tg2.tc.PreVertex},ExecEventType.Detachable);
+            TestGraph1 tg1 = new TestGraph1();
+            TestGraph1 tg2 = new TestGraph1();
+            // Synchronize tb and td
+            VertexSynchronizer vs1 = new VertexSynchronizer(tg1.Model.Executive, new Vertex[] { tg1.Tb.PreVertex, tg1.Td.PreVertex }, ExecEventType.Detachable);
+            // Synchronize tb and tc
+            VertexSynchronizer vs2 = new VertexSynchronizer(tg2.Model.Executive, new Vertex[] { tg2.Tb.PreVertex, tg2.Tc.PreVertex }, ExecEventType.Detachable);
 
-			tg1.model.Start();
-			Debug.WriteLine("Test 2");
-			tg2.model.Start();
+            tg1.Model.Start();
+            Debug.WriteLine("Test 2");
+            tg2.Model.Start();
 
             // Test graph 1
-            Assert.IsTrue(tg1.tb.GetStartTime(tg1.GraphContext).Equals(new DateTime(1,1,1,4,0,0)),"Task B did not start at 4AM 1/1/1");
+            Assert.IsTrue(tg1.Tb.GetStartTime(tg1.GraphContext).Equals(new DateTime(1, 1, 1, 4, 0, 0)), "Task B did not start at 4AM 1/1/1");
 
-            Assert.IsTrue(tg1.td.GetStartTime(tg1.GraphContext).Equals(new DateTime(1,1,1,4,0,0)),"Task D did not start at 4AM 1/1/1");
+            Assert.IsTrue(tg1.Td.GetStartTime(tg1.GraphContext).Equals(new DateTime(1, 1, 1, 4, 0, 0)), "Task D did not start at 4AM 1/1/1");
 
-            Assert.IsTrue(tg1.parent.GetFinishTime(tg1.GraphContext).Equals(new DateTime(1,1,1,5,0,0)),"Task parent did not finish at 5AM 1/1/1");
+            Assert.IsTrue(tg1.Parent.GetFinishTime(tg1.GraphContext).Equals(new DateTime(1, 1, 1, 5, 0, 0)), "Task parent did not finish at 5AM 1/1/1");
 
             // Test graph 2
-            Assert.IsTrue(tg2.tb.GetStartTime(tg2.GraphContext).Equals(new DateTime(1,1,1,4,0,0)),"Task B did not start at 4AM 1/1/1");
+            Assert.IsTrue(tg2.Tb.GetStartTime(tg2.GraphContext).Equals(new DateTime(1, 1, 1, 4, 0, 0)), "Task B did not start at 4AM 1/1/1");
 
-            Assert.IsTrue(tg2.tc.GetStartTime(tg2.GraphContext).Equals(new DateTime(1,1,1,4,0,0)),"Task C did not start at 4AM 1/1/1");
+            Assert.IsTrue(tg2.Tc.GetStartTime(tg2.GraphContext).Equals(new DateTime(1, 1, 1, 4, 0, 0)), "Task C did not start at 4AM 1/1/1");
 
-            Assert.IsTrue(tg2.parent.GetFinishTime(tg2.GraphContext).Equals(new DateTime(1,1,1,6,0,0)),"Task parent did not finish at 6AM 1/1/1");
+            Assert.IsTrue(tg2.Parent.GetFinishTime(tg2.GraphContext).Equals(new DateTime(1, 1, 1, 6, 0, 0)), "Task parent did not finish at 6AM 1/1/1");
 
-		}
+        }
 
-		/*
+        /*
         // Ta(4 hr) -> Tb(1 hr)
         // Tc(1 hr) -> Td(1 hr) (Tc.finish synched to Ta.finish, so tb and td start at t=4.)
         [TestMethod] 
@@ -189,127 +204,158 @@ namespace Highpoint.Sage.Graphs.Tasks {
 
         }*/
 
-        
-		class TestGraph1{
-            public TestTask ta, tb, tc, td;
-			public TestTask parent, follow;
-            public TaskProcessor tp;
-            public Model model;
-            public TestGraph1(){
-                model = new Model();
-                model.AddService<ITaskManagementService>(new TaskManagementService());
+
+        class TestGraph1
+        {
+            public TestTask Ta, Tb, Tc, Td;
+            public TestTask Parent, Follow;
+            public TaskProcessor Tp;
+            public Model Model;
+            public TestGraph1()
+            {
+                Model = new Model();
+                Model.AddService<ITaskManagementService>(new TaskManagementService());
 
 
-                parent = new TestTask(model,"Parent");
-				follow = new TestTask(model,"Follow");
+                Parent = new TestTask(Model, "Parent");
+                Follow = new TestTask(Model, "Follow");
 
-                tp = new TaskProcessor(model,"TP",parent);
-                tp.KeepGraphContexts = true;
+                Tp = new TaskProcessor(Model, "TP", Parent);
+                Tp.KeepGraphContexts = true;
 
-                ta = new TestTask(model,"TaskA",TimeSpan.FromHours(4));
-                tb = new TestTask(model,"TaskB",TimeSpan.FromHours(1));
-                tc = new TestTask(model,"TaskC",TimeSpan.FromHours(1));
-                td = new TestTask(model,"TaskD",TimeSpan.FromHours(1));
+                Ta = new TestTask(Model, "TaskA", TimeSpan.FromHours(4));
+                Tb = new TestTask(Model, "TaskB", TimeSpan.FromHours(1));
+                Tc = new TestTask(Model, "TaskC", TimeSpan.FromHours(1));
+                Td = new TestTask(Model, "TaskD", TimeSpan.FromHours(1));
 
-                parent.AddChildEdge(ta);
-                parent.AddChildEdge(tb);
-                parent.AddChildEdge(tc);
-                parent.AddChildEdge(td);
-                ta.AddSuccessor(tb);
-                tc.AddSuccessor(td);
-				parent.AddSuccessor(follow);
+                Parent.AddChildEdge(Ta);
+                Parent.AddChildEdge(Tb);
+                Parent.AddChildEdge(Tc);
+                Parent.AddChildEdge(Td);
+                Ta.AddSuccessor(Tb);
+                Tc.AddSuccessor(Td);
+                Parent.AddSuccessor(Follow);
             }
 
-            public IDictionary GraphContext { get { return (IDictionary)tp.GraphContexts[0]; } }
+            public IDictionary GraphContext
+            {
+                get
+                {
+                    return (IDictionary)Tp.GraphContexts[0];
+                }
+            }
         }
 
-        
+
         /*********************************************************************************/
         /*                   S  U  P  P  O  R  T     M  E  T  H  O  D  S                 */
         /*********************************************************************************/
-        IList CreateSubGraph(IModel model, int howManyTasks, string nameRoot){
+        IList CreateSubGraph(IModel model, int howManyTasks, string nameRoot)
+        {
             ArrayList edges = new ArrayList();
-            for ( int i = 0 ; i < howManyTasks ; i++ ) {
-                TestTask task = new TestTask(model,nameRoot+i);
+            for (int i = 0; i < howManyTasks; i++)
+            {
+                TestTask task = new TestTask(model, nameRoot + i);
                 Debug.WriteLine("Creating task " + task.Name);
                 edges.Add(task);
             }
 
-            while ( true ) {
+            while (true)
+            {
 
                 // Select 2 tasks, and connect them.
-                TestTask taskA = (TestTask)((Edge)edges[m_random.Next(edges.Count)]);
-                TestTask taskB = (TestTask)((Edge)edges[m_random.Next(edges.Count)]);
+                TestTask taskA = (TestTask)((Edge)edges[_random.Next(edges.Count)]);
+                TestTask taskB = (TestTask)((Edge)edges[_random.Next(edges.Count)]);
 
-                if ( taskA == taskB ) continue;
+                if (taskA == taskB)
+                    continue;
 
-                Debug.WriteLine(String.Format("Considering a connection between {0} and {1}.",taskA.Name,taskB.Name));
+                Debug.WriteLine(String.Format("Considering a connection between {0} and {1}.", taskA.Name, taskB.Name));
 
-                int forward = Graphs.Analysis.PathLength.ShortestPathLength(taskA,taskB);
-                int backward = Graphs.Analysis.PathLength.ShortestPathLength(taskB,taskA);
+                int forward = Graphs.Analysis.PathLength.ShortestPathLength(taskA, taskB);
+                int backward = Graphs.Analysis.PathLength.ShortestPathLength(taskB, taskA);
 
-                Debug.WriteLine(String.Format("Forward path length is {0}, and reverse path length is {1}.",forward,backward));
+                Debug.WriteLine(String.Format("Forward path length is {0}, and reverse path length is {1}.", forward, backward));
 
-                if ( (forward==int.MaxValue) && (backward==int.MaxValue) ) {
+                if ((forward == int.MaxValue) && (backward == int.MaxValue))
+                {
                     taskA.AddSuccessor(taskB);
-                    Debug.WriteLine(String.Format("{0} will follow {1}.",taskB.Name,taskA.Name));
-                } else if ( (forward!=int.MaxValue) && (backward==int.MaxValue) ) {
+                    Debug.WriteLine(String.Format("{0} will follow {1}.", taskB.Name, taskA.Name));
+                }
+                else if ((forward != int.MaxValue) && (backward == int.MaxValue))
+                {
                     taskA.AddSuccessor(taskB);
-                    Debug.WriteLine(String.Format("{0} will follow {1}.",taskB.Name,taskA.Name));
-                }else if ( (forward==int.MaxValue) && (backward!=int.MaxValue) ) {
+                    Debug.WriteLine(String.Format("{0} will follow {1}.", taskB.Name, taskA.Name));
+                }
+                else if ((forward == int.MaxValue) && (backward != int.MaxValue))
+                {
                     taskB.AddSuccessor(taskA);
-                    Debug.WriteLine(String.Format("{1} will follow {0}.",taskB.Name,taskA.Name));
-                }else {
+                    Debug.WriteLine(String.Format("{1} will follow {0}.", taskB.Name, taskA.Name));
+                }
+                else
+                {
                     throw new ApplicationException("Cycle exists between " + taskA.Name + " and " + taskB.Name + ".");
                 }
 
                 // Once all tasks are connected to something, we're done constructing the test.
                 bool allTasksAreConnected = true;
-                foreach ( Edge edge in edges ) {
+                foreach (Edge edge in edges)
+                {
                     Task task = (Task)edge;
-                    if ( (edge.PredecessorEdges.Count == 0) && (edge.SuccessorEdges.Count == 0) ) {
+                    if ((edge.PredecessorEdges.Count == 0) && (edge.SuccessorEdges.Count == 0))
+                    {
                         allTasksAreConnected = false;
                         break;
                     }
                 }
-                if ( allTasksAreConnected ) break;
+                if (allTasksAreConnected)
+                    break;
             }
 
             return edges;
         }
 
-        
-        class TestTask : Highpoint.Sage.Graphs.Tasks.Task {
-            private TimeSpan m_delay = TimeSpan.Zero;
-			private bool m_svs = true;
-            public TestTask(IModel model, string name):this(model,name,TimeSpan.Zero){}
-            public TestTask(IModel model, string name, TimeSpan delay):base(model,name,Guid.NewGuid()){
-                m_delay = delay;
-                this.EdgeExecutionStartingEvent+=new EdgeEvent(OnTaskBeginning);
-                this.EdgeExecutionFinishingEvent+=new EdgeEvent(OnTaskCompleting);
+
+        class TestTask : Highpoint.Sage.Graphs.Tasks.Task
+        {
+            private TimeSpan _delay = TimeSpan.Zero;
+            private bool _svs = true;
+            public TestTask(IModel model, string name) : this(model, name, TimeSpan.Zero) { }
+            public TestTask(IModel model, string name, TimeSpan delay) : base(model, name, Guid.NewGuid())
+            {
+                _delay = delay;
+                this.EdgeExecutionStartingEvent += new EdgeEvent(OnTaskBeginning);
+                this.EdgeExecutionFinishingEvent += new EdgeEvent(OnTaskCompleting);
             }
-        
-            protected override void DoTask(IDictionary graphContext){
-				SelfValidState = m_svs;
-                if ( m_delay.Equals(TimeSpan.Zero) ) {
+
+            protected override void DoTask(IDictionary graphContext)
+            {
+                SelfValidState = _svs;
+                if (_delay.Equals(TimeSpan.Zero))
+                {
                     SignalTaskCompletion(graphContext);
-                } else {
-                    Debug.WriteLine(Model.Executive.Now + " : " +  Name + " is commencing a sleep for " + m_delay + ".");
-                    Model.Executive.RequestEvent(new ExecEventReceiver(DoneDelaying),Model.Executive.Now+m_delay,0.0,graphContext);
+                }
+                else
+                {
+                    Debug.WriteLine(Model.Executive.Now + " : " + Name + " is commencing a sleep for " + _delay + ".");
+                    Model.Executive.RequestEvent(new ExecEventReceiver(DoneDelaying), Model.Executive.Now + _delay, 0.0, graphContext);
                 }
             }
 
-            private void DoneDelaying(IExecutive exec, object graphContext){
+            private void DoneDelaying(IExecutive exec, object graphContext)
+            {
                 SignalTaskCompletion((IDictionary)graphContext);
-				Debug.WriteLine(Model.Executive.Now + " : " +  Name + " is done.");
-			}
-
-            private void OnTaskBeginning(IDictionary graphContext, Edge edge){
-                Debug.WriteLine(Model.Executive.Now + " : " +  Name + " is beginning.");
+                Debug.WriteLine(Model.Executive.Now + " : " + Name + " is done.");
             }
 
-            private void OnTaskCompleting(IDictionary graphContext, Edge edge){
-                Debug.WriteLine(Model.Executive.Now + " : " +  Name + " is completing.");
+            private void OnTaskBeginning(IDictionary graphContext, Edge edge)
+            {
+                Debug.WriteLine(Model.Executive.Now + " : " + Name + " is beginning.");
+            }
+
+            private void OnTaskCompleting(IDictionary graphContext, Edge edge)
+            {
+                Debug.WriteLine(Model.Executive.Now + " : " + Name + " is completing.");
             }
         }
     }

@@ -14,7 +14,8 @@ namespace Highpoint.Sage.SystemDynamics.Utility
             string outputFileName = null,
             string header = null,
             Action<TextWriter, T1> toWrite = null,
-            T1 seed = null)
+            T1 seed = null,
+            bool startExcel = false)
         {
             outputFileName = outputFileName ?? Path.GetTempPath() + typeof(T1).FullName + Guid.NewGuid() + string.Format("{0}.csv", integrator);
 
@@ -55,7 +56,8 @@ namespace Highpoint.Sage.SystemDynamics.Utility
                     }
                 }
             }
-            Process.Start("excel.exe", outputFileName);
+            if (startExcel)
+                Process.Start("excel.exe", outputFileName);
         }
     }
 }
