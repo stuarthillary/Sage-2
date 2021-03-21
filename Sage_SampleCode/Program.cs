@@ -1,13 +1,15 @@
 ﻿/* This source code licensed under the GNU Affero General Public License */
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Diagnostics;
 using System.Text;
 using System.Threading;
 using System.Windows.Forms;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace Sage_SampleCode {
-    static class Program {
+namespace Sage_SampleCode
+{
+    static class Program
+    {
 
         static void Main(string[] args)
         {
@@ -56,20 +58,21 @@ namespace Sage_SampleCode {
 
             Demonstrate(Demo.SequenceControl.Basic.TaskGraphDemo.Run);
 
-            Thread thread = new Thread(() => Clipboard.SetText(s_sb.ToString()));
+            Thread thread = new Thread(() => Clipboard.SetText(_sb.ToString()));
             thread.SetApartmentState(ApartmentState.STA);
             thread.Start();
             thread.Join();
         }
 
         private static bool _prompts = false;
-        private static readonly string s_markerLine = new string('-', 79);
+        private static readonly string _markerLine = new string('-', 79);
 
         private static void Demonstrate(Action run)
         {
-            s_collectDocs?.Invoke(run); // Collect documentation only if s_collectDocs isn't null.
+            _collectDocs?.Invoke(run); // Collect documentation only if s_collectDocs isn't null.
 
-            if (!_prompts) Console.WriteLine(s_markerLine);
+            if (!_prompts)
+                Console.WriteLine(_markerLine);
 
             string demoName = run.Method.DeclaringType?.Name;
             if (_prompts)
@@ -80,7 +83,8 @@ namespace Sage_SampleCode {
 
             object[] oa = run.Method.GetCustomAttributes(typeof(DescriptionAttribute), false);
             string message = "";
-            if (oa.Length == 1) message = ((DescriptionAttribute)oa[0]).Description;
+            if (oa.Length == 1)
+                message = ((DescriptionAttribute)oa[0]).Description;
 
             Console.WriteLine("Demo : {0}\r\n\r\n{1}", demoName, message);
             if (_prompts)
@@ -93,26 +97,27 @@ namespace Sage_SampleCode {
             {
                 Console.WriteLine("Press any key to continue ('U' to run unprompted.)");
                 var k = Console.ReadKey();
-                if (k.Key == ConsoleKey.U) _prompts = false;
+                if (k.Key == ConsoleKey.U)
+                    _prompts = false;
             }
         }
 
-        private static readonly StringBuilder s_sb = new StringBuilder();
+        private static readonly StringBuilder _sb = new StringBuilder();
         private static string _feature = "";
         private static string _subFeature = "";
-        private static readonly Action<Action> s_collectDocs = CreateDocs; // Uncomment this line to turn on doc creation.
+        private static readonly Action<Action> _collectDocs = CreateDocs; // Uncomment this line to turn on doc creation.
         // private static readonly Action<Action> s_collectDocs = null; // Uncomment this line to turn off doc creation.
         private static void CreateDocs(Action run)
         {
             string @namespace = run.Method.DeclaringType?.Namespace;
-            string demoNamespace = @namespace.StartsWith("Demo.")? @namespace.Substring(5) : @namespace;
+            string demoNamespace = @namespace.StartsWith("Demo.") ? @namespace.Substring(5) : @namespace;
             Debug.Assert(!string.IsNullOrEmpty(demoNamespace));
             if (demoNamespace.Contains("."))
             {
                 string demoFeature = demoNamespace.Substring(0, demoNamespace.IndexOf('.'));
                 if (!string.Equals(demoFeature, _feature))
                 {
-                    s_sb.AppendLine(string.Format("<h2>{0}</h2>", demoFeature));
+                    _sb.AppendLine(string.Format("<h2>{0}</h2>", demoFeature));
                     _feature = demoFeature;
                 }
 
@@ -121,7 +126,7 @@ namespace Sage_SampleCode {
                 Debug.Assert(!string.IsNullOrEmpty(subFeature));
                 if (!string.Equals(subFeature, _subFeature))
                 {
-                    s_sb.AppendLine(string.Format("<h3>{0}</h3>", subFeature));
+                    _sb.AppendLine(string.Format("<h3>{0}</h3>", subFeature));
                     _subFeature = subFeature;
                 }
             }
@@ -130,17 +135,17 @@ namespace Sage_SampleCode {
                 string demoFeature = demoNamespace;
                 if (!string.Equals(demoFeature, _feature))
                 {
-                    s_sb.AppendLine(string.Format("<h2>{0}</h2>", demoFeature));
+                    _sb.AppendLine(string.Format("<h2>{0}</h2>", demoFeature));
                     _feature = demoFeature;
                 }
             }
 
             string demoName = run.Method.DeclaringType?.Name;
-            s_sb.AppendLine(string.Format("<h4>{0}</h4>", demoName));
+            _sb.AppendLine(string.Format("<h4>{0}</h4>", demoName));
 
             object[] oa = run.Method.GetCustomAttributes(typeof(DescriptionAttribute), false);
-            string message = oa.Length == 1 ? ((DescriptionAttribute) oa[0]).Description.Replace("\r\n\r\n", "</p>\r\n<p>") : "ERROR";
-            s_sb.AppendLine($"<p>{message}</p>");
+            string message = oa.Length == 1 ? ((DescriptionAttribute)oa[0]).Description.Replace("\r\n\r\n", "</p>\r\n<p>") : "ERROR";
+            _sb.AppendLine($"<p>{message}</p>");
         }
     }
 }

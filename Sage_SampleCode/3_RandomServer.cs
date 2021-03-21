@@ -1,12 +1,14 @@
 ﻿/* This source code licensed under the GNU Affero General Public License */
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace Demo.RandomServer {
-    using System;
-    using Highpoint.Sage.SimCore;
+namespace Demo.RandomServer
+{
     using Highpoint.Sage.Randoms;
+    using Highpoint.Sage.SimCore;
+    using System;
 
-    class SimpleDefaultServer {
+    class SimpleDefaultServer
+    {
 
         [Description(@"This demonstration shows the default use of a RandomServer. It obtains, 
 for each of five test case seed-and-buffer-size combinations, an instance
@@ -14,15 +16,17 @@ of IRandomChannel from the GlobalRandomServer, and outputs the first ten
 values from that random channel. The demonstration calls ""NextDouble()"",
 but there are a number of other familiar methods for getting randoms as
 well.")]
-        public static void Run() {
+        public static void Run()
+        {
 
-            ulong[][] testValues = new ulong[][] { 
-                new ulong[] { 12345, 100 }, 
-                new ulong[] { 54321, 100 }, 
-                new ulong[] { 12345, 200 }, 
+            ulong[][] testValues = new ulong[][] {
+                new ulong[] { 12345, 100 },
+                new ulong[] { 54321, 100 },
+                new ulong[] { 12345, 200 },
                 new ulong[] { 51903, 200 } };
 
-            foreach (ulong[] ula in testValues) {
+            foreach (ulong[] ula in testValues)
+            {
                 ulong seed = ula[0];
                 int bufferSize = (int)ula[1];
                 IRandomChannel irc = GlobalRandomServer.Instance.GetRandomChannel(seed, bufferSize);
@@ -36,7 +40,8 @@ well.")]
         }
     }
 
-    class DecorrellatedActivities {
+    class DecorrellatedActivities
+    {
 
         [Description(@"This demonstration shows the random server's ability to maintain two
 separate streams of random numbers that do not affect each other. The
@@ -60,7 +65,8 @@ behavior in the second part of the demo, illustrating the decorrellated nature
 of random channels. They can be used to hold one part of a simulation constant
 and allow another to change."
 )]
-        public static void Run() {
+        public static void Run()
+        {
             RandomServer rs = null;
             IExecutive exec = null;
             Activity fooActivity = null;
@@ -68,7 +74,8 @@ and allow another to change."
 
 
             int defaultBufferSize = 100;
-            foreach (ulong hyperSeed in new ulong[] { 87654, 23456 }) {
+            foreach (ulong hyperSeed in new ulong[] { 87654, 23456 })
+            {
                 Console.WriteLine("Test with hyperSeed of {0}.", hyperSeed);
                 rs = new RandomServer(hyperSeed, defaultBufferSize);
                 exec = ExecFactory.Instance.CreateExecutive();
@@ -101,41 +108,54 @@ and allow another to change."
 
             DateTime when = DateTime.Parse("1/1/0001 7:13:29 AM");
             exec.RequestEvent(
-                delegate(IExecutive _exec, object userData) {
-                    Console.WriteLine("{0} : Doubling barActivity's multiplier.", _exec.Now); barActivity.Multiplier = 2.0;
+                delegate (IExecutive _exec, object userData)
+                {
+                    Console.WriteLine("{0} : Doubling barActivity's multiplier.", _exec.Now);
+                    barActivity.Multiplier = 2.0;
                 },
                 when);
 
             exec.Start();
 
         }
-        class Activity {
+        class Activity
+        {
 
-            private static readonly int m_defaultBufferSize = 100;
-            private readonly IRandomChannel m_rc;
-            private readonly int m_numIterations;
-            private readonly string m_name;
-            private double m_multiplier = 1.0;
+            private static readonly int _defaultBufferSize = 100;
+            private readonly IRandomChannel _rc;
+            private readonly int _numIterations;
+            private readonly string _name;
+            private double _multiplier = 1.0;
 
-            public Activity(string name, int numIterations, IExecutive executive, RandomServer rs, ulong seed) {
-                m_name = name;
-                m_numIterations = numIterations;
-                m_rc = rs.GetRandomChannel(seed, m_defaultBufferSize);
-                executive.ExecutiveStarted += delegate(IExecutive exec) {
+            public Activity(string name, int numIterations, IExecutive executive, RandomServer rs, ulong seed)
+            {
+                _name = name;
+                _numIterations = numIterations;
+                _rc = rs.GetRandomChannel(seed, _defaultBufferSize);
+                executive.ExecutiveStarted += delegate (IExecutive exec)
+                {
                     exec.RequestEvent(Run, exec.Now, 0.0, null, ExecEventType.Detachable);
                 };
             }
 
-            private void Run(IExecutive exec, object userData) {
-                for (int iterationNum = 1; iterationNum <= m_numIterations; iterationNum++) {
-                    Console.WriteLine("{0} : {1} beginning iteration {2}.", exec.Now, m_name, iterationNum);
-                    TimeSpan iterationDuration = TimeSpan.FromHours(m_multiplier * m_rc.NextDouble(2.0, 4.0));
+            private void Run(IExecutive exec, object userData)
+            {
+                for (int iterationNum = 1; iterationNum <= _numIterations; iterationNum++)
+                {
+                    Console.WriteLine("{0} : {1} beginning iteration {2}.", exec.Now, _name, iterationNum);
+                    TimeSpan iterationDuration = TimeSpan.FromHours(_multiplier * _rc.NextDouble(2.0, 4.0));
                     exec.CurrentEventController.SuspendFor(iterationDuration);
-                    Console.WriteLine("{0} : {1} ending iteration {2}.", exec.Now, m_name, iterationNum);
+                    Console.WriteLine("{0} : {1} ending iteration {2}.", exec.Now, _name, iterationNum);
                 }
             }
 
-            public double Multiplier { set { m_multiplier = value; } }
+            public double Multiplier
+            {
+                set
+                {
+                    _multiplier = value;
+                }
+            }
         }
     }
 }

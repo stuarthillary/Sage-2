@@ -1,12 +1,12 @@
 ﻿/* This source code licensed under the GNU Affero General Public License */
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using Highpoint.Sage.Mathematics;
 using Highpoint.Sage.Resources;
 using Highpoint.Sage.SimCore;
 using Highpoint.Sage.Utility;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
 
 namespace Demo.Resources
 {
@@ -106,13 +106,14 @@ non-deterministic issues of multithreading do not apply here.")]
             public void Initialize()
             {
                 Starting += GenerateTellers;
-                Executive.ExecutiveStarted += GenerateCustomers;               
+                Executive.ExecutiveStarted += GenerateCustomers;
             }
 
             protected virtual void GenerateTellers(IModel model)
             {
                 TellerPool = new TellerPool(this);
-                for (int i = 0; i < NTellers; i++) TellerPool.Add(new Teller(this, ServiceTime));
+                for (int i = 0; i < NTellers; i++)
+                    TellerPool.Add(new Teller(this, ServiceTime));
             }
 
             protected virtual void GenerateCustomers(IExecutive exec)
@@ -130,12 +131,13 @@ non-deterministic issues of multithreading do not apply here.")]
             public string Report()
             {
                 StringBuilder sb = new StringBuilder();
-                foreach (Teller teller in TellerPool.Resources) sb.AppendLine(teller.Report());
+                foreach (Teller teller in TellerPool.Resources)
+                    sb.AppendLine(teller.Report());
                 return sb.ToString();
             }
         }
 
-        class Customer 
+        class Customer
         {
             internal virtual void Start(TellerPool tellerPool)
             {
@@ -148,7 +150,10 @@ non-deterministic issues of multithreading do not apply here.")]
             }
         }
 
-        enum TellerState {  Busy, Idle }
+        enum TellerState
+        {
+            Busy, Idle
+        }
         class Teller : Resource
         {
             protected static int TellerNum = 0;
@@ -156,12 +161,12 @@ non-deterministic issues of multithreading do not apply here.")]
             protected readonly IDoubleDistribution ServiceTime;
             protected readonly EnumStateMachine<TellerState> TellerState;
 
-            public Teller(IModel model, IDoubleDistribution serviceTime) 
+            public Teller(IModel model, IDoubleDistribution serviceTime)
                 : base(model, $"Teller_{TellerNum++:D3}", Guid.NewGuid(), 1, 1, true, true, true)
             {
                 m_model = model;
                 ServiceTime = serviceTime;
-                TellerState = new EnumStateMachine<TellerState>(model.Executive,Basic.TellerState.Idle, trackTransitions:false);
+                TellerState = new EnumStateMachine<TellerState>(model.Executive, Basic.TellerState.Idle, trackTransitions: false);
             }
 
             internal string Report()
@@ -182,7 +187,7 @@ non-deterministic issues of multithreading do not apply here.")]
 
         class TellerPool : ResourceManager
         {
-            public TellerPool(IModel model) 
+            public TellerPool(IModel model)
                 : base(model, "Teller Pool", Guid.NewGuid(), priorityEnabled: false)
             {
             }
@@ -190,7 +195,7 @@ non-deterministic issues of multithreading do not apply here.")]
 
         class TellerRequest : ResourceRequest
         {
-            public TellerRequest() : base(1.0){} // Only ever need one teller.
+            public TellerRequest() : base(1.0) { } // Only ever need one teller.
 
             public override double GetScore(IResource resource) => double.MaxValue; // Any teller is just fine - no other one could be better.
 
@@ -202,13 +207,14 @@ non-deterministic issues of multithreading do not apply here.")]
 
         class DemoModelSynchronous : DemoModel
         {
-            public DemoModelSynchronous(string name, int nCustomers, IDoubleDistribution interarrivalTime, int nTellers, IDoubleDistribution serviceTime) 
+            public DemoModelSynchronous(string name, int nCustomers, IDoubleDistribution interarrivalTime, int nTellers, IDoubleDistribution serviceTime)
                 : base(name, nCustomers, interarrivalTime, nTellers, serviceTime) { }
 
             protected override void GenerateTellers(IModel model)
             {
                 TellerPool = new TellerPool(this);
-                for (int i = 0; i < NTellers; i++) TellerPool.Add(new TellerSynchronous(this, ServiceTime));
+                for (int i = 0; i < NTellers; i++)
+                    TellerPool.Add(new TellerSynchronous(this, ServiceTime));
             }
             protected override void GenerateCustomers(IExecutive exec)
             {
@@ -225,7 +231,7 @@ non-deterministic issues of multithreading do not apply here.")]
 
         class TellerSynchronous : Teller
         {
-            public TellerSynchronous(IModel model, IDoubleDistribution serviceTime) : base(model, serviceTime){}
+            public TellerSynchronous(IModel model, IDoubleDistribution serviceTime) : base(model, serviceTime) { }
 
             internal void StartServiceSynchronous(CustomerSynchronous customer)
             {
@@ -246,16 +252,16 @@ non-deterministic issues of multithreading do not apply here.")]
 
         class CustomerSynchronous : Customer
         {
-            private TellerRequest m_tellerRequest;
-            private TellerPool m_tellerPool;
+            private TellerRequest _tellerRequest;
+            private TellerPool _tellerPool;
 
             internal override void Start(TellerPool tellerPool)
             {
-                m_tellerPool = tellerPool;
-                m_tellerRequest = new TellerRequest();
-                if (!m_tellerPool.Acquire(m_tellerRequest, false))
+                _tellerPool = tellerPool;
+                _tellerRequest = new TellerRequest();
+                if (!_tellerPool.Acquire(_tellerRequest, false))
                 {
-                    m_tellerPool.ResourceReleased += TellerPoolOnResourceReleased;
+                    _tellerPool.ResourceReleased += TellerPoolOnResourceReleased;
                     // We might use this, too, if we were adding and removing tellers dynamically.
                     //m_tellerPool.ResourceAdded += TellerPoolOnResourceAdded;
                 }
@@ -268,22 +274,22 @@ non-deterministic issues of multithreading do not apply here.")]
 
             private void TellerPoolOnResourceReleased(IResourceRequest irr, IResource resource)
             {
-                if (m_tellerPool.Acquire(m_tellerRequest, false))
+                if (_tellerPool.Acquire(_tellerRequest, false))
                 {
-                    m_tellerPool.ResourceReleased -= TellerPoolOnResourceReleased;
+                    _tellerPool.ResourceReleased -= TellerPoolOnResourceReleased;
                 }
             }
 
             internal void StartService()
             {
-                TellerSynchronous teller = (TellerSynchronous)m_tellerRequest.ResourceObtained;
+                TellerSynchronous teller = (TellerSynchronous)_tellerRequest.ResourceObtained;
                 teller.StartServiceSynchronous(this);
             }
 
             internal void FinishService()
             {
                 // Service is done.
-                m_tellerRequest.Release(); // The 'teller' resource is released back into the pool.
+                _tellerRequest.Release(); // The 'teller' resource is released back into the pool.
             }
         }
     }
@@ -324,15 +330,15 @@ TellerRequest : A resource request that asks for one teller, any teller.
             {
                 Highpoint.Sage.SimCore.Model model = new Highpoint.Sage.SimCore.Model();
                 MotorPool mp = new MotorPool(model);
-                foreach (int passengerCapacity in new[] {1,3,4,7,9})
+                foreach (int passengerCapacity in new[] { 1, 3, 4, 7, 9 })
                 {
-                    mp.Add(new Vehicle(model,passengerCapacity));
+                    mp.Add(new Vehicle(model, passengerCapacity));
                 }
-                Console.WriteLine("Stocked a motor pool with {0} seat vehicles.\r\n", 
+                Console.WriteLine("Stocked a motor pool with {0} seat vehicles.\r\n",
                     StringOperations.ToCommasAndAndedList(mp.Resources.Cast<Vehicle>(),
                     vehicle => vehicle.PassengerCapacity.ToString()));
 
-                foreach (int[] requisitions in new[] {new[] {1, 3, 4}, new[] {2, 5, 7}, new[] {1, 5, 8}, new[] { 8, 1, 6 }, new[] { 8, 7, 6 } , new[] { 1, 3, 4, 7, 8, 9 } })
+                foreach (int[] requisitions in new[] { new[] { 1, 3, 4 }, new[] { 2, 5, 7 }, new[] { 1, 5, 8 }, new[] { 8, 1, 6 }, new[] { 8, 7, 6 }, new[] { 1, 3, 4, 7, 8, 9 } })
                 {
                     Console.WriteLine("\r\nTest:");
                     List<VehicleRequest> requests = requisitions.Select(requisition => new VehicleRequest(requisition)).ToList();
@@ -350,7 +356,8 @@ TellerRequest : A resource request that asks for one teller, any teller.
                         }
                     }
 
-                    foreach (VehicleRequest vehicleRequest in requests.Where(n=>n.ResourceObtained != null)) vehicleRequest.Release();
+                    foreach (VehicleRequest vehicleRequest in requests.Where(n => n.ResourceObtained != null))
+                        vehicleRequest.Release();
                 }
             }
         }
@@ -359,12 +366,15 @@ TellerRequest : A resource request that asks for one teller, any teller.
     internal class MotorPool : ResourceManager
     {
         public MotorPool(IModel model)
-            : base(model, "Teller Pool", Guid.NewGuid(), priorityEnabled: false) {}
+            : base(model, "Teller Pool", Guid.NewGuid(), priorityEnabled: false) { }
     }
 
     internal class Vehicle : Resource
     {
-        public int PassengerCapacity { get; set; }
+        public int PassengerCapacity
+        {
+            get; set;
+        }
         protected static int VehicleNum = 0;
 
         public Vehicle(IModel model, int passengerCapacity)
@@ -376,7 +386,10 @@ TellerRequest : A resource request that asks for one teller, any teller.
 
     internal class VehicleRequest : ResourceRequest
     {
-        public int SeatsNeeded { get; set; }
+        public int SeatsNeeded
+        {
+            get; set;
+        }
 
         public VehicleRequest(int seatsNeeded) : base(1)
         {
@@ -385,9 +398,10 @@ TellerRequest : A resource request that asks for one teller, any teller.
 
         public override double GetScore(IResource resource)
         {
-            Vehicle vehicle = (Vehicle) resource;
+            Vehicle vehicle = (Vehicle)resource;
             // We will choose the one with the highest score.
-            if (vehicle.PassengerCapacity < SeatsNeeded) return double.MinValue; // Magic number signifying "totally unacceptable."
+            if (vehicle.PassengerCapacity < SeatsNeeded)
+                return double.MinValue; // Magic number signifying "totally unacceptable."
             return SeatsNeeded - vehicle.PassengerCapacity; // Highest number will be least number of empty seats.
         }
 

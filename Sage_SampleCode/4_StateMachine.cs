@@ -1,10 +1,10 @@
 ﻿/* This source code licensed under the GNU Affero General Public License */
-using System;
-using System.Collections.Generic;
-using System.Text;
 using Highpoint.Sage.Randoms;
 using Highpoint.Sage.SimCore;
 using Highpoint.Sage.Utility;
+using System;
+using System.Collections.Generic;
+using System.Text;
 
 namespace Demo.StateMachine
 {
@@ -91,38 +91,41 @@ here to try to avoid confusion.")]
             }
         }
 
-        enum SADO_States {  Idle, Running }
+        enum SADO_States
+        {
+            Idle, Running
+        }
 
         internal class StateAwareDemoObject : BaseModelObject
         {
-            private readonly int m_howManyCycles;
-            private int m_jobNum;
-            private readonly EnumStateMachine<SADO_States> m_state;
-            private readonly IRandomChannel m_rc;
+            private readonly int _howManyCycles;
+            private int _jobNum;
+            private readonly EnumStateMachine<SADO_States> _state;
+            private readonly IRandomChannel _rc;
 
             public StateAwareDemoObject(IModel model, string name, int howManyCycles)
                 : base(model, name, System.Guid.NewGuid())
             {
-                m_howManyCycles = howManyCycles;
-                m_state = new EnumStateMachine<SADO_States>(model.Executive, SADO_States.Idle, true);
-                m_rc = model.RandomServer.GetRandomChannel();
+                _howManyCycles = howManyCycles;
+                _state = new EnumStateMachine<SADO_States>(model.Executive, SADO_States.Idle, true);
+                _rc = model.RandomServer.GetRandomChannel();
                 model.Starting += WaitAndRun;
             }
 
             private void WaitAndRun(IModel theModel)
             {
                 IExecutive exec = theModel.Executive;
-                DateTime whenToStart = exec.Now + TimeSpan.FromHours(m_rc.NextDouble()*2);
-                TimeSpan howLongToRun = TimeSpan.FromHours(m_rc.NextDouble()*4);
+                DateTime whenToStart = exec.Now + TimeSpan.FromHours(_rc.NextDouble() * 2);
+                TimeSpan howLongToRun = TimeSpan.FromHours(_rc.NextDouble() * 4);
                 exec.RequestEvent((executive, data) => StartRunning(howLongToRun), whenToStart);
             }
 
             private void StartRunning(TimeSpan forHowLong)
             {
-                Console.WriteLine("{0} : {1} starting job {2}.", Model.Executive.Now, Name, m_jobNum);
-                if (m_state.CurrentState == SADO_States.Idle)
+                Console.WriteLine("{0} : {1} starting job {2}.", Model.Executive.Now, Name, _jobNum);
+                if (_state.CurrentState == SADO_States.Idle)
                 {
-                    m_state.ToState(SADO_States.Running);
+                    _state.ToState(SADO_States.Running);
                     DateTime runUntil = Model.Executive.Now + forHowLong;
                     Model.Executive.RequestEvent(FinishRunning, runUntil, null);
                 }
@@ -130,12 +133,13 @@ here to try to avoid confusion.")]
 
             private void FinishRunning(IExecutive exec, object userdata)
             {
-                Console.WriteLine("{0} : {1} finishing job {2}.", Model.Executive.Now, Name, m_jobNum);
-                m_state.ToState(SADO_States.Idle);
-                if (++m_jobNum < m_howManyCycles) WaitAndRun(Model);
+                Console.WriteLine("{0} : {1} finishing job {2}.", Model.Executive.Now, Name, _jobNum);
+                _state.ToState(SADO_States.Idle);
+                if (++_jobNum < _howManyCycles)
+                    WaitAndRun(Model);
             }
 
-            public SADO_States State => m_state.CurrentState;
+            public SADO_States State => _state.CurrentState;
 
             public string StateReport
             {
@@ -144,10 +148,10 @@ here to try to avoid confusion.")]
                     StringBuilder sb = new StringBuilder();
                     sb.AppendFormat("{0} spent {1} idle and {2} running.\r\n",
                         Name,
-                        m_state.StateTimes[SADO_States.Idle],
-                        m_state.StateTimes[SADO_States.Running]);
+                        _state.StateTimes[SADO_States.Idle],
+                        _state.StateTimes[SADO_States.Running]);
 
-                    foreach (var transitionRecord in m_state.Transitions)
+                    foreach (var transitionRecord in _state.Transitions)
                     {
                         sb.AppendFormat("{0} : {1} transitioned from {2} to {3}.\r\n",
                             transitionRecord.When,

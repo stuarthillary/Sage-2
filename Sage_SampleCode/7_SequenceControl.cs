@@ -1,9 +1,8 @@
 ﻿/* This source code licensed under the GNU Affero General Public License */
-using System;
 using Highpoint.Sage.Graphs.Tasks;
 using Highpoint.Sage.SimCore;
+using System;
 using System.Collections;
-using Highpoint.Sage.Graphs.Analysis;
 
 namespace Demo.SequenceControl
 {
@@ -56,19 +55,19 @@ multiple instance execution (let's make three batches of brownies.)
                 TestTask waitForCookTime = new TestTask(model, "Wait for Cook Time", 45);
                 TestTask removePanFromOven = new TestTask(model, "Remove Pan From Oven", 2);
 
-                makeBrownies.AddChildEdges(new [] { prepareOven , preparePan , assembleBrownies, bakeBrownies }); // We'll allow them to proceed in parallel.
-                preparePan.AddChainOfChildren(new[] { acquirePan , greasePan }); // These happen in series.
+                makeBrownies.AddChildEdges(new[] { prepareOven, preparePan, assembleBrownies, bakeBrownies }); // We'll allow them to proceed in parallel.
+                preparePan.AddChainOfChildren(new[] { acquirePan, greasePan }); // These happen in series.
                 assembleBrownies.AddChainOfChildren(new[] { acquireIngredients, mixIngredients, pourBatter }); // These happen in series.
                 bakeBrownies.AddChainOfChildren(new[] { putPanInOven, waitForCookTime, removePanFromOven }); // These happen in series.
 
                 bakeBrownies.AddPredecessor(preparePan);
                 bakeBrownies.AddPredecessor(assembleBrownies);
 
-//                CpmAnalyst cpa = new CpmAnalyst(bakeBrownies);
-//                cpa.Analyze();
+                //                CpmAnalyst cpa = new CpmAnalyst(bakeBrownies);
+                //                cpa.Analyze();
 
-                model.Starting += delegate(IModel theModel)
-                {          
+                model.Starting += delegate (IModel theModel)
+                {
                     theModel.Executive.RequestEvent((exec, data) => makeBrownies.Start(graphContext1), startTime);
                 };
 
@@ -76,7 +75,7 @@ multiple instance execution (let's make three batches of brownies.)
 
                 Console.WriteLine("\r\nPost-run analysis:\r\n");
 
-                foreach (TestTask testTask in new[] {prepareOven, mixIngredients, putPanInOven, waitForCookTime})
+                foreach (TestTask testTask in new[] { prepareOven, mixIngredients, putPanInOven, waitForCookTime })
                 {
                     Console.WriteLine("It was recorded that {0} started at {1} and took {2}.", testTask.Name,
                         testTask.GetStartTime(graphContext1), testTask.GetRecordedDuration(graphContext1));
@@ -99,21 +98,21 @@ multiple instance execution (let's make three batches of brownies.)
 
             private class TestTask : Task
             {
-                private readonly double m_minutesToDelay;
+                private readonly double _minutesToDelay;
 
                 public TestTask(IModel model, string name, double minutesToDelay)
                     : base(model, name, Guid.NewGuid())
                 {
-                    m_minutesToDelay = minutesToDelay;
+                    _minutesToDelay = minutesToDelay;
                     this.TaskStartingEvent += (context, task) => Console.WriteLine("{2}{0} : Starting {1}.", model.Executive.Now, Name, Tabs);
                     this.TaskFinishingEvent += (context, task) => Console.WriteLine("{2}{0} : Finishing {1}.", model.Executive.Now, Name, Tabs);
                 }
 
-                private string Tabs => "  " + ((TestTask) Parent)?.Tabs;
+                private string Tabs => "  " + ((TestTask)Parent)?.Tabs;
 
                 protected override void DoTask(IDictionary graphContext)
                 {
-                    DateTime completeWhen = Model.Executive.Now + TimeSpan.FromMinutes(m_minutesToDelay);
+                    DateTime completeWhen = Model.Executive.Now + TimeSpan.FromMinutes(_minutesToDelay);
                     Model.Executive.RequestEvent((exec, data) => SignalTaskCompletion(graphContext), completeWhen);
                 }
             }

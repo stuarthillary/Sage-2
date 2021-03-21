@@ -1,7 +1,7 @@
 ﻿/* This source code licensed under the GNU Affero General Public License */
-using System;
 using Highpoint.Sage.SimCore;
 using Highpoint.Sage.Utility;
+using System;
 
 namespace Demo.Model
 {
@@ -142,7 +142,7 @@ It is the same as the ""StateMachine.Basic.SimpleEnumStateMachine"" demo.")]
 
                 // In the follow-on-states array, if a state has itself as a follow-on-state, it is a terminal
                 // state, and requires an overt action to leave that state (Such as calling "Run" to leave "Idle.")
-                Enum[] followOnStates = new Enum[] {States.Idle, States.Running, States.Idle};
+                Enum[] followOnStates = new Enum[] { States.Idle, States.Running, States.Idle };
 
                 Enum initialState = States.Idle;
 

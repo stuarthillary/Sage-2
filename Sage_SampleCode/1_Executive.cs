@@ -3,11 +3,11 @@
 // ReSharper disable InconsistentNaming
 // ReSharper disable UnusedMember.Local
 
-using System;
 using Highpoint.Sage.SimCore;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System;
 using System.Collections.Generic;
 using System.Threading;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Demo.Executive
 {
@@ -121,7 +121,7 @@ and also shows an event handler requesting a further, future, event service.")]
             {
                 IExecutive exec = ExecFactory.Instance.CreateExecutive();
 
-                Queue<string> userData = new Queue<string>(new[] {"Hello", "World"});
+                Queue<string> userData = new Queue<string>(new[] { "Hello", "World" });
 
                 DateTime when = DateTime.Parse("Fri, 15 Jul 2016 03:51:21");
                 exec.RequestEvent(WriteIt, when, 0.0, userData);
@@ -131,7 +131,7 @@ and also shows an event handler requesting a further, future, event service.")]
 
             private static void WriteIt(IExecutive exec, object _userData)
             {
-                Queue<string> userData = (Queue<string>) _userData;
+                Queue<string> userData = (Queue<string>)_userData;
                 if (userData.Count > 0)
                 {
                     Console.WriteLine("{0} : {1}", exec.Now, userData.Dequeue());
@@ -153,7 +153,7 @@ analysis.")]
             {
                 IExecutive exec = ExecFactory.Instance.CreateExecutive();
 
-                Queue<string> userData = new Queue<string>(new[] {"Hello", "World"});
+                Queue<string> userData = new Queue<string>(new[] { "Hello", "World" });
 
                 DateTime when = DateTime.Parse("Fri, 15 Jul 2016 03:51:21");
                 exec.RequestEvent(WriteIt, when, 0.0, userData);
@@ -173,7 +173,7 @@ analysis.")]
             private static void WriteIt(IExecutive exec, object _userData)
             {
                 // We want to generate an exception in an event handler.
-                Stack<string> userData = (Stack<string>) _userData; // <-- Miscast. It's a queue. 
+                Stack<string> userData = (Stack<string>)_userData; // <-- Miscast. It's a queue. 
                 if (userData.Count > 0)
                 {
                     Console.WriteLine("{0} : {1}", exec.Now, userData.Pop());
@@ -214,7 +214,7 @@ never serviced.")]
             private static void RescindIt(IExecutive exec, object userData)
             {
                 Console.WriteLine("{0} : Rescinding event {1}", exec.Now, userData);
-                exec.UnRequestEvent((long) userData);
+                exec.UnRequestEvent((long)userData);
             }
 
         }
@@ -270,7 +270,7 @@ This demonstrates some more advanced capabilities of event rescinding.")]
 
             private static void RescindIndividual(IExecutive exec, object userData)
             {
-                Domain.Sample1.Dog targetDog = (Domain.Sample1.Dog) userData;
+                Domain.Sample1.Dog targetDog = (Domain.Sample1.Dog)userData;
                 Console.WriteLine("{0} : Rescinding events to {1}.Speak()", exec.Now, targetDog.Name);
                 exec.UnRequestEvents(new ExecEventReceiver(targetDog.Speak));
             }
@@ -345,7 +345,7 @@ This demonstrates how two things may be in process at the same time.")]
 
             private static void DoSomething(IExecutive exec, object userData)
             {
-                TimeSpan duration = (TimeSpan) userData;
+                TimeSpan duration = (TimeSpan)userData;
                 Console.WriteLine("{0} : Starting to do something. Will be done in {1} minutes.", exec.Now,
                     duration.TotalMinutes);
                 // exec.CurrentEventController.SuspendFor(duration);
@@ -428,7 +428,7 @@ a suspension to its activity, and relying on another agent to resume it.")]
 
                 private void FinishRewiringDisposal(IExecutive exec, object userData)
                 {
-                    IDetachableEventController plumbersIDEC = (IDetachableEventController) userData;
+                    IDetachableEventController plumbersIDEC = (IDetachableEventController)userData;
                     Console.WriteLine("{0} : {1} is done fixing the disposal.", exec.Now, Name);
                     plumbersIDEC.Resume();
                     Console.WriteLine("{0} : {1} is leaving.", exec.Now, Name);
@@ -549,7 +549,7 @@ detachable events.")]
 
             private static void RescindIndividual(IExecutive exec, object userData)
             {
-                Domain.Sample1.Dog dog = (Domain.Sample1.Dog) userData;
+                Domain.Sample1.Dog dog = (Domain.Sample1.Dog)userData;
                 Console.WriteLine("{0} : Rescinding events to {1}.Speak()", exec.Now, dog.Name);
                 exec.UnRequestEvents(new ExecEventReceiver(dog.Speak));
             }
@@ -565,11 +565,11 @@ detachable events.")]
 
             private class Revoker : IExecEventSelector
             {
-                private readonly Type m_targetType;
+                private readonly Type _targetType;
 
                 public Revoker(Type targetType)
                 {
-                    m_targetType = targetType;
+                    _targetType = targetType;
                 }
 
                 #region IExecEventSelector Members
@@ -577,7 +577,7 @@ detachable events.")]
                 public bool SelectThisEvent(ExecEventReceiver eer, DateTime when, double priority, object userData,
                     ExecEventType eet)
                 {
-                    return eer.Target != null && eer.Target.GetType() == m_targetType;
+                    return eer.Target != null && eer.Target.GetType() == _targetType;
                 }
 
                 #endregion
@@ -677,7 +677,7 @@ for example, be tied to a button-press in the GUI.")]
         internal class UseExecController
         {
 
-            private static string m_state = "Uninitiated.";
+            private static string _state = "Uninitiated.";
 
             [Description(@"This demo shows the capabilities of the ExecController, which can be used
 to drive scaled-rate animation. The ExecController's two relevant properties
@@ -718,12 +718,12 @@ state every five milliseconds of simulation time and firese a ""Render"" event
 
             private static void Render(IExecutive exec, object userData)
             {
-                Console.WriteLine("User time : {0}, Sim Time {1}. State = {2}.", DateTime.Now, exec.Now, m_state);
+                Console.WriteLine("User time : {0}, Sim Time {1}. State = {2}.", DateTime.Now, exec.Now, _state);
             }
 
             private static void UpdateState(IExecutive exec, object userData)
             {
-                m_state = exec.Now.Second.ToString();
+                _state = exec.Now.Second.ToString();
             }
         }
 
