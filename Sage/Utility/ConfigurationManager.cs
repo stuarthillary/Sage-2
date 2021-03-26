@@ -5,15 +5,15 @@ using System.Collections.Specialized;
 namespace Highpoint.Sage.Utility
 {
 
-    public class ConfigurationManager
-    {
-        public ConfigurationManager(string filename)
-        {
+    //public class ConfigurationManager
+    //{
+    //    public ConfigurationManager(string filename)
+    //    {
 
-        }
-        public NameValueCollection GetSection(string sectionName)
-        {
-            return null;
-        }
-    }
+    //    }
+    //    public NameValueCollection GetSection(string sectionName)
+    //    {
+    //        return null;
+    //    }
+    //}
 }

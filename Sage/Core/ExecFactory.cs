@@ -3,7 +3,12 @@
 #define TIME_BOUNDED
 
 using System;
+using System.Collections.Specialized;
+using System.Configuration;
+using System.Diagnostics;
 using System.Reflection;
+using _Debug = System.Diagnostics.Debug;
+
 #if LICENSING_ENABLED
 using Highpoint.Sage.Licensing;
 #endif // LICENSING_ENABLED
@@ -144,7 +149,7 @@ namespace Highpoint.Sage.SimCore
             if (_requiredType == null)
             {
                 _requiredType = "Highpoint.Sage.SimCore.Executive, Sage";
-#if !NETSTANDARD
+
                 NameValueCollection nvc = (NameValueCollection)ConfigurationManager.GetSection("Sage");
                 if (nvc == null)
                 {
@@ -152,9 +157,9 @@ namespace Highpoint.Sage.SimCore
                 }
                 else if (nvc["ExecutiveType"] != null)
                 {
-                    m_requiredType = nvc["ExecutiveType"];
+                    _requiredType = nvc["ExecutiveType"];
                 }
-#endif
+
             }
             return CreateExecutive(_requiredType, execGuid);
         }

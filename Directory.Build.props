@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+  <PropertyGroup>
+    <RootPath>$(MSBuildThisFileDirectory)</RootPath>
+    <BuildOutput>$(RootPath)BuildOutput\</BuildOutput>
+    <BaseIntermediateOutputPath>$(BuildOutput)obj\$(Configuration)\$(MSBuildProjectName)\</BaseIntermediateOutputPath>
+    <IntermediateOutputPath>$(BuildOutput)obj\$(Configuration)\$(MSBuildProjectName)\</IntermediateOutputPath>
+    <MSBuildProjectExtensionsPath>$(IntermediateOutputPath)\</MSBuildProjectExtensionsPath>
+    <OutputPath>$(BuildOutput)$(Platform)\$(Configuration)</OutputPath>
+    <OutDir>$(OutputPath)</OutDir>
+    <PublishDir>$(BuildOutput)publish\$(Platform)\$(Configuration)</PublishDir>
+    <CommonAssemblyProps>$(RootPath)CommonAssembly.props</CommonAssemblyProps>
+  </PropertyGroup>
+
+</Project>

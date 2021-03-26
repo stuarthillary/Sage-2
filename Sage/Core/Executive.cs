@@ -3,6 +3,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.Diagnostics;
 using System.Threading;
 using _Debug = System.Diagnostics.Debug;
@@ -51,7 +52,7 @@ namespace Highpoint.Sage.SimCore
             _guid = execGuid;
             _currentEventType = ExecEventType.None;
 
-#if !NETSTANDARD
+
             #region >>> Set up from-config-file parameters <<<
             int desiredMinWorkerThreads = 100;
             int desiredMaxWorkerThreads = 900;
@@ -68,7 +69,7 @@ namespace Highpoint.Sage.SimCore
             }
             if (nvc == null)
             {
-                _Debug.WriteLine(_cannot_Find_Sage_Section);
+                _Debug.WriteLine(cannot_Find_Sage_Section);
                 // Leave at default values.
             }
             else
@@ -76,13 +77,13 @@ namespace Highpoint.Sage.SimCore
                 string workerThreads = nvc["WorkerThreads"];
                 if (workerThreads == null || ( !int.TryParse(workerThreads, out desiredMaxWorkerThreads) ))
                 {
-                    _Debug.WriteLine(_cannot_Find_Workerthread_Directive);
+                    _Debug.WriteLine(cannot_Find_Workerthread_Directive);
                 } // else wt has been set to the desired value.
 
                 string ignoreCausalityViolations = nvc["IgnoreCausalityViolations"];
                 if (ignoreCausalityViolations == null || !bool.TryParse(ignoreCausalityViolations, out _ignoreCausalityViolations))
                 {
-                    _Debug.WriteLine(_cannot_Find_Causality_Directive);
+                    _Debug.WriteLine(cannot_Find_Causality_Directive);
                 } // else micv has been set to the desired value.
             }
 
@@ -117,11 +118,12 @@ namespace Highpoint.Sage.SimCore
                     _Debug.WriteLine(msg);
                 }
             }
+        }
             #endregion
 
             #region Error Messages
 
-        private static readonly string _cannot_Find_Sage_Section =
+        private static readonly string cannot_Find_Sage_Section =
     @"Missing Sage section of config file. Defaulting to maintaining between 100 and 900 execution threads.
 Add the following two sections to your app.config to fix this issue:
 <configSections>
@@ -134,19 +136,17 @@ Add the following two sections to your app.config to fix this issue:
 </Sage>
 NOTE - everything will still work fine, we're just defaulting to maintaining between 100 and 900 worker threads for now, and ignoring causality exceptions.";
 
-        private static readonly string _cannot_Find_Workerthread_Directive =
+        private static readonly string cannot_Find_Workerthread_Directive =
     @"Unable to find (or parse) WorkerThread directive in Sage section of App Config file. Add the following to the Sage section:
 <Sage>\r\n<add key=""WorkerThreads"" value=""100""/>\r\n</Sage>
 NOTE - everything will still work fine, we're just defaulting to maintaining between 100 and 900 worker threads for now.";
 
-        private static readonly string _cannot_Find_Causality_Directive =
+        private static readonly string cannot_Find_Causality_Directive =
     @"Unable to find Causality Exception directive in Sage section of App Config file. Add the following to the Sage section:
     <add key=""IgnoreCausalityViolations"" value=""true""/>
 NOTE - the engine will still run, we'll just ignore it if an event is requested earlier than tNow during a simulation.";
 
         #endregion
-#endif
-        }
 
         private static void Swap(ref int a, ref int b)
         {

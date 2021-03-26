@@ -2,6 +2,7 @@
 
 using System;
 using System.Collections;
+using System.Collections.Specialized;
 
 namespace Highpoint.Sage.SimCore
 {
@@ -165,7 +166,7 @@ namespace Highpoint.Sage.SimCore
         private long _key;
         private _ExecEvent _currentEvent;
         private static readonly ArrayList _emptyList = ArrayList.ReadOnly(new ArrayList());
-        private static readonly bool _ignoreCausalityViolations = true;
+        private static bool _ignoreCausalityViolations = true;
 
         private _ExecEvent _parentEvent;
 
@@ -177,7 +178,7 @@ namespace Highpoint.Sage.SimCore
         /// <param name="execGuid">The GUID by which this executive will be known.</param>
         public ExecutiveFastLight(Guid execGuid)
         {
-#if !NETSTANDARD
+
             NameValueCollection nvc = (NameValueCollection)System.Configuration.ConfigurationManager.GetSection("Sage");
             if (nvc != null)
             {
@@ -187,18 +188,18 @@ namespace Highpoint.Sage.SimCore
 
                 nvc = (NameValueCollection) System.Configuration.ConfigurationManager.GetSection("diagnostics");
                 string strEba = nvc["ExecBreakAt"];
-                if (!m_hasTarget && strEba != null && strEba.Length > 0)
+                if (!_hasTarget && strEba != null && strEba.Length > 0)
                 {
                     _targetdatestr = strEba;
-                    m_targetdate = DateTime.Parse(_targetdatestr);
-                    m_hasTarget = true;
+                    _targetdate = DateTime.Parse(_targetdatestr);
+                    _hasTarget = true;
                 }
             }
             else
             {
                 Console.WriteLine("No Sage initialization section found in app.config.");
             }
-#endif
+
             _execGuid = execGuid;
             _runNumber = 0;
             Reset();
@@ -466,13 +467,13 @@ namespace Highpoint.Sage.SimCore
             lock (this)
             {
                 _now = m_startTime;
-                if (m_executiveStarted != null)
-                    m_executiveStarted(this);
+                if (executiveStarted != null)
+                    executiveStarted(this);
 
-                if (ExecutiveStartedSingleShot != null)
+                if (executiveStartedSingleShot != null)
                 {
-                    ExecutiveStartedSingleShot(this);
-                    ExecutiveStartedSingleShot = (ExecutiveEvent)Delegate.RemoveAll(ExecutiveStartedSingleShot, ExecutiveStartedSingleShot);
+                    executiveStartedSingleShot(this);
+                    executiveStartedSingleShot = (ExecutiveEvent)Delegate.RemoveAll(executiveStartedSingleShot, executiveStartedSingleShot);
                 }
 
                 if (_ignoreCausalityViolations)
@@ -481,13 +482,13 @@ namespace Highpoint.Sage.SimCore
                     StartWcv();
                 if (_stopRequested)
                 {
-                    if (m_executiveStopped != null)
-                        m_executiveStopped(this);
+                    if (executiveStopped != null)
+                        executiveStopped(this);
                     _stopRequested = false;
                 }
 
-                if (m_executiveFinished != null)
-                    m_executiveFinished(this);
+                if (executiveFinished != null)
+                    executiveFinished(this);
             }
         }
 
@@ -517,14 +518,14 @@ namespace Highpoint.Sage.SimCore
                 }
                 _lastEventServiceTime = _now;
                 _now = new DateTime(_currentEvent.When);
-                if (m_eventAboutToFire != null)
+                if (eventAboutToFire != null)
                 {
-                    m_eventAboutToFire(_currentEvent.Key, _currentEvent.Eer, 0.0, _now, _currentEvent.UserData, ExecEventType.Synchronous);
+                    eventAboutToFire(_currentEvent.Key, _currentEvent.Eer, 0.0, _now, _currentEvent.UserData, ExecEventType.Synchronous);
                 }
                 _currentEvent.Eer(this, _currentEvent.UserData);
-                if (m_eventHasCompleted != null)
+                if (eventHasCompleted != null)
                 {
-                    m_eventHasCompleted(_currentEvent.Key, _currentEvent.Eer, 0.0, _now, _currentEvent.UserData, ExecEventType.Synchronous);
+                    eventHasCompleted(_currentEvent.Key, _currentEvent.Eer, 0.0, _now, _currentEvent.UserData, ExecEventType.Synchronous);
                 }
                 _execEventCache.Return(_currentEvent);
             }
@@ -532,10 +533,10 @@ namespace Highpoint.Sage.SimCore
 
         #region ELEMENTS IN SUPPORT OF TEMPORAL DEBUGGING
         static string _targetdatestr = new DateTime(1999, 7, 15, 3, 51, 21).ToString("r");
-        DateTime m_targetdate = DateTime.Parse(_targetdatestr);
-        bool m_hasTarget = false;
-        bool m_hasFired = false;
-        string m_hoverHere;
+        DateTime _targetdate = DateTime.Parse(_targetdatestr);
+        bool _hasTarget = false;
+        bool _hasFired = false;
+        string _hoverHere;
 
         #endregion ELEMENTS IN SUPPORT OF TEMPORAL DEBUGGING
 
@@ -550,23 +551,23 @@ namespace Highpoint.Sage.SimCore
 
                 #region TEMPORAL DEBUGGING
 
-                if (m_hasTarget && (_now.ToString().Equals(_targetdatestr) || (!m_hasFired && _now > m_targetdate)))
+                if (_hasTarget && (_now.ToString().Equals(_targetdatestr) || (!_hasFired && _now > _targetdate)))
                 {
-                    m_hasFired = true;
-                    m_hoverHere = _now.ToString();
+                    _hasFired = true;
+                    _hoverHere = _now.ToString();
                     System.Diagnostics.Debugger.Break();
                 }
 
                 #endregion TEMPORAL DEBUGGING
 
-                if (m_eventAboutToFire != null)
+                if (eventAboutToFire != null)
                 {
-                    m_eventAboutToFire(_currentEvent.Key, _currentEvent.Eer, 0.0, _now, _currentEvent.UserData, ExecEventType.Synchronous);
+                    eventAboutToFire(_currentEvent.Key, _currentEvent.Eer, 0.0, _now, _currentEvent.UserData, ExecEventType.Synchronous);
                 }
                 _currentEvent.Eer(this, _currentEvent.UserData);
-                if (m_eventHasCompleted != null)
+                if (eventHasCompleted != null)
                 {
-                    m_eventHasCompleted(_currentEvent.Key, _currentEvent.Eer, 0.0, _now, _currentEvent.UserData, ExecEventType.Synchronous);
+                    eventHasCompleted(_currentEvent.Key, _currentEvent.Eer, 0.0, _now, _currentEvent.UserData, ExecEventType.Synchronous);
                 }
                 _execEventCache.Return(_currentEvent);
             }
@@ -717,12 +718,12 @@ namespace Highpoint.Sage.SimCore
         // in a detachable event and adding a handler to an executive event. For that reason, all public
         // event members are methods with add {} and remove {} that defer to private event members. This
         // does not cause the aforementioned lockup.
-        private event ExecutiveEvent m_executiveStarted;
-        private event ExecutiveEvent ExecutiveStartedSingleShot;
-        private event ExecutiveEvent m_executiveStopped;
-        private event ExecutiveEvent m_executiveFinished;
-        private event EventMonitor m_eventAboutToFire;
-        private event EventMonitor m_eventHasCompleted;
+        private event ExecutiveEvent executiveStarted;
+        private event ExecutiveEvent executiveStartedSingleShot;
+        private event ExecutiveEvent executiveStopped;
+        private event ExecutiveEvent executiveFinished;
+        private event EventMonitor eventAboutToFire;
+        private event EventMonitor eventHasCompleted;
         //private event ExecutiveEvent m_executiveAborted;
         //private event ExecutiveEvent m_executiveReset;
         //private event ExecutiveEvent m_clockAboutToChange;
@@ -732,11 +733,11 @@ namespace Highpoint.Sage.SimCore
         {
             add
             {
-                ExecutiveStartedSingleShot += value;
+                executiveStartedSingleShot += value;
             }
             remove
             {
-                ExecutiveStartedSingleShot -= value;
+                executiveStartedSingleShot -= value;
             }
         }
 
@@ -744,11 +745,11 @@ namespace Highpoint.Sage.SimCore
         {
             add
             {
-                m_executiveStarted += value;
+                executiveStarted += value;
             }
             remove
             {
-                m_executiveStarted -= value;
+                executiveStarted -= value;
             }
         }
 
@@ -785,22 +786,22 @@ namespace Highpoint.Sage.SimCore
         {
             add
             {
-                m_executiveStopped += value;
+                executiveStopped += value;
             }
             remove
             {
-                m_executiveStopped -= value;
+                executiveStopped -= value;
             }
         }
         public event ExecutiveEvent ExecutiveFinished
         {
             add
             {
-                m_executiveFinished += value;
+                executiveFinished += value;
             }
             remove
             {
-                m_executiveFinished -= value;
+                executiveFinished -= value;
             }
         }
 
@@ -811,11 +812,11 @@ namespace Highpoint.Sage.SimCore
         {
             add
             {
-                m_eventAboutToFire += value;
+                eventAboutToFire += value;
             }
             remove
             {
-                m_eventAboutToFire -= value;
+                eventAboutToFire -= value;
             }
         }
 
@@ -826,11 +827,11 @@ namespace Highpoint.Sage.SimCore
         {
             add
             {
-                m_eventHasCompleted += value;
+                eventHasCompleted += value;
             }
             remove
             {
-                m_eventHasCompleted -= value;
+                eventHasCompleted -= value;
             }
         }
 
