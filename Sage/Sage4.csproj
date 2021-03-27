@@ -2,6 +2,7 @@
 
   <PropertyGroup>
     <OutputType>Library</OutputType>
+	 <AssemblyName>Sage</AssemblyName>
   </PropertyGroup>
 
   <Import Condition="Exists('$(CommonAssemblyProps)')" Project="$(CommonAssemblyProps)" />
