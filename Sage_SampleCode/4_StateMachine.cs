@@ -4,6 +4,7 @@ using Highpoint.Sage.SimCore;
 using Highpoint.Sage.Utility;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Text;
 
 namespace Demo.StateMachine
@@ -14,7 +15,7 @@ namespace Demo.StateMachine
 
         public static class Default
         {
-            [Microsoft.VisualStudio.TestTools.UnitTesting.Description(@"This demonstration shows the default configuration of
+            [Description(@"This demonstration shows the default configuration of
             a model state machine. It's pretty simple - the model is either idle, or running. If it's idle, calling ""Start()""
             transitions it to running, in which state the executive processes all of its events. After running, it returns to idle")]
             public static void Run()
@@ -39,7 +40,7 @@ namespace Demo.StateMachine
 
         public static class SimpleCustomWithInitialization
         {
-            [Microsoft.VisualStudio.TestTools.UnitTesting.Description(@"This demonstration shows a simple custom
+            [Description(@"This demonstration shows a simple custom
             configuration of a model state machine. We will add a state, ""Initialize"" that, upon invocation of
             the model's ""Start()"" method, performs setup.")]
             public static void Run()
@@ -64,7 +65,7 @@ namespace Demo.StateMachine
 
         public static class SimpleEnumStateMachine
         {
-            [Microsoft.VisualStudio.TestTools.UnitTesting.Description(
+            [Description(
                 @"This demo shows the utility of a different kind of state machine. It
 is not usable to control model state, but is demonstrated here to
 hopefully avoid confusion as to its use. It manages the state of Model

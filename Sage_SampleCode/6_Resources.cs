@@ -5,6 +5,7 @@ using Highpoint.Sage.SimCore;
 using Highpoint.Sage.Utility;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 
@@ -14,7 +15,7 @@ namespace Demo.Resources
     {
         public static class ServicePoolExample
         {
-            [Microsoft.VisualStudio.TestTools.UnitTesting.Description(@"This demo shows how a bank teller simulation might treat tellers as
+            [Description(@"This demo shows how a bank teller simulation might treat tellers as
 a resource. A customer generation method registers events to creates customers
 with a certain interarrival time. The customer is created on its own thread
 (see the ExecEventType.Detachable parameter to RequestEvent) and immediately 
@@ -61,7 +62,7 @@ TellerRequest : A resource request that asks for one teller, any teller.
 
         public static class ServicePoolExampleWithSynchronousEvents
         {
-            [Microsoft.VisualStudio.TestTools.UnitTesting.Description(@"This demo is identical to the ServicePoolExample demo, except that rather
+            [Description(@"This demo is identical to the ServicePoolExample demo, except that rather
 than using Detachable events, it accomplishes the same scenario with
 Synchronous events. The difference between the two approaches is that the
 former makes model code much simpler, and logic easier to follow, but at the 
@@ -298,7 +299,7 @@ non-deterministic issues of multithreading do not apply here.")]
     {
         public static class OptimalResourceAcquisition
         {
-            [Microsoft.VisualStudio.TestTools.UnitTesting.Description(
+            [Description(
                 @"This demo shows how a bank teller simulation might treat tellers as
 a resource. A customer generation method registers events to creates customers
 with a certain interarrival time. The customer is created on its own thread

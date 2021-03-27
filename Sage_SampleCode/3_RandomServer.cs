@@ -1,11 +1,11 @@
 ﻿/* This source code licensed under the GNU Affero General Public License */
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Demo.RandomServer
 {
     using Highpoint.Sage.Randoms;
     using Highpoint.Sage.SimCore;
     using System;
+    using System.ComponentModel;
 
     class SimpleDefaultServer
     {

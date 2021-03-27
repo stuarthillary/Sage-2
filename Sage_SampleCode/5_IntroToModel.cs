@@ -2,6 +2,7 @@
 using Highpoint.Sage.SimCore;
 using Highpoint.Sage.Utility;
 using System;
+using System.ComponentModel;
 
 namespace Demo.Model
 {
@@ -11,7 +12,7 @@ namespace Demo.Model
 
         public static class DefaultModel
         {
-            [Microsoft.VisualStudio.TestTools.UnitTesting.Description(
+            [Description(
                 @"This demonstration shows the default configuration of a model. It's pretty
 simple - no services are provided, and the model is either idle, or running.
 If it's idle, calling ""Start()"" transitions it to running, in which state
@@ -45,7 +46,7 @@ the executive processes all of its events. After running, it returns to idle.")]
 
         public static class SimpleCustomWithInitialization
         {
-            [Microsoft.VisualStudio.TestTools.UnitTesting.Description(@"This demonstration shows a simple custom
+            [Description(@"This demonstration shows a simple custom
             configuration of a model state machine. We will add a state, ""Initialize"" that, upon invocation of
             the model's ""Start()"" method, performs setup.")]
             public static void Run()
@@ -77,7 +78,7 @@ the executive processes all of its events. After running, it returns to idle.")]
 
         public static class DefaultModelWithSelfManagingModelObjects
         {
-            [Microsoft.VisualStudio.TestTools.UnitTesting.Description(@"This demo creates three tools as IModelObjects, each of which manages and
+            [Description(@"This demo creates three tools as IModelObjects, each of which manages and
 tracks its own state through nine jobs, requesting events from the executive 
 to transition it from idle to running and back. At the end, each tool reports
 its utilization and the times at which it underwent each state transition.

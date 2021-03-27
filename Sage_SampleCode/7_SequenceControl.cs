@@ -3,6 +3,7 @@ using Highpoint.Sage.Graphs.Tasks;
 using Highpoint.Sage.SimCore;
 using System;
 using System.Collections;
+using System.ComponentModel;
 
 namespace Demo.SequenceControl
 {
@@ -10,7 +11,7 @@ namespace Demo.SequenceControl
     {
         public static class TaskGraphDemo
         {
-            [Microsoft.VisualStudio.TestTools.UnitTesting.Description(@"This demo shows the modeling of a hierarchical process, in this case, that of
+            [Description(@"This demo shows the modeling of a hierarchical process, in this case, that of
 making brownies. There are tasks that can happen in parallel, and tasks that 
 must happen serially. The top level task is ""Make Brownies"" and it has four
 subtasks, ""Prepare Oven"", ""Prepare Pan"", ""Assemble Brownies"" and 

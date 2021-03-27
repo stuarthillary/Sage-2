@@ -1,10 +1,12 @@
 ﻿/* This source code licensed under the GNU Affero General Public License */
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+
 using System;
+using System.ComponentModel;
 using System.Diagnostics;
+using System.IO;
+using System.Reflection;
 using System.Text;
 using System.Threading;
-using System.Windows.Forms;
 
 namespace Sage_SampleCode
 {
@@ -58,10 +60,16 @@ namespace Sage_SampleCode
 
             Demonstrate(Demo.SequenceControl.Basic.TaskGraphDemo.Run);
 
-            Thread thread = new Thread(() => Clipboard.SetText(_sb.ToString()));
-            thread.SetApartmentState(ApartmentState.STA);
-            thread.Start();
-            thread.Join();
+            outputDocumentation();
+        }
+
+        private static void outputDocumentation()
+        {
+            if(_collectDocs == null)
+                return;
+
+            var assemblyDirectory = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+            File.WriteAllText(Path.Combine(assemblyDirectory, "sampledocs.txt"), _sb.ToString());
         }
 
         private static bool _prompts = false;
@@ -106,7 +114,7 @@ namespace Sage_SampleCode
         private static string _feature = "";
         private static string _subFeature = "";
         private static readonly Action<Action> _collectDocs = CreateDocs; // Uncomment this line to turn on doc creation.
-        // private static readonly Action<Action> s_collectDocs = null; // Uncomment this line to turn off doc creation.
+        // private static readonly Action<Action> _collectDocs = null; // Uncomment this line to turn off doc creation.
         private static void CreateDocs(Action run)
         {
             string @namespace = run.Method.DeclaringType?.Namespace;

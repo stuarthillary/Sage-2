@@ -4,9 +4,9 @@
 // ReSharper disable UnusedMember.Local
 
 using Highpoint.Sage.SimCore;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Threading;
 
 namespace Demo.Executive

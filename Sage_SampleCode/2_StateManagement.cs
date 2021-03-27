@@ -1,13 +1,12 @@
 ﻿/* This source code licensed under the GNU Affero General Public License */
 // ReSharper disable InconsistentNaming
 
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-
 namespace Demo.StateManagement
 {
     using Highpoint.Sage.Randoms;
     using Highpoint.Sage.SimCore;
     using System;
+    using System.ComponentModel;
 
     /// <summary>
     /// Use agents (a tank, in this case) to maintain state. Recalculate
