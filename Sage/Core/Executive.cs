@@ -517,10 +517,8 @@ NOTE - the engine will still run, we'll just ignore it if an event is requested 
 
         public void Start()
         {
-
-            _pauseMgr = new Thread(new ThreadStart(doPause));
-            _pauseMgr.Name = "Pause Management";
-            _pauseMgr.Start();
+            _pauser = new PauseManager(this);
+            _pauser.DoPause();
 
             lock (this)
             {
@@ -741,7 +739,7 @@ NOTE - the engine will still run, we'll just ignore it if an event is requested 
                 //}
             }
 
-            _pauseMgr.Abort();
+            _pauser.Abort();
 
             _executiveFinished?.Invoke(this);
 
@@ -812,39 +810,73 @@ NOTE - the engine will still run, we'll just ignore it if an event is requested 
 
         private readonly object _pauseLock = new object();
         private readonly object _runLock = new object();
-        private Thread _pauseMgr = null;
-        private void doPause()
-        {
-            try
-            {
-                while (true)
-                {
-                    lock (_runLock)
-                    {
-                        //Console.WriteLine("Pause thread is waiting for a pulse on RunLock.");
+        private PauseManager _pauser = null;
 
-                        Monitor.Wait(_runLock);
-                        //Console.WriteLine("Pause thread received a pulse on RunLock.");
-                    }
-                    _state = ExecState.Paused;
-                    lock (_pauseLock)
-                    {
-                        //Console.WriteLine("Pause thread is acquiring an exclusive handle on RunLock.");
-                        Monitor.Enter(_runLock);
-                        //Console.WriteLine("Pause thread is waiting for a pulse on PauseLock.");
-                        Monitor.Wait(_pauseLock);
-                        //Console.WriteLine("Pause thread received a pulse on PauseLock.");
-                        //Console.WriteLine("Pause thread is releasing its exclusive handle on RunLock.");
-                        Monitor.Exit(_runLock);
-                    }
-                    _state = ExecState.Running;
+        private class PauseManager
+        {
+            private Thread _pauseMgr = null;
+            private bool _abort;
+            private readonly Executive _executive;
+
+            public PauseManager(Executive executive)
+            {
+                _executive = executive;
+            }
+
+            public void Abort()
+            {
+                _abort = true;
+                if (_pauseMgr != null)
+                {
+                    _pauseMgr.Interrupt();
+                    _pauseMgr.Join();
                 }
             }
-            catch (ThreadAbortException)
+
+            public void DoPause()
             {
-                Thread.ResetAbort();
+                if (_abort)
+                    return;
+
+                _pauseMgr = new Thread(new ThreadStart(doPause));
+                _pauseMgr.Name = "Pause Management";
+                _pauseMgr.Start();
+            }
+
+            private void doPause()
+            {
+                try
+                {
+                    while (!_abort)
+                    {
+                        lock (_executive._runLock)
+                        {
+                            Console.WriteLine("Pause thread is waiting for a pulse on RunLock.");
+
+                            Monitor.Wait(_executive._runLock);
+                            Console.WriteLine("Pause thread received a pulse on RunLock.");
+                        }
+                        _executive._state = ExecState.Paused;
+                        lock (_executive._pauseLock)
+                        {
+                            Console.WriteLine("Pause thread is acquiring an exclusive handle on RunLock.");
+                            Monitor.Enter(_executive._runLock);
+                            Console.WriteLine("Pause thread is waiting for a pulse on PauseLock.");
+                            Monitor.Wait(_executive._pauseLock);
+                            Console.WriteLine("Pause thread received a pulse on PauseLock.");
+                            Console.WriteLine("Pause thread is releasing its exclusive handle on RunLock.");
+                            Monitor.Exit(_executive._runLock);
+                        }
+                        _executive._state = ExecState.Running;
+                    }
+                }
+                catch (ThreadInterruptedException e)
+                {
+                    Console.WriteLine($"Interrupted by thread. {e.Message}");
+                }
             }
         }
+
         /// <summary>
         /// If running, pauses the executive and transitions its state to 'Paused'.
         /// </summary>
@@ -892,7 +924,6 @@ NOTE - the engine will still run, we'll just ignore it if an event is requested 
                 }
             }
         }
-
 
         public void Abort()
         {
@@ -1138,8 +1169,11 @@ NOTE - the engine will still run, we'll just ignore it if an event is requested 
         {
             try
             {
-                if (_pauseMgr != null && _pauseMgr.IsAlive)
-                    _pauseMgr.Abort();
+                if (_pauser != null)
+                {
+                    _pauser.Abort();
+                    _pauser = null;
+                }
             }
             catch { }
         }
