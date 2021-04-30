@@ -47,6 +47,8 @@ namespace Highpoint.Sage.SimCore
         private object _eventLock = new Object();
         public int EventLockCount = 0;
 
+        private int _executiveThreadId = Thread.CurrentThread.ManagedThreadId;
+
         internal Executive(Guid execGuid)
         {
             _guid = execGuid;
@@ -153,6 +155,14 @@ NOTE - the engine will still run, we'll just ignore it if an event is requested 
             int tmp = a;
             a = b;
             b = tmp;
+        }
+
+        public int ThreadId
+        {
+            get
+            {
+                return _executiveThreadId;
+            }
         }
 
         internal ArrayList RunningDetachables = new ArrayList();

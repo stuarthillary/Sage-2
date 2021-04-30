@@ -22,13 +22,15 @@ namespace Highpoint.Sage.SimCore
         #region >>> Private Fields <<<
         private static readonly bool _diagnostics = Diagnostics.DiagnosticAids.Diagnostics("DetachableEventController");
         private StackTrace _suspendedStackTrace = null;
-        private static int _lockNum = 0;
-        private readonly string _lock = "Lock #" + _lockNum++;
         private readonly Executive _exec;
         private readonly ExecEvent _currEvent;
         private bool _abortRequested = false;
-        private long _isWaitingCount;
         private DateTime _timeOfLastWait;
+
+        private ManualResetEventSlim _beginResetEvent = null;
+        private ManualResetEventSlim _resumeResetEvent = null;
+        private ManualResetEventSlim _suspendResetEvent = null;
+
         #endregion
 
         private DetachableEventAbortHandler _abortHandler;
@@ -64,19 +66,26 @@ namespace Highpoint.Sage.SimCore
         public void Begin()
         {
             Debug.Assert(!_abortRequested, "(Re)beginning an aborted DetachableEvent");
+            Debug.Assert(Thread.CurrentThread.ManagedThreadId == _exec.ThreadId,
+                    $"DetachableEvent.Begin running on thread {Thread.CurrentThread.ManagedThreadId}, which should be same as Executive {_exec.ThreadId}");
 
             // This method runs in the executive's event service thread.
-            lock (_lock)
-            {
-                object userData = _currEvent.UserData;
-                IAsyncResult iar = _currEvent.ExecEventReceiver.BeginInvoke(_exec, userData, new AsyncCallback(End), null);
-                Interlocked.Increment(ref _isWaitingCount);
-                _timeOfLastWait = _exec.Now;
-                Monitor.Wait(_lock); // Keeps exec from running off and launching another event.
-                Interlocked.Decrement(ref _isWaitingCount);
-                if (_abortRequested)
-                    Abort();
-            }
+
+            _beginResetEvent = new ManualResetEventSlim(false);
+
+            var currentTask = System.Threading.Tasks.Task
+                    .Run(() =>
+                    {
+                        _currEvent.ExecEventReceiver.Invoke(_exec, _currEvent.UserData);
+                    })
+                    .ContinueWith(End);
+
+            _timeOfLastWait = _exec.Now;
+
+            _beginResetEvent.Wait(); // Keeps exec from running off and launching another event.
+
+            if (_abortRequested)
+                Abort();
         }
 
         /// <summary>
@@ -86,26 +95,32 @@ namespace Highpoint.Sage.SimCore
         {
             Debug.Assert(!_abortRequested, "Suspending an aborted DetachableEvent");
             Debug.Assert(_exec.CurrentEventType.Equals(ExecEventType.Detachable), _errMsg1 + _exec.CurrentEventType, _errMsg1Explanation);
+            Debug.Assert(Thread.CurrentThread.ManagedThreadId != _exec.ThreadId,
+                    $"DetachableEvent.Suspend running on thread {Thread.CurrentThread.ManagedThreadId}, which should NOT be same as Executive {_exec.ThreadId}");
 
             // This method runs on the DE's execution thread. The only way to get the DE is to use Executive's
             // CurrentEventController property, and this DE should be used immediately, not held for later.
             Debug.Assert(Equals(_exec.CurrentEventController), "Suspend called from someone else's thread!");
-            lock (_lock)
-            {
-                //_Debug.WriteLine(this.m_currEvent.m_eer.Target+"."+this.m_currEvent.m_eer.Method + "de is suspending." + GetHashCode());
-                if (_diagnostics)
-                    _suspendedStackTrace = new StackTrace();
+            if (_diagnostics)
+                _suspendedStackTrace = new StackTrace();
 
-                _exec.SetCurrentEventController(null);
-                Monitor.Pulse(_lock);
-                Interlocked.Increment(ref _isWaitingCount);
-                _timeOfLastWait = _exec.Now;
-                Monitor.Wait(_lock);
-                _exec.SetCurrentEventType(ExecEventType.Detachable); // Whatever it was, it is now a detachable.
-                Interlocked.Decrement(ref _isWaitingCount);
-                if (_abortRequested)
-                    DoAbort();
-            }
+            _exec.SetCurrentEventController(null);
+
+            _suspendResetEvent = new ManualResetEventSlim(false);
+            _beginResetEvent.Set();
+
+            if (_resumeResetEvent != null)
+                _resumeResetEvent.Set();
+
+            _timeOfLastWait = _exec.Now;
+            _suspendResetEvent.Wait();
+
+            _exec.SetCurrentEventType(ExecEventType.Detachable); // Whatever it was, it is now a detachable.
+            _suspendResetEvent.Dispose();
+            _suspendResetEvent = null;
+
+            if (_abortRequested)
+                DoAbort();
         }
 
         public void SuspendUntil(DateTime when)
@@ -149,70 +164,59 @@ namespace Highpoint.Sage.SimCore
         {
             Debug.Assert(!_abortRequested, "(Re)aborting an aborted DetachableEvent");
             FireAbortHandler();
-            lock (_lock)
-            {
-                _abortRequested = true;
-                Monitor.Pulse(_lock);
-            }
+            _abortRequested = true;
+
+            if (_suspendResetEvent != null && !_suspendResetEvent.IsSet)
+                _suspendResetEvent.Set();
+            if (_resumeResetEvent != null && !_resumeResetEvent.IsSet)
+                _resumeResetEvent.Set();
+            if (_beginResetEvent != null && !_beginResetEvent.IsSet)
+                _beginResetEvent.Set();
         }
 
         private void DoAbort()
         {
             Debug.Assert(!Equals(_exec.CurrentEventController), "DoAbort called from someone else's thread!");
 
-            lock (_lock)
-            {
-                Monitor.Pulse(_lock);
-            }
-
             if (Diagnostics.DiagnosticAids.Diagnostics("Executive.BreakOnThreadAbort"))
             {
                 Debugger.Break();
             }
-
-            Thread.CurrentThread.Abort();
-
         }
 
         private void resume(IExecutive exec, object userData)
         {
             // This method is always called on the Executive's event service thread.
-            lock (_lock)
-            {
-                //_Debug.WriteLine(this.m_currEvent.m_eer.Target+"."+this.m_currEvent.m_eer.Method + "de is resuming." + GetHashCode());
+            //_Debug.WriteLine(this.m_currEvent.m_eer.Target+"."+this.m_currEvent.m_eer.Method + "de is resuming." + GetHashCode());
 
-                if (_diagnostics)
-                    _suspendedStackTrace = null;
+            Debug.Assert(Thread.CurrentThread.ManagedThreadId == _exec.ThreadId,
+                    $"DetachableEvent.resume running on thread {Thread.CurrentThread.ManagedThreadId}, which should be same as Executive {_exec.ThreadId}");
 
-                //_Debug.WriteLine(DateTime.Now.Ticks + "Task Resume is Pulsing " + m_lock);Trace.Out.Flush();
-                _exec.SetCurrentEventController(this);
-                Monitor.Pulse(_lock);
-                Interlocked.Increment(ref _isWaitingCount);
-                if (_isWaitingCount > 1)
-                    Monitor.Wait(_lock);
-                Interlocked.Decrement(ref _isWaitingCount);
+            if (_diagnostics)
+                _suspendedStackTrace = null;
 
-            }
+            //_Debug.WriteLine(DateTime.Now.Ticks + "Task Resume is Pulsing " + m_lock);Trace.Out.Flush();
+            _exec.SetCurrentEventController(this);
+            _resumeResetEvent = new ManualResetEventSlim(false);
+            _suspendResetEvent.Set();
+
+            _resumeResetEvent.Wait();
         }
 
         private void End(IAsyncResult iar)
         {
-
             try
             {
                 _exec.RunningDetachables.Remove(this);
                 //_Debug.WriteLine(this.m_currEvent.m_eer.Target+"."+this.m_currEvent.m_eer.Method + "de is finishing." + GetHashCode());
-                lock (_lock)
-                {
-                    _currEvent.OnServiceCompleted();
-                    Monitor.Pulse(_lock);
-                }
+                _currEvent.OnServiceCompleted();
+                if (_suspendResetEvent != null)
+                    _suspendResetEvent.Set();
+                if (_resumeResetEvent != null)
+                    _resumeResetEvent.Set();
+                if (_beginResetEvent != null)
+                    _beginResetEvent.Set();
                 //_Debug.WriteLine(this.m_currEvent.m_eer.Target+"."+this.m_currEvent.m_eer.Method + "de is really finishing." + GetHashCode());
-                _currEvent.ExecEventReceiver.EndInvoke(iar);
-            }
-            catch (ThreadAbortException)
-            {
-                //_Debug.WriteLine(tae.Message); // Must explicitly catch the ThreadAbortException or it bubbles up.
             }
             catch (Exception e)
             {
@@ -241,7 +245,9 @@ namespace Highpoint.Sage.SimCore
 
         public bool IsWaiting()
         {
-            return _isWaitingCount > 0;
+            return (_beginResetEvent != null && !_beginResetEvent.IsSet)
+                   || (_resumeResetEvent != null && !_resumeResetEvent.IsSet)
+                   || (_suspendResetEvent != null && !_suspendResetEvent.IsSet);
         }
 
         public DateTime TimeOfLastWait
