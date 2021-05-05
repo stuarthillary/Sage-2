@@ -851,20 +851,20 @@ NOTE - the engine will still run, we'll just ignore it if an event is requested 
                     {
                         lock (_executive._runLock)
                         {
-                            Console.WriteLine("Pause thread is waiting for a pulse on RunLock.");
+                            //Console.WriteLine("Pause thread is waiting for a pulse on RunLock.");
 
                             Monitor.Wait(_executive._runLock);
-                            Console.WriteLine("Pause thread received a pulse on RunLock.");
+                            //Console.WriteLine("Pause thread received a pulse on RunLock.");
                         }
                         _executive._state = ExecState.Paused;
                         lock (_executive._pauseLock)
                         {
-                            Console.WriteLine("Pause thread is acquiring an exclusive handle on RunLock.");
+                            //Console.WriteLine("Pause thread is acquiring an exclusive handle on RunLock.");
                             Monitor.Enter(_executive._runLock);
-                            Console.WriteLine("Pause thread is waiting for a pulse on PauseLock.");
+                            //Console.WriteLine("Pause thread is waiting for a pulse on PauseLock.");
                             Monitor.Wait(_executive._pauseLock);
-                            Console.WriteLine("Pause thread received a pulse on PauseLock.");
-                            Console.WriteLine("Pause thread is releasing its exclusive handle on RunLock.");
+                            //Console.WriteLine("Pause thread received a pulse on PauseLock.");
+                            //Console.WriteLine("Pause thread is releasing its exclusive handle on RunLock.");
                             Monitor.Exit(_executive._runLock);
                         }
                         _executive._state = ExecState.Running;
@@ -872,7 +872,7 @@ NOTE - the engine will still run, we'll just ignore it if an event is requested 
                 }
                 catch (ThreadInterruptedException e)
                 {
-                    Console.WriteLine($"Interrupted by thread. {e.Message}");
+                    //Console.WriteLine($"Interrupted by thread. {e.Message}");
                 }
             }
         }
