@@ -16,11 +16,6 @@ namespace Sage_SampleCode
         static void Main(string[] args)
         {
 
-            Console.BufferWidth = 132;
-            Console.BufferHeight = 9999;
-            Console.WindowWidth = 132;
-            Console.WindowHeight = 80;
-
             Demonstrate(Demo.Executive.SynchronousEvents.HelloWorld.Run);
             Demonstrate(Demo.Executive.SynchronousEvents.TwoCallbacksOutOfSequence.Run);
             Demonstrate(Demo.Executive.SynchronousEvents.CallbacksWithPriorities.Run);
