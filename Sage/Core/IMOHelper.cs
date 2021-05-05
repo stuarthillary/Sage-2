@@ -77,7 +77,7 @@ namespace Highpoint.Sage.SimCore
             {
                 m_model = model;
                 m_name = name;
-                if (description == null || description.Equals(""))
+                if (string.IsNullOrEmpty(description))
                 {
                     m_description = name;
                 }

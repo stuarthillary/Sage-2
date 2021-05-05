@@ -48,7 +48,7 @@ namespace Highpoint.Sage.Graphs.PFC.Expressions
         /// <returns>The string for this expression element.</returns>
         public override string ToString(ExpressionType t, object forWhom)
         {
-            _Debug.Assert(Name.StartsWith(MACRO_START));
+            _Debug.Assert(Name.StartsWith(MACRO_START, StringComparison.Ordinal));
 
             switch (t)
             {

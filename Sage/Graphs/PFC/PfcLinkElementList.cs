@@ -47,7 +47,7 @@ namespace Highpoint.Sage.Graphs.PFC
             {
                 return Find(delegate (IPfcLinkElement node)
                 {
-                    return node.Name.Equals(name);
+                    return node.Name.Equals(name, StringComparison.Ordinal);
                 });
             }
         }

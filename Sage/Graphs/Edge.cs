@@ -1003,7 +1003,7 @@ namespace Highpoint.Sage.Graphs
             bool breakHere = false;
             foreach (string eventName in m_breakpointEvents)
             {
-                if (Name.Equals(eventName))
+                if (Name.Equals(eventName, StringComparison.Ordinal))
                     breakHere = true;
             }
             if (breakHere)

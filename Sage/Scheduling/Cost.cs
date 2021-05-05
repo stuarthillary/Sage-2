@@ -38,7 +38,7 @@ namespace Highpoint.Sage.Scheduling.Cost
 
         CostCategory<T> GetMatchingCategory(CostCategory<T> exemplar)
         {
-            return _categories.Single(n => n.Name.Equals(exemplar.Name));
+            return _categories.Single(n => n.Name.Equals(exemplar.Name, StringComparison.Ordinal));
         }
 
         public IEnumerable<CostCategory<T>> Categories => _categories;
@@ -47,7 +47,7 @@ namespace Highpoint.Sage.Scheduling.Cost
         {
             get
             {
-                return _categories.Single(n => n.Name.Equals(categoryName));
+                return _categories.Single(n => n.Name.Equals(categoryName, StringComparison.Ordinal));
             }
         }
 

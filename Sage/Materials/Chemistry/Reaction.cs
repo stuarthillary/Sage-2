@@ -291,7 +291,7 @@ namespace Highpoint.Sage.Materials.Chemistry
 
             target.AddEnergy(_energy * (fwdScale - revScale));
 
-            target.ResumeChangeEvents(!mixtureWas.ToString("F2", "F3").Equals(target.ToString("F2", "F3"))); // Only emit summary events if the mixture has changed.
+            target.ResumeChangeEvents(!mixtureWas.ToString("F2", "F3").Equals(target.ToString("F2", "F3"), StringComparison.Ordinal)); // Only emit summary events if the mixture has changed.
 
             return ri;
         }

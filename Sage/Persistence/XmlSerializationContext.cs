@@ -366,14 +366,14 @@ namespace Highpoint.Sage.Persistence
         {
             _Debug.Assert(node.Attributes != null, "node.Attributes != null");
             XmlAttribute nullness = node.Attributes[null_Label];
-            return nullness != null && nullness.InnerText.Equals("true");
+            return nullness != null && nullness.InnerText.Equals("true", StringComparison.Ordinal);
         }
 
         private static bool NodeIsRef(XmlNode node)
         {
             _Debug.Assert(node.Attributes != null, "node.Attributes != null");
             XmlAttribute refness = node.Attributes[isref_Label];
-            return refness != null && refness.InnerText.Equals("true");
+            return refness != null && refness.InnerText.Equals("true", StringComparison.Ordinal);
         }
 
         /// <summary>

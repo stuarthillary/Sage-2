@@ -56,7 +56,7 @@ namespace Highpoint.Sage.Diagnostics
         private void Executive_EventAboutToFire(long key, ExecEventReceiver eer, double priority, DateTime when, object userData, ExecEventType eventType)
         {
             string method = eer.Method.ToString();
-            method = method.Replace(",", ":");
+            method = method.Replace(",", ":", StringComparison.Ordinal);
             _logFile.WriteLine(when.ToString(CultureInfo.InvariantCulture) + ", " + priority + ", " + eer.Target + ", " + method + ", " +
                 (userData?.ToString() ?? "<null>") + ", " + eventType);
         }

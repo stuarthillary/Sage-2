@@ -118,21 +118,21 @@ namespace Sage_SampleCode
         private static void CreateDocs(Action run)
         {
             string @namespace = run.Method.DeclaringType?.Namespace;
-            string demoNamespace = @namespace.StartsWith("Demo.") ? @namespace.Substring(5) : @namespace;
+            string demoNamespace = @namespace.StartsWith("Demo.", StringComparison.Ordinal) ? @namespace.Substring(5) : @namespace;
             Debug.Assert(!string.IsNullOrEmpty(demoNamespace));
-            if (demoNamespace.Contains("."))
+            if (demoNamespace.Contains(".", StringComparison.Ordinal))
             {
-                string demoFeature = demoNamespace.Substring(0, demoNamespace.IndexOf('.'));
-                if (!string.Equals(demoFeature, _feature))
+                string demoFeature = demoNamespace.Substring(0, demoNamespace.IndexOf('.', StringComparison.Ordinal));
+                if (!string.Equals(demoFeature, _feature, StringComparison.Ordinal))
                 {
                     _sb.AppendLine(string.Format("<h2>{0}</h2>", demoFeature));
                     _feature = demoFeature;
                 }
 
 
-                string subFeature = demoNamespace.Substring(demoNamespace.IndexOf('.') + 1);
+                string subFeature = demoNamespace.Substring(demoNamespace.IndexOf('.', StringComparison.Ordinal) + 1);
                 Debug.Assert(!string.IsNullOrEmpty(subFeature));
-                if (!string.Equals(subFeature, _subFeature))
+                if (!string.Equals(subFeature, _subFeature, StringComparison.Ordinal))
                 {
                     _sb.AppendLine(string.Format("<h3>{0}</h3>", subFeature));
                     _subFeature = subFeature;
@@ -141,7 +141,7 @@ namespace Sage_SampleCode
             else
             {
                 string demoFeature = demoNamespace;
-                if (!string.Equals(demoFeature, _feature))
+                if (!string.Equals(demoFeature, _feature, StringComparison.Ordinal))
                 {
                     _sb.AppendLine(string.Format("<h2>{0}</h2>", demoFeature));
                     _feature = demoFeature;
@@ -152,7 +152,7 @@ namespace Sage_SampleCode
             _sb.AppendLine(string.Format("<h4>{0}</h4>", demoName));
 
             object[] oa = run.Method.GetCustomAttributes(typeof(DescriptionAttribute), false);
-            string message = oa.Length == 1 ? ((DescriptionAttribute)oa[0]).Description.Replace("\r\n\r\n", "</p>\r\n<p>") : "ERROR";
+            string message = oa.Length == 1 ? ((DescriptionAttribute)oa[0]).Description.Replace("\r\n\r\n", "</p>\r\n<p>", StringComparison.Ordinal) : "ERROR";
             _sb.AppendLine($"<p>{message}</p>");
         }
     }

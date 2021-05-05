@@ -1,5 +1,6 @@
 /* This source code licensed under the GNU Affero General Public License */
 
+using System;
 using System.Collections;
 using _Debug = System.Diagnostics.Debug;
 
@@ -117,7 +118,7 @@ namespace Highpoint.Sage.Graphs.Validity
                 string stackThinks = (string)_suspendResumeStack.Pop();
                 stackThinks = stackThinks.Split(new char[] { ',' }, 2)[0];
                 // TODO: Move this into an Errors & Warnings collection on the model.
-                if (!where.Equals(stackThinks))
+                if (!where.Equals(stackThinks, StringComparison.Ordinal))
                 {
                     string msg = "ERROR - Validation Service's \"Resume\" location (" + where + ")doesn't match the opposite \"Suspend\" location!";
                     if (_root is SimCore.IModelObject)

@@ -107,7 +107,7 @@ namespace SageTestLib
             string addee = "String 1";
             _uut.Add(addee);
 
-            Assert.IsTrue(_responses.Equals("m_uut_AboutToAddItem String 1 | m_uut_AddedItem String 1 | m_uut_ContentsChanged | "));
+            Assert.IsTrue(_responses.Equals("m_uut_AboutToAddItem String 1 | m_uut_AddedItem String 1 | m_uut_ContentsChanged | ", StringComparison.Ordinal));
             Console.WriteLine(_responses);
         }
 
@@ -120,9 +120,9 @@ namespace SageTestLib
             string[] addee = new string[] { "String 2", "String 3" };
             _uut.AddRange(addee);
 
-            Assert.IsTrue(_responses.Equals("m_uut_AboutToAddItems System.String[] | m_uut_AddedItems System.String[] | m_uut_ContentsChanged | "));
-            Assert.IsTrue(_uut[0].Equals("String 2"));
-            Assert.IsTrue(_uut[1].Equals("String 3"));
+            Assert.IsTrue(_responses.Equals("m_uut_AboutToAddItems System.String[] | m_uut_AddedItems System.String[] | m_uut_ContentsChanged | ", StringComparison.Ordinal));
+            Assert.IsTrue(_uut[0].Equals("String 2", StringComparison.Ordinal));
+            Assert.IsTrue(_uut[1].Equals("String 3", StringComparison.Ordinal));
             Console.WriteLine(_responses);
         }
 
@@ -135,9 +135,9 @@ namespace SageTestLib
             _uut.AddRange(new string[] { "Bob", "Mary", "Sue" });
             _uut.Remove("Mary");
 
-            Assert.IsTrue(_uut[0].Equals("Bob"));
-            Assert.IsTrue(_uut[1].Equals("Sue"));
-            Assert.IsTrue(_responses.Equals("m_uut_AboutToAddItems System.String[] | m_uut_AddedItems System.String[] | m_uut_ContentsChanged | m_uut_AboutToRemoveItem Mary | m_uut_RemovedItem Mary | m_uut_ContentsChanged | "));
+            Assert.IsTrue(_uut[0].Equals("Bob", StringComparison.Ordinal));
+            Assert.IsTrue(_uut[1].Equals("Sue", StringComparison.Ordinal));
+            Assert.IsTrue(_responses.Equals("m_uut_AboutToAddItems System.String[] | m_uut_AddedItems System.String[] | m_uut_ContentsChanged | m_uut_AboutToRemoveItem Mary | m_uut_RemovedItem Mary | m_uut_ContentsChanged | ", StringComparison.Ordinal));
             Console.WriteLine(_responses);
         }
 
@@ -153,8 +153,8 @@ namespace SageTestLib
                 return s.Length.Equals(3);
             });
 
-            Assert.IsTrue(_uut[0].Equals("Mary"));
-            Assert.IsTrue(_responses.Equals("m_uut_AboutToAddItems System.String[] | m_uut_AddedItems System.String[] | m_uut_ContentsChanged | m_uut_AboutToRemoveItems System.Predicate`1[System.String] | m_uut_RemovedItems System.Predicate`1[System.String] | m_uut_ContentsChanged | "));
+            Assert.IsTrue(_uut[0].Equals("Mary", StringComparison.Ordinal));
+            Assert.IsTrue(_responses.Equals("m_uut_AboutToAddItems System.String[] | m_uut_AddedItems System.String[] | m_uut_ContentsChanged | m_uut_AboutToRemoveItems System.Predicate`1[System.String] | m_uut_RemovedItems System.Predicate`1[System.String] | m_uut_ContentsChanged | ", StringComparison.Ordinal));
             Console.WriteLine(_responses);
         }
 
@@ -167,9 +167,9 @@ namespace SageTestLib
             _uut.AddRange(new string[] { "Bob", "Mary", "Sue" });
             _uut.RemoveAt(1);
 
-            Assert.IsTrue(_uut[0].Equals("Bob"));
-            Assert.IsTrue(_uut[1].Equals("Sue"));
-            Assert.IsTrue(_responses.Equals("m_uut_AboutToAddItems System.String[] | m_uut_AddedItems System.String[] | m_uut_ContentsChanged | m_uut_AboutToRemoveItem Mary | m_uut_RemovedItem Mary | m_uut_ContentsChanged | "));
+            Assert.IsTrue(_uut[0].Equals("Bob", StringComparison.Ordinal));
+            Assert.IsTrue(_uut[1].Equals("Sue", StringComparison.Ordinal));
+            Assert.IsTrue(_responses.Equals("m_uut_AboutToAddItems System.String[] | m_uut_AddedItems System.String[] | m_uut_ContentsChanged | m_uut_AboutToRemoveItem Mary | m_uut_RemovedItem Mary | m_uut_ContentsChanged | ", StringComparison.Ordinal));
             Console.WriteLine(_responses);
         }
 
@@ -183,7 +183,7 @@ namespace SageTestLib
             _uut.Clear();
 
             Assert.IsTrue(_uut.Count == 0);
-            Assert.IsTrue(_responses.Equals("m_uut_AboutToAddItems System.String[] | m_uut_AddedItems System.String[] | m_uut_ContentsChanged | m_uut_ContentsChanged | "));
+            Assert.IsTrue(_responses.Equals("m_uut_AboutToAddItems System.String[] | m_uut_AddedItems System.String[] | m_uut_ContentsChanged | m_uut_ContentsChanged | ", StringComparison.Ordinal));
             Console.WriteLine(_responses);
         }
 
@@ -232,13 +232,13 @@ namespace SageTestLib
 
             _uut.InsertRange(1, new string[] { "Paul", "Randy", "Sara" });
 
-            Assert.IsTrue(_uut[0].Equals("Bob"));
-            Assert.IsTrue(_uut[1].Equals("Paul"));
-            Assert.IsTrue(_uut[2].Equals("Randy"));
-            Assert.IsTrue(_uut[3].Equals("Sara"));
-            Assert.IsTrue(_uut[4].Equals("Mary"));
-            Assert.IsTrue(_uut[5].Equals("Tim"));
-            Assert.IsTrue(_responses.Equals("m_uut_AboutToAddItems System.String[] | m_uut_AddedItems System.String[] | m_uut_ContentsChanged | m_uut_AboutToAddItems System.String[] | m_uut_AddedItems System.String[] | m_uut_ContentsChanged | "));
+            Assert.IsTrue(_uut[0].Equals("Bob", StringComparison.Ordinal));
+            Assert.IsTrue(_uut[1].Equals("Paul", StringComparison.Ordinal));
+            Assert.IsTrue(_uut[2].Equals("Randy", StringComparison.Ordinal));
+            Assert.IsTrue(_uut[3].Equals("Sara", StringComparison.Ordinal));
+            Assert.IsTrue(_uut[4].Equals("Mary", StringComparison.Ordinal));
+            Assert.IsTrue(_uut[5].Equals("Tim", StringComparison.Ordinal));
+            Assert.IsTrue(_responses.Equals("m_uut_AboutToAddItems System.String[] | m_uut_AddedItems System.String[] | m_uut_ContentsChanged | m_uut_AboutToAddItems System.String[] | m_uut_AddedItems System.String[] | m_uut_ContentsChanged | ", StringComparison.Ordinal));
             Console.WriteLine(_responses);
         }
 

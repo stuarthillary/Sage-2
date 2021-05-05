@@ -1260,7 +1260,7 @@ namespace Highpoint.Sage.Graphs.PFC
             foreach (IPfcStepNode theStep in Steps)
             {
                 if ((theStep.IsNullNode && theStep.PredecessorNodes.Count > 0 && theStep.SuccessorNodes.Count > 0)
-                || (theStep.Name.StartsWith("NULL_UP:")))
+                || (theStep.Name.StartsWith("NULL_UP:", StringComparison.Ordinal)))
                 {
                     theStep.SetName(Guid.NewGuid().ToString());
                     myNullSteps.Add(theStep);
@@ -1888,9 +1888,9 @@ namespace Highpoint.Sage.Graphs.PFC
 
             reader.ReadToFollowing("ElementFactoryType");
             string elementFactoryType = reader.ReadString();
-            if (elementFactoryType.Contains(_libWas))
+            if (elementFactoryType.Contains(_libWas, StringComparison.Ordinal))
             {
-                elementFactoryType = elementFactoryType.Replace(_libWas, _libIs);
+                elementFactoryType = elementFactoryType.Replace(_libWas, _libIs, StringComparison.Ordinal);
             }
 
             //System.Reflection.ConstructorInfo[] cia = Type.GetType(elementFactoryType).GetConstructors();
@@ -1921,7 +1921,7 @@ namespace Highpoint.Sage.Graphs.PFC
                             break;
                     }
                 }
-            } while (!(reader.Name.Equals("ProcedureFunctionChart") && !reader.IsStartElement()));
+            } while (!(reader.Name.Equals("ProcedureFunctionChart", StringComparison.Ordinal) && !reader.IsStartElement()));
             reader.Read();
             _sfcElementFactory.OnPfcLoadCompleted(this);
             foreach (IPfcTransitionNode trans in _transitionNodeList)
@@ -2103,9 +2103,9 @@ namespace Highpoint.Sage.Graphs.PFC
 
             reader.Read();
             reader.Read();
-            while (!(reader.Name.Equals("ParticipantDirectory") && !reader.IsStartElement()))
+            while (!(reader.Name.Equals("ParticipantDirectory", StringComparison.Ordinal) && !reader.IsStartElement()))
             {
-                if (reader.Name.Equals("ExpressionElement") && reader.IsStartElement())
+                if (reader.Name.Equals("ExpressionElement", StringComparison.Ordinal) && reader.IsStartElement())
                 {
                     reader.ReadToFollowing("Name");
                     string name = reader.ReadString();
@@ -2118,7 +2118,7 @@ namespace Highpoint.Sage.Graphs.PFC
                     if (elementType == null)
                     {
                         // In-place upgrade from old data.
-                        type = type.Replace(_libWas, _libIs);
+                        type = type.Replace(_libWas, _libIs, StringComparison.Ordinal);
                         elementType = Type.GetType(type);
                     }
                     if (typeof(Macro).IsAssignableFrom(elementType))
@@ -2131,7 +2131,7 @@ namespace Highpoint.Sage.Graphs.PFC
                         _participantDirectory.RegisterMapping(name, guid);
                     }
 
-                    while (!(reader.Name.Equals("ExpressionElement")))
+                    while (!(reader.Name.Equals("ExpressionElement", StringComparison.Ordinal)))
                         reader.Read();
                 }
                 else
@@ -2139,7 +2139,7 @@ namespace Highpoint.Sage.Graphs.PFC
                     Console.WriteLine(reader.Name + " := " + reader.Value);
                 }
                 reader.Read();
-                if (reader.Name.Equals("ParticipantDirectory"))
+                if (reader.Name.Equals("ParticipantDirectory", StringComparison.Ordinal))
                     break;
                 reader.Read();
             }
@@ -2284,7 +2284,7 @@ namespace Highpoint.Sage.Graphs.PFC
             reader.Read();
             reader.Read();
 
-            if (reader.Name.Equals("Priority"))
+            if (reader.Name.Equals("Priority", StringComparison.Ordinal))
             {
                 reader.Read();
                 int.TryParse(reader.ReadString(), out priority);
@@ -2328,7 +2328,7 @@ namespace Highpoint.Sage.Graphs.PFC
         public IPfcNode FindNode(string path)
         {
             IPfcNode retval = null;
-            if (path.Contains("/"))
+            if (path.Contains("/", StringComparison.Ordinal))
             {
                 string[] s = path.Split(new char[] { '/' }, 2);
                 IPfcStepNode child = Nodes[s[0]] as IPfcStepNode;

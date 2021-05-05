@@ -36,7 +36,7 @@ namespace Highpoint.Sage.ItemBased.Ports
         /// <param name="owner">The IPortOwner that will own this port.</param>
         public GenericPort(IModel model, string name, Guid guid, IPortOwner owner)
         {
-            if (name == null || name.Equals(string.Empty) && owner != null)
+            if (string.IsNullOrEmpty(name) && owner != null)
             {
                 name = GetNextName(owner);
             }
@@ -72,7 +72,7 @@ namespace Highpoint.Sage.ItemBased.Ports
             int i = 0;
             foreach (IPort port in owner.Ports)
             {
-                if (port.Name.StartsWith(PortPrefix))
+                if (port.Name.StartsWith(PortPrefix, StringComparison.Ordinal))
                 {
                     int tmp = 0;
                     if (int.TryParse(port.Name.Substring(PortPrefix.Length), out tmp))

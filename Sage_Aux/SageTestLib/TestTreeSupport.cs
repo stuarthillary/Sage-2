@@ -70,7 +70,7 @@ namespace Highpoint.Sage.Utility
                 "This test manipulates a tree that holds elements that have no knowledge of their participation in a tree.");
             Console.WriteLine(sb.ToString());
             Console.WriteLine();
-            Assert.IsTrue(StripCRLF(sb.ToString()).Equals(StripCRLF(REQUIRED_ITERATIONSTRING1)),
+            Assert.IsTrue(StripCRLF(sb.ToString()).Equals(StripCRLF(REQUIRED_ITERATIONSTRING1), StringComparison.Ordinal),
                 "Expected \"" + REQUIRED_ITERATIONSTRING1 + "\", but got \"" + sb.ToString() + "\" instead.");
         }
 
@@ -112,7 +112,7 @@ namespace Highpoint.Sage.Utility
                 "This test manipulates a tree that holds elements that have no knowledge of their participation in a tree.");
             Console.WriteLine(sb.ToString());
             Console.WriteLine();
-            Assert.IsTrue(StripCRLF(sb.ToString()).Equals(StripCRLF(REQUIRED_ITERATIONSTRING1)),
+            Assert.IsTrue(StripCRLF(sb.ToString()).Equals(StripCRLF(REQUIRED_ITERATIONSTRING1), StringComparison.Ordinal),
                 "Expected \"" + REQUIRED_ITERATIONSTRING1 + "\", but got \"" + sb.ToString() + "\" instead.");
         }
 
@@ -160,7 +160,7 @@ namespace Highpoint.Sage.Utility
             Console.WriteLine("This test manipulates a tree that holds elements that derive from TreeNode.");
             Console.WriteLine(sb.ToString());
             Console.WriteLine();
-            Assert.IsTrue(StripCRLF(sb.ToString()).Equals(StripCRLF(REQUIRED_ITERATIONSTRING1)));
+            Assert.IsTrue(StripCRLF(sb.ToString()).Equals(StripCRLF(REQUIRED_ITERATIONSTRING1), StringComparison.Ordinal));
 
         }
 
@@ -209,7 +209,7 @@ namespace Highpoint.Sage.Utility
             Console.WriteLine("This test manipulates a tree that holds elements that implement ITreeNode.");
             Console.WriteLine(sb.ToString());
             Console.WriteLine();
-            Assert.IsTrue(StripCRLF(sb.ToString()).Equals(StripCRLF(REQUIRED_ITERATIONSTRING1)));
+            Assert.IsTrue(StripCRLF(sb.ToString()).Equals(StripCRLF(REQUIRED_ITERATIONSTRING1), StringComparison.Ordinal));
 
         }
 
@@ -292,7 +292,7 @@ Dingus";
             {
                 s += activity.Payload.Name;
             });
-            Assert.IsTrue(s.Equals("EthelFrankGeorge"));
+            Assert.IsTrue(s.Equals("EthelFrankGeorge", StringComparison.Ordinal));
 
             s = string.Empty;
             bob.SortChildren(new Comparison<ITreeNode<Activity>>(ReverseSortTreeNodeActivities));
@@ -300,7 +300,7 @@ Dingus";
             {
                 s += activity.Payload.Name;
             });
-            Assert.IsTrue(s.Equals("GeorgeFrankEthel"));
+            Assert.IsTrue(s.Equals("GeorgeFrankEthel", StringComparison.Ordinal));
 
             Console.WriteLine(s);
 
@@ -308,7 +308,7 @@ Dingus";
 
         private int ReverseSortTreeNodeActivities(ITreeNode<Activity> tn1, ITreeNode<Activity> tn2)
         {
-            return tn2.Payload.Name.CompareTo(tn1.Payload.Name);
+            return string.Compare(tn2.Payload.Name, tn1.Payload.Name, StringComparison.Ordinal);
         }
 
         [TestMethod]
@@ -377,7 +377,7 @@ Dingus";
             Assert.AreEqual(StripCRLF(sb.ToString()), StripCRLF(REQUIRED_ITERATIONSTRING2), "Expected \"" + REQUIRED_ITERATIONSTRING2 + "\", but got \"" + sb.ToString() + "\" instead.");
         }
 
-        private string StripCRLF(string structureString) => structureString.Replace("\r", "").Replace("\n", "");
+        private string StripCRLF(string structureString) => structureString.Replace("\r", "", StringComparison.Ordinal).Replace("\n", "", StringComparison.Ordinal);
 
         #region REQUIRED_ITERATIONSTRING2
         private static string REQUIRED_ITERATIONSTRING2 =

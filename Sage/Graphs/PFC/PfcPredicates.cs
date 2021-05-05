@@ -14,7 +14,7 @@ namespace Highpoint.Sage.Graphs.PFC
         {
             return new Predicate<T>(delegate (T element)
             {
-                return element.Name.Equals(targetName);
+                return element.Name.Equals(targetName, StringComparison.Ordinal);
             });
         }
         public static Predicate<T> ByGuid<T>(Guid targetGuid) where T : SimCore.IHasIdentity

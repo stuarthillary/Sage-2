@@ -551,7 +551,7 @@ namespace Highpoint.Sage.SimCore
 
                 #region TEMPORAL DEBUGGING
 
-                if (_hasTarget && (_now.ToString().Equals(_targetdatestr) || (!_hasFired && _now > _targetdate)))
+                if (_hasTarget && (_now.ToString().Equals(_targetdatestr, StringComparison.Ordinal) || (!_hasFired && _now > _targetdate)))
                 {
                     _hasFired = true;
                     _hoverHere = _now.ToString();

@@ -10,7 +10,7 @@ namespace Highpoint.Sage.Utility
         {
             string testAssemblyName = "Microsoft.VisualStudio.TestPlatform.TestFramework";
             UnitTestDetector.IsInUnitTest = AppDomain.CurrentDomain.GetAssemblies()
-                .Any(a => a.FullName.StartsWith(testAssemblyName));
+                .Any(a => a.FullName.StartsWith(testAssemblyName, StringComparison.Ordinal));
         }
 
         public static bool IsInUnitTest

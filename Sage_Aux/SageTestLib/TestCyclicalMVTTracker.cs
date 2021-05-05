@@ -97,8 +97,8 @@ namespace SchedulerDemoMaterial
             Debug.WriteLine("Masses      : " + cmvt.MassHistory.ToString());
             Debug.WriteLine("Volumes     : " + cmvt.VolumeHistory.ToString());
 
-            Assert.IsTrue(cmvt.MassHistory.ToString().Equals("[0/0/0/0]"));
-            Assert.IsTrue(cmvt.VolumeHistory.ToString().Equals("[0/0/0/0]"));
+            Assert.IsTrue(cmvt.MassHistory.ToString().Equals("[0/0/0/0]", StringComparison.Ordinal));
+            Assert.IsTrue(cmvt.VolumeHistory.ToString().Equals("[0/0/0/0]", StringComparison.Ordinal));
         }
 
         /// <summary>

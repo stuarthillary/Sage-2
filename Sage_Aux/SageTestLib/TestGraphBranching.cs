@@ -3,6 +3,7 @@
 using Highpoint.Sage.Graphs.Tasks;
 using Highpoint.Sage.SimCore;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System;
 using System.Collections;
 using System.Diagnostics;
 
@@ -64,7 +65,7 @@ namespace Highpoint.Sage.Graphs
 
             model.Start();
 
-            Assert.IsTrue(_loopResult.Equals(_out.ToString()), "LoopingTester Results", "Looping tester failed to match expected results.");
+            Assert.IsTrue(_loopResult.Equals(_out.ToString(), StringComparison.Ordinal), "LoopingTester Results", "Looping tester failed to match expected results.");
 
         }
 
@@ -97,7 +98,7 @@ namespace Highpoint.Sage.Graphs
 
             model.Start();
 
-            Assert.IsTrue(_branchResult.Equals(_out.ToString()), "BranchingTester Results", "Branching tester failed to match expected results.");
+            Assert.IsTrue(_branchResult.Equals(_out.ToString(), StringComparison.Ordinal), "BranchingTester Results", "Branching tester failed to match expected results.");
         }
 
         private void CreateLoopback(IModel model, Vertex from, Vertex to, object channelMarker, int howManyTimes)

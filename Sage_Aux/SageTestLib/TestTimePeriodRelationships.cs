@@ -146,9 +146,9 @@ namespace Highpoint.Sage.Scheduling
             }
 
             int selector = 0;
-            if (ofWhich.Equals("A"))
+            if (ofWhich.Equals("A", StringComparison.Ordinal))
                 selector += 0;
-            if (ofWhich.Equals("B"))
+            if (ofWhich.Equals("B", StringComparison.Ordinal))
                 selector += 1;
             selector <<= 1;
             if (moveWhichPart.Equals(TimePeriodPart.StartTime))

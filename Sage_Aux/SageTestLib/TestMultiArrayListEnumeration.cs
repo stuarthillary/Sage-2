@@ -59,7 +59,7 @@ namespace Highpoint.Sage.Utility
 
             string result = sb.ToString();
             Console.WriteLine("Simple three list aggregation - " + result + ".");
-            Assert.IsTrue(result.Equals(_expected123), "MultiArrayListEnumerable basics", "Failed test");
+            Assert.IsTrue(result.Equals(_expected123, StringComparison.Ordinal), "MultiArrayListEnumerable basics", "Failed test");
         }
         /// <summary>
         /// Basic test.
@@ -80,8 +80,8 @@ namespace Highpoint.Sage.Utility
             foreach (string s in male)
                 sb.Append(s);
             string result = sb.ToString();
-            Console.WriteLine(name + "\r\n\texpected = \"" + expected + "\",\r\n\tresult   = \"" + result + "\".\r\n\t\t" + (result.Equals(expected) ? "Passed.\r\n" : "Failed.\r\n"));
-            Assert.IsTrue(result.Equals(expected), "MultiArrayListEnumerable basics", "Failed test");
+            Console.WriteLine(name + "\r\n\texpected = \"" + expected + "\",\r\n\tresult   = \"" + result + "\".\r\n\t\t" + (result.Equals(expected, StringComparison.Ordinal) ? "Passed.\r\n" : "Failed.\r\n"));
+            Assert.IsTrue(result.Equals(expected, StringComparison.Ordinal), "MultiArrayListEnumerable basics", "Failed test");
         }
     }
 }

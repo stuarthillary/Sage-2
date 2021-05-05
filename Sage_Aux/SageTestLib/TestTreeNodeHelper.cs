@@ -65,7 +65,7 @@ namespace Highpoint.Sage.Utility
 
 
             string result = root.ToStringDeep();
-            Assert.IsTrue(_adamsResult.Equals(result), "TestTreeNodeHelperBasics");
+            Assert.IsTrue(_adamsResult.Equals(result, StringComparison.Ordinal), "TestTreeNodeHelperBasics", StringComparison.Ordinal);
         }
 
         [TestMethod]
@@ -115,7 +115,7 @@ namespace Highpoint.Sage.Utility
             string result = jqaNode.GetRoot().ToStringDeep();
 
             Console.WriteLine(result);
-            Assert.IsTrue(_adamsResult.Equals(result), "TestReadOnlyTreeNodeHelperBasics");
+            Assert.IsTrue(_adamsResult.Equals(result, StringComparison.Ordinal), "TestReadOnlyTreeNodeHelperBasics", StringComparison.Ordinal);
         }
 
         [TestMethod]
@@ -154,7 +154,7 @@ namespace Highpoint.Sage.Utility
             string result = jqaNode.GetRoot().ToStringDeep();
 
             Console.WriteLine(result);
-            Assert.IsTrue(_adamsResultJQAChildrenSequenced.Equals(result), "TestTreeNodeHelperChildSequencing");
+            Assert.IsTrue(_adamsResultJQAChildrenSequenced.Equals(result, StringComparison.Ordinal), "TestTreeNodeHelperChildSequencing");
         }
     }
 }

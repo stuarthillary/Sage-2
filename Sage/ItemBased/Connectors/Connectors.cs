@@ -49,7 +49,7 @@ namespace Highpoint.Sage.ItemBased.Connectors
             foreach (IModelObject imo in model.ModelObjects.Values)
             {
                 IConnector conn = imo as IConnector;
-                if (conn != null && conn.Name != null && conn.Name.StartsWith(_prefix))
+                if (conn != null && conn.Name != null && conn.Name.StartsWith(_prefix, StringComparison.Ordinal))
                 {
                     names.Add(conn.Name);
                 }
@@ -107,7 +107,7 @@ namespace Highpoint.Sage.ItemBased.Connectors
 
             }
 
-            if (name == null || name.Equals(string.Empty))
+            if (string.IsNullOrEmpty(name))
             {
                 name = _prefix + (++_nextConnectorNumber);
             }

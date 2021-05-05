@@ -1,4 +1,5 @@
 ﻿/* This source code licensed under the GNU Affero General Public License */
+using System;
 using System.Collections.Generic;
 
 namespace Highpoint.Sage.ItemBased
@@ -33,7 +34,7 @@ namespace Highpoint.Sage.ItemBased
         {
             return FindAll(delegate (ITag tag)
             {
-                return tag.TagType.TypeName.Equals(typeName);
+                return tag.TagType.TypeName.Equals(typeName, StringComparison.Ordinal);
             });
         }
 
@@ -47,7 +48,7 @@ namespace Highpoint.Sage.ItemBased
             {
                 return Find(delegate (ITag tag)
                 {
-                    return tag.Name.Equals(name);
+                    return tag.Name.Equals(name, StringComparison.Ordinal);
                 });
             }
         }

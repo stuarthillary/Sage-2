@@ -62,7 +62,7 @@ namespace Highpoint.Sage.Resources
             new PriRscReqTester(5).Start();
             //Console.WriteLine(m_resultString);
 
-            Assert.IsTrue(StripCRLF(_resultString).Equals(StripCRLF(expected)), "TestPrioritizedResourceRequestWRemoval_2", "Results didn't match!");
+            Assert.IsTrue(StripCRLF(_resultString).Equals(StripCRLF(expected), StringComparison.Ordinal), "TestPrioritizedResourceRequestWRemoval_2", "Results didn't match!");
         }
 
 
@@ -100,9 +100,9 @@ namespace Highpoint.Sage.Resources
             _prt.Start();
             //Console.WriteLine(m_resultString);
 
-            Assert.IsTrue(StripCRLF(_resultString).Equals(StripCRLF(expected)), "TestPrioritizedResourceRequestWRemoval_2", "Results didn't match!");
+            Assert.IsTrue(StripCRLF(_resultString).Equals(StripCRLF(expected), StringComparison.Ordinal), "TestPrioritizedResourceRequestWRemoval_2", "Results didn't match!");
         }
-        private string StripCRLF(string structureString) => structureString.Replace("\r", "").Replace("\n", "");
+        private string StripCRLF(string structureString) => structureString.Replace("\r", "", StringComparison.Ordinal).Replace("\n", "", StringComparison.Ordinal);
 
         [TestMethod]
         [Highpoint.Sage.Utility.FieldDescription("First functional test of Resource Tester Infrastructural Class")]
@@ -138,7 +138,7 @@ namespace Highpoint.Sage.Resources
             _prt.Start();
             //Console.WriteLine(m_resultString);
 
-            Assert.IsTrue(StripCRLF(_resultString).Equals(StripCRLF(expected)), "TestPrioritizedResourceRequestWRemoval_2", "Results didn't match!");
+            Assert.IsTrue(StripCRLF(_resultString).Equals(StripCRLF(expected), StringComparison.Ordinal), "TestPrioritizedResourceRequestWRemoval_2", "Results didn't match!");
         }
 
         [TestMethod]
@@ -168,7 +168,7 @@ namespace Highpoint.Sage.Resources
             _resultString = "";
             _prt.Start();
             //Console.WriteLine(m_resultString);
-            Assert.IsTrue(StripCRLF(_resultString).Equals(StripCRLF(expected)), "TestPrioritizedResourceRequestWRemoval_2", "Results didn't match!");
+            Assert.IsTrue(StripCRLF(_resultString).Equals(StripCRLF(expected), StringComparison.Ordinal), "TestPrioritizedResourceRequestWRemoval_2", "Results didn't match!");
         }
 
         private void Model_Starting(IModel theModel)

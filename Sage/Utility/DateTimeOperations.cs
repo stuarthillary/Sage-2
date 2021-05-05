@@ -45,7 +45,7 @@ namespace Highpoint.Sage.Utility
         /// <returns>The string.</returns>
         public static string DtFileString(DateTime when, string extension = "")
         {
-            if (extension.Length > 0 && !extension.StartsWith("."))
+            if (extension.Length > 0 && !extension.StartsWith(".", StringComparison.Ordinal))
                 extension = "." + extension;
             return $"{when.Year}{when.Month:00}{when.Day:00}{when.Hour:00}{when.Minute:00}{when.Second:00}{extension}";
         }

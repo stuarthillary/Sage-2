@@ -210,7 +210,7 @@ namespace Highpoint.Sage.Graphs.PFC.Expressions
             List<string> closeMatchers = new List<string>();
             foreach (string potentialName in _nameMap.Keys)
             {
-                if (from.Contains(potentialName) || potentialName.Contains(from))
+                if (from.Contains(potentialName, StringComparison.Ordinal) || potentialName.Contains(from, StringComparison.Ordinal))
                 {
                     closeMatchers.Add(potentialName);
                 }

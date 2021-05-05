@@ -65,7 +65,7 @@ namespace Highpoint.Sage.Utility
 
         private string HashCode(string k1)
         {
-            return k1.GetHashCode().ToString();
+            return k1.GetHashCode(StringComparison.Ordinal).ToString();
         }
 
         [TestMethod]

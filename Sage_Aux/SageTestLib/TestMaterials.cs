@@ -601,21 +601,21 @@ namespace Highpoint.Sage.Materials.Chemistry
 
             w1.Temperature = 85.0;
             w1.Add((Substance)waterType.CreateMass(100, 37));
-            Assert.IsTrue(results.Equals(RESULT1));
+            Assert.IsTrue(results.Equals(RESULT1, StringComparison.Ordinal));
 
             results = string.Empty;
             w1.SuspendChangeEvents();
             w1.Temperature = 95.0;
             w1.Add((Substance)waterType.CreateMass(100, 37));
             w1.ResumeChangeEvents(false);
-            Assert.IsTrue(results.Equals(string.Empty));
+            Assert.IsTrue(results.Length == 0);
 
             results = string.Empty;
             w1.SuspendChangeEvents();
             w1.Temperature = 95.0;
             w1.Add((Substance)waterType.CreateMass(100, 37));
             w1.ResumeChangeEvents(true);
-            Assert.IsTrue(results.Equals(RESULT2));
+            Assert.IsTrue(results.Equals(RESULT2, StringComparison.Ordinal));
 
             // NOW, SAME TEST, BUT ON A MIXTURE INSTEAD.
             MaterialType acetoneType = (MaterialType)brs.MyMaterialCatalog["Acetone"];
@@ -629,23 +629,23 @@ namespace Highpoint.Sage.Materials.Chemistry
             results = string.Empty;
             m1.AddMaterial((Substance)waterType.CreateMass(100, 37));
             m1.AddMaterial((Substance)acetoneType.CreateMass(100, 45));
-            Assert.IsTrue(results.Equals(RESULT3));
+            Assert.IsTrue(results.Equals(RESULT3, StringComparison.Ordinal));
 
             results = string.Empty;
             m1.SuspendChangeEvents();
             m1.AddMaterial((Substance)waterType.CreateMass(100, 99));
             m1.AddMaterial((Substance)acetoneType.CreateMass(100, 99));
-            Assert.IsTrue(results.Equals(string.Empty));
+            Assert.IsTrue(results.Length == 0);
             m1.ResumeChangeEvents(false);
-            Assert.IsTrue(results.Equals(string.Empty));
+            Assert.IsTrue(results.Length == 0);
 
             results = string.Empty;
             m1.SuspendChangeEvents();
             m1.AddMaterial((Substance)waterType.CreateMass(100, 99));
             m1.AddMaterial((Substance)acetoneType.CreateMass(100, 99));
-            Assert.IsTrue(results.Equals(string.Empty));
+            Assert.IsTrue(results.Length == 0);
             m1.ResumeChangeEvents(true);
-            Assert.IsTrue(results.Equals(RESULT4));
+            Assert.IsTrue(results.Equals(RESULT4, StringComparison.Ordinal));
 
         }
 

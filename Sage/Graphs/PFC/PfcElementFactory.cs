@@ -18,15 +18,15 @@ namespace Highpoint.Sage.Graphs.PFC
 
         #region Private Members
 
-        private readonly CanonicalityTest _linkCanonicality = new CanonicalityTest(delegate (string s) { int x; return (s.StartsWith("L_") && int.TryParse(s.Substring(2), out x)); });
+        private readonly CanonicalityTest _linkCanonicality = new CanonicalityTest(delegate (string s) { int x; return (s.StartsWith("L_", StringComparison.Ordinal) && int.TryParse(s.Substring(2), out x)); });
         private static string _linkTemplate = "{0:D3}";
         private static string _linkPrefix = "L_";
 
-        private readonly CanonicalityTest _stepCanonicality = new CanonicalityTest(delegate (string s) { int x; return (s.StartsWith("S_") && int.TryParse(s.Substring(2), out x)); });
+        private readonly CanonicalityTest _stepCanonicality = new CanonicalityTest(delegate (string s) { int x; return (s.StartsWith("S_", StringComparison.Ordinal) && int.TryParse(s.Substring(2), out x)); });
         private static string _stepTemplate = "{0:D3}";
         private static string _stepPrefix = "S_";
 
-        private readonly CanonicalityTest _transCanonicality = new CanonicalityTest(delegate (string s) { int x; return ((s.StartsWith("T_") && int.TryParse(s.Substring(2), out x)) || (s.StartsWith("T") && int.TryParse(s.Substring(1), out x))); });
+        private readonly CanonicalityTest _transCanonicality = new CanonicalityTest(delegate (string s) { int x; return ((s.StartsWith("T_", StringComparison.Ordinal) && int.TryParse(s.Substring(2), out x)) || (s.StartsWith("T", StringComparison.Ordinal) && int.TryParse(s.Substring(1), out x))); });
         private static string _transitionTemplate = "{0:D3}";
         private static readonly string _transitionPrefix = "T_";
 
@@ -321,7 +321,7 @@ namespace Highpoint.Sage.Graphs.PFC
         {
             foreach (IPfcLinkElement link in newPfc.Links)
             {
-                if (link.Name.StartsWith(_linkPrefix))
+                if (link.Name.StartsWith(_linkPrefix, StringComparison.Ordinal))
                 {
                     int linkNum;
                     if (int.TryParse(link.Name.Substring(_linkPrefix.Length), out linkNum))
@@ -336,7 +336,7 @@ namespace Highpoint.Sage.Graphs.PFC
 
             foreach (IPfcStepNode step in newPfc.Steps)
             {
-                if (step.Name.StartsWith(_stepPrefix))
+                if (step.Name.StartsWith(_stepPrefix, StringComparison.Ordinal))
                 {
                     int stepNum;
                     if (int.TryParse(step.Name.Substring(_stepPrefix.Length), out stepNum))
@@ -351,7 +351,7 @@ namespace Highpoint.Sage.Graphs.PFC
 
             foreach (IPfcTransitionNode transition in newPfc.Transitions)
             {
-                if (transition.Name.StartsWith(_transitionPrefix))
+                if (transition.Name.StartsWith(_transitionPrefix, StringComparison.Ordinal))
                 {
                     int transitionNum;
                     if (int.TryParse(transition.Name.Substring(_transitionPrefix.Length), out transitionNum))

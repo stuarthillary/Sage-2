@@ -3,6 +3,7 @@ using Highpoint.Sage.Utility;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Diagnostics;
+using System.Text;
 
 namespace SageTestLib
 {
@@ -120,12 +121,12 @@ namespace SageTestLib
 
                 //Console.ReadLine();
 
-                IComparable lastValRead = heap.Dequeue();
+                string lastValRead = (string)heap.Dequeue();
                 while (heap.Count > 0)
                 {
-                    IComparable thisValRead = heap.Dequeue();
-                    int comparisonVal = lastValRead.CompareTo(thisValRead);
-                    Assert.IsTrue(((comparisonVal == ((int)direction)) || (comparisonVal == 0)), "Heap Test", "Heap test failed.");
+                    string thisValRead = (string)heap.Dequeue();
+                    int comparisonVal = string.Compare(lastValRead, thisValRead, StringComparison.Ordinal);
+                    Assert.IsTrue((comparisonVal * (int)direction > 0 || (comparisonVal == 0)), "Heap Test", "Heap test failed.");
                     if (testNum < 10)
                         Console.WriteLine("Dequeueing " + lastValRead);
                     lastValRead = thisValRead;

@@ -1,4 +1,5 @@
 ﻿/* This source code licensed under the GNU Affero General Public License */
+using System;
 using System.Collections.Generic;
 
 namespace Highpoint.Sage.ItemBased
@@ -40,7 +41,7 @@ namespace Highpoint.Sage.ItemBased
                 {
                     return -1;
                 }
-                return s1.CompareTo(s2);
+                return string.Compare(s1, s2, StringComparison.Ordinal);
             }
 
             #endregion

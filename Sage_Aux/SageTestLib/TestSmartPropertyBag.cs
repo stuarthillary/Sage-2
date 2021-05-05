@@ -62,11 +62,11 @@ namespace Highpoint.Sage.SimCore
             Assert.IsTrue((double)animals["Dogs.Labs.Black"] == 4, "Black Lab is not 4");
             Assert.IsTrue((double)animals["Dogs.Labs.Brown"] == 2, "Brown Lab is not 2");
             Assert.IsTrue((double)animals["Dogs.Labs.Yellow"] == 1, "Yellow Lab is not 1");
-            Assert.IsTrue("Mellow".Equals((string)labs["Temperament"]), "The Labs temperament is not Mellow");
+            Assert.IsTrue("Mellow".Equals((string)labs["Temperament"], StringComparison.Ordinal), "The Labs temperament is not Mellow");
             Assert.IsTrue((double)animals["Dogs.Collies"] == 18, "Collies are not 18");
             Assert.IsTrue((double)animals["Dogs.Chows"] == 16, "Chows are not 16");
             Assert.IsTrue((double)animals["Horses"] == 12, "Horses are not 12");
-            Assert.IsTrue("Animal".Equals((string)animals["Kingdom"]), "The Kingdom is not the Animal Kingdom");
+            Assert.IsTrue("Animal".Equals((string)animals["Kingdom"], StringComparison.Ordinal), "The Kingdom is not the Animal Kingdom");
             Assert.IsTrue(!(bool)labs["Faithful"], "Labs are not not faithful");
 
 
@@ -80,11 +80,11 @@ namespace Highpoint.Sage.SimCore
             Assert.IsTrue((double)animals["Dogs.Labs.Black"] == 19, "Black Lab is not 19");
             Assert.IsTrue((double)animals["Dogs.Labs.Brown"] == 2, "Brown Lab is not 2");
             Assert.IsTrue((double)animals["Dogs.Labs.Yellow"] == 1, "Yellow Lab is not 1");
-            Assert.IsTrue("Lovable".Equals((string)labs["Temperament"]), "The Labs temperament is not Lovable");
+            Assert.IsTrue("Lovable".Equals((string)labs["Temperament"], StringComparison.Ordinal), "The Labs temperament is not Lovable");
             Assert.IsTrue((double)animals["Dogs.Collies"] == 18, "Collies are not 18");
             Assert.IsTrue((double)animals["Dogs.Chows"] == 16, "Chows are not 16");
             Assert.IsTrue((double)animals["Horses"] == 12, "Horses are not 12");
-            Assert.IsTrue("Animal".Equals((string)animals["Kingdom"]), "The Kingdom is the Animal Kingdom");
+            Assert.IsTrue("Animal".Equals((string)animals["Kingdom"], StringComparison.Ordinal), "The Kingdom is the Animal Kingdom");
             Assert.IsTrue((bool)labs["Faithful"], "Labs are faithful");
         }
 
@@ -129,11 +129,11 @@ namespace Highpoint.Sage.SimCore
                 Assert.IsTrue((double)animals["Dogs.Labs.Black"] == 4, "Black Lab is not 4");
                 Assert.IsTrue((double)animals["Dogs.Labs.Brown"] == 2, "Brown Lab is not 2");
                 Assert.IsTrue((double)animals["Dogs.Labs.Yellow"] == 1, "Yellow Lab is not 1");
-                Assert.IsTrue("Mellow".Equals((string)labs["Temperament"]), "The Lab's temperament is not Mellow");
+                Assert.IsTrue("Mellow".Equals((string)labs["Temperament"], StringComparison.Ordinal), "The Lab's temperament is not Mellow");
                 Assert.IsTrue((double)animals["Dogs.Collies"] == 18, "Collies are not 18");
                 Assert.IsTrue((double)animals["Dogs.Chows"] == 16, "Chows are not 16");
                 Assert.IsTrue((double)animals["Horses"] == 12, "Horses are not 12");
-                Assert.IsTrue("Animal".Equals((string)animals["Kingdom"]), "The Kingdom is not the Animal Kingdom");
+                Assert.IsTrue("Animal".Equals((string)animals["Kingdom"], StringComparison.Ordinal), "The Kingdom is not the Animal Kingdom");
                 Assert.IsTrue((bool)labs["Faithful"], "Labs are not faithful");
 
                 //Debug.WriteLine(DiagnosticAids.DumpDictionary("",(IDictionary)animals.Memento.GetDictionary()));
@@ -304,11 +304,11 @@ namespace Highpoint.Sage.SimCore
             spb2["Scovilles"] = 16000;
 
             Assert.IsTrue(!(bool)spb0["Habanero.Hot"], "Habanero.Hot is hot");
-            Assert.IsTrue("Habañero".Equals((string)spb0["Habanero.Name"]), "Habanero.Name is not Habañero");
+            Assert.IsTrue("Habañero".Equals((string)spb0["Habanero.Name"], StringComparison.Ordinal), "Habanero.Name is not Habañero");
             Assert.IsTrue((double)spb0["Habanero.Scovilles"] == 32000, "Habanero.Scovilles is not 32000");
 
             Assert.IsTrue((bool)spb0["Jalapeno.Hot"], "Jalapeno.Hot is not hot");
-            Assert.IsTrue("Jalapeño".Equals((string)spb0["Jalapeno.Name"]), "Jalapeno.Name is not Jalapeño");
+            Assert.IsTrue("Jalapeño".Equals((string)spb0["Jalapeno.Name"], StringComparison.Ordinal), "Jalapeno.Name is not Jalapeño");
             Assert.IsTrue((double)spb0["Jalapeno.Scovilles"] == 16000, "Jalapeno.Scovilles is not 16000");
 
             Highpoint.Sage.Utility.Mementos.IMemento mem2 = spb0.Memento;

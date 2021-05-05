@@ -190,7 +190,7 @@ namespace Highpoint.Sage.Graphs.PFC
         {
             get
             {
-                return (/*PredecessorNodes.Count < 2 && SuccessorNodes.Count < 2 &&*/ ExpressionUFValue.Equals(DefaultExpression));
+                return (/*PredecessorNodes.Count < 2 && SuccessorNodes.Count < 2 &&*/ ExpressionUFValue.Equals(DefaultExpression, StringComparison.Ordinal));
             }
             set
             {

@@ -90,7 +90,7 @@ namespace Highpoint.Sage.Utility
         /// <param name="context">The context - use null or string.Empty for the default context.</param>
         public void SetLabel(string label, string context)
         {
-            if (context == null || context.Equals(string.Empty))
+            if (string.IsNullOrEmpty(context))
             {
                 context = DEFAULT_CHANNEL;
             }
@@ -104,7 +104,7 @@ namespace Highpoint.Sage.Utility
         /// <returns></returns>
         public string GetLabel(string context)
         {
-            if (context == null || context.Equals(string.Empty))
+            if (string.IsNullOrEmpty(context))
             {
                 context = DEFAULT_CHANNEL;
             }

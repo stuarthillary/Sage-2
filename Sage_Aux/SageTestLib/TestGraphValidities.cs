@@ -657,7 +657,7 @@ namespace Highpoint.Sage.Tasks
         {
             string[] includeeArray = includees.Split(',');
             foreach (string x in includeeArray)
-                if (x.Equals(candidate))
+                if (x.Equals(candidate, StringComparison.Ordinal))
                     return true;
             return false;
         }

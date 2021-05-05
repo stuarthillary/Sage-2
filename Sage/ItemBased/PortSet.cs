@@ -425,7 +425,7 @@ namespace Highpoint.Sage.ItemBased.Ports
             {
                 foreach (IPort port in _ports.Values)
                 {
-                    if (port.Name.Equals(name))
+                    if (port.Name.Equals(name, StringComparison.Ordinal))
                     {
                         return port;
                     }

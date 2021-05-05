@@ -199,7 +199,7 @@ namespace Highpoint.Sage.SimCore
                 if (!(otherGuy is SPBAlias))
                     return false;
                 SPBAlias spba = (SPBAlias)otherGuy;
-                if (_key.Equals(spba._key) && _spb.Equals(spba._spb))
+                if (_key.Equals(spba._key, StringComparison.Ordinal) && _spb.Equals(spba._spb))
                     return true;
                 return false;
             }
@@ -626,7 +626,7 @@ namespace Highpoint.Sage.SimCore
 
             public void SetValue(string val)
             {
-                if (!val.Equals(_value))
+                if (!val.Equals(_value, StringComparison.Ordinal))
                 {
                     _value = val;
                     _ssh.ReportChange();
@@ -656,7 +656,7 @@ namespace Highpoint.Sage.SimCore
                 if (!(otherGuy is SPBStringHolder))
                     return false;
                 SPBStringHolder spbvh = (SPBStringHolder)otherGuy;
-                return _value.Equals(spbvh._value);
+                return _value.Equals(spbvh._value, StringComparison.Ordinal);
             }
 
             #region >>> Serialization Support (incl. IXmlPersistable Members) <<<
@@ -711,7 +711,7 @@ namespace Highpoint.Sage.SimCore
                     if (!(otheOneMemento is SPBStringHolderMemento))
                         return false;
 
-                    if (_value.Equals(((SPBStringHolderMemento)otheOneMemento)._value))
+                    if (_value.Equals(((SPBStringHolderMemento)otheOneMemento)._value, StringComparison.Ordinal))
                         return true;
 
                     return false;
@@ -1132,10 +1132,10 @@ namespace Highpoint.Sage.SimCore
             {
                 key = key.Trim();
                 // NOTE: Do not use a key with a '.' in it.
-                if (key.IndexOf('.') != -1)
+                if (key.IndexOf('.', StringComparison.Ordinal) != -1)
                 { // TODO: Speed this up. Checks all key values in all tables, currently.
-                    string myKey = key.Substring(0, key.IndexOf('.'));
-                    string subsKey = key.Substring(key.IndexOf('.') + 1);
+                    string myKey = key.Substring(0, key.IndexOf('.', StringComparison.Ordinal));
+                    string subsKey = key.Substring(key.IndexOf('.', StringComparison.Ordinal) + 1);
                     object subbag = GetContentsOfKey(myKey);
                     SmartPropertyBag bag = subbag as SmartPropertyBag;
                     if (bag != null)
@@ -1159,11 +1159,11 @@ namespace Highpoint.Sage.SimCore
                 if (!_writeLock.IsWritable)
                     throw new WriteProtectionViolationException(this, _writeLock);
                 key = key.Trim();
-                if (key.IndexOf('.') != -1)
+                if (key.IndexOf('.', StringComparison.Ordinal) != -1)
                 {
                     // It's formatted to be a set from a subsidiary SPB.
-                    string myKey = key.Substring(0, key.IndexOf('.'));
-                    string subsKey = key.Substring(key.IndexOf('.') + 1);
+                    string myKey = key.Substring(0, key.IndexOf('.', StringComparison.Ordinal));
+                    string subsKey = key.Substring(key.IndexOf('.', StringComparison.Ordinal) + 1);
                     object subbag = GetContentsOfKey(myKey);
                     SmartPropertyBag bag = subbag as SmartPropertyBag;
                     if (bag != null)
@@ -1235,7 +1235,7 @@ namespace Highpoint.Sage.SimCore
         /// <returns>The contents of the key.</returns>
         protected bool ExistsKey(string key)
         {
-            int firstDotNdx = key.IndexOf('.');
+            int firstDotNdx = key.IndexOf('.', StringComparison.Ordinal);
             if (firstDotNdx != -1)
             {
                 string lclKey = key.Substring(0, firstDotNdx);
@@ -1256,7 +1256,7 @@ namespace Highpoint.Sage.SimCore
 
         private void AddSPBEntry(string key, object payload)
         {
-            int firstDotNdx = key.IndexOf('.');
+            int firstDotNdx = key.IndexOf('.', StringComparison.Ordinal);
             if (firstDotNdx != -1)
             {
                 string lclKey = key.Substring(0, firstDotNdx);

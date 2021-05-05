@@ -73,7 +73,7 @@ namespace Highpoint.Sage.Utility
                     tmp.Add(strings[i]);
                 }
                 string result = StringOperations.ToCommasAndAndedList(((IEnumerable<string>)tmp));
-                Assert.IsTrue(result.Equals(results[count - 1]));
+                Assert.IsTrue(result.Equals(results[count - 1], StringComparison.Ordinal));
                 Console.WriteLine(result);
 
             }
@@ -86,7 +86,7 @@ namespace Highpoint.Sage.Utility
                     tmp.Add(strings[i]);
                 }
                 string result = StringOperations.ToCommasAndAndedList(tmp);
-                Assert.IsTrue(result.Equals(results[count - 1]));
+                Assert.IsTrue(result.Equals(results[count - 1], StringComparison.Ordinal));
                 Console.WriteLine(result);
             }
 
@@ -98,7 +98,7 @@ namespace Highpoint.Sage.Utility
                     tmp.Add(new Thingy(strings[i]));
                 }
                 string result = StringOperations.ToCommasAndAndedListOfNames(tmp);
-                Assert.IsTrue(result.Equals(results[count - 1]));
+                Assert.IsTrue(result.Equals(results[count - 1], StringComparison.Ordinal));
                 Console.WriteLine(result);
             }
 
@@ -110,7 +110,7 @@ namespace Highpoint.Sage.Utility
                     tmp.Add(new Thingy(strings[i]));
                 }
                 string result = StringOperations.ToCommasAndAndedList(tmp, n => n.Name);
-                Assert.IsTrue(result.Equals(results[count - 1]));
+                Assert.IsTrue(result.Equals(results[count - 1], StringComparison.Ordinal));
                 Console.WriteLine(result);
             }
 

@@ -55,7 +55,7 @@ namespace Highpoint.Sage.Materials.Chemistry.BoilingPoints
                     mt.SetAntoinesCoefficients3(double.Parse(antoineA), double.Parse(antoineB), double.Parse(antoineC), PressureUnits.mmHg, TemperatureUnits.Celsius);
                 }
 
-                if (mt.Name.Equals("Hydrazine"))
+                if (mt.Name.Equals("Hydrazine", StringComparison.Ordinal))
                 {
                     mt.SetAntoinesCoefficientsExt(76.858, -7245.2, 0, 0, -8.22, .0061557, 1, double.NaN, double.NaN);
                 }
@@ -175,7 +175,7 @@ namespace Highpoint.Sage.Materials.Chemistry.BoilingPoints
             char[] comma = new char[] { ',' };
             while ((line = reader.ReadLine()) != null)
             {
-                if (!line.StartsWith(";") && line.Length != 0)
+                if (!line.StartsWith(";", StringComparison.Ordinal) && line.Length != 0)
                     lines.Add(line.Split(comma));
             }
 

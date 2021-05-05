@@ -375,7 +375,7 @@ namespace Highpoint.Sage.Graphs.PFC
             pfc.Synchronize(new IPfcStepNode[] { t0, t1, t2, t3 }, new IPfcStepNode[] { t4, t5, t6, t7 });
 
             string structureString = PfcDiagnostics.GetStructure(pfc);
-            structureString = structureString.Replace("SFC 1.Root", "SFC 1.Root");
+            structureString = structureString.Replace("SFC 1.Root", "SFC 1.Root", StringComparison.Ordinal);
             string shouldBe = "{S_Alice-->[L_000(SFC 1.Root)]-->T_000}\r\n{S_Bob-->[L_001(SFC 1.Root)]-->T_000}\r\n{S_Charley-->[L_002(SFC 1.Root)]-->T_000}\r\n{S_David-->[L_003(SFC 1.Root)]-->T_000}\r\n{T_000-->[L_004(SFC 1.Root)]-->S_Edna}\r\n{T_000-->[L_005(SFC 1.Root)]-->S_Frank}\r\n{T_000-->[L_006(SFC 1.Root)]-->S_Gary}\r\n{T_000-->[L_007(SFC 1.Root)]-->S_Hailey}\r\n";
 
             Console.WriteLine("After a synchronization of steps, structure is \r\n" + structureString);
@@ -433,7 +433,7 @@ namespace Highpoint.Sage.Graphs.PFC
 
             structureString = PfcDiagnostics.GetStructure(pfc);
             Console.WriteLine("Structure is \r\n" + structureString);
-            Assert.IsTrue(structureString.Equals("{START-->[L_000(SFC 1.Root)]-->T_000}\r\n{T_000-->[L_002(SFC 1.Root)]-->STEP_1}\r\n{STEP_1-->[L_003(SFC 1.Root)]-->T_001}\r\n{T_001-->[L_004(SFC 1.Root)]-->FINISH}\r\n"));
+            Assert.IsTrue(structureString.Equals("{START-->[L_000(SFC 1.Root)]-->T_000}\r\n{T_000-->[L_002(SFC 1.Root)]-->STEP_1}\r\n{STEP_1-->[L_003(SFC 1.Root)]-->T_001}\r\n{T_001-->[L_004(SFC 1.Root)]-->FINISH}\r\n", StringComparison.Ordinal));
 
         }
 
@@ -591,7 +591,7 @@ namespace Highpoint.Sage.Graphs.PFC
 
             string result = PfcDiagnostics.GetStructure(pfc);
             Console.WriteLine(result);
-            Assert.IsTrue(result.Equals("{START-->[L_000(SFC 1.Root)]-->T1}\r\n{T1-->[L_001(SFC 1.Root)]-->STEP1}\r\n{STEP1-->[L_003(SFC 1.Root)]-->T3}\r\n{T2-->[L_004(SFC 1.Root)]-->STEP1}\r\n{T3-->[L_005(SFC 1.Root)]-->FINISH}\r\n{STEP2-->[L_006(SFC 1.Root)]-->T2}\r\n{STEP1-->[L_007(SFC 1.Root)]-->T4}\r\n{T4-->[L_008(SFC 1.Root)]-->STEP2}\r\n"));
+            Assert.IsTrue(result.Equals("{START-->[L_000(SFC 1.Root)]-->T1}\r\n{T1-->[L_001(SFC 1.Root)]-->STEP1}\r\n{STEP1-->[L_003(SFC 1.Root)]-->T3}\r\n{T2-->[L_004(SFC 1.Root)]-->STEP1}\r\n{T3-->[L_005(SFC 1.Root)]-->FINISH}\r\n{STEP2-->[L_006(SFC 1.Root)]-->T2}\r\n{STEP1-->[L_007(SFC 1.Root)]-->T4}\r\n{T4-->[L_008(SFC 1.Root)]-->STEP2}\r\n", StringComparison.Ordinal));
 
 
         }
@@ -658,7 +658,7 @@ namespace Highpoint.Sage.Graphs.PFC
 
         private string StripCRLF(string structureString)
         {
-            return structureString.Replace("\r", "").Replace("\n", "");
+            return structureString.Replace("\r", "", StringComparison.Ordinal).Replace("\n", "", StringComparison.Ordinal);
         }
 
         private void testSimpleLink(PfcElementType inType, PfcElementType outType, string shouldBe)

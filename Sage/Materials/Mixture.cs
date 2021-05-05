@@ -825,7 +825,7 @@ namespace Highpoint.Sage.Materials.Chemistry
             Update();
             if (!_writeLock.IsWritable)
                 throw new WriteProtectionViolationException(this, _writeLock);
-            if (requestedSubstance.Name.Equals(""))
+            if (requestedSubstance.Name.Length == 0)
             { // Removing all substances.
                 Mixture m = new Mixture(Model, Name);
                 double howMuchOfIt = requestedSubstance.Mass / Mass;
@@ -1358,7 +1358,7 @@ namespace Highpoint.Sage.Materials.Chemistry
                     return tmp;
                 if ((tmp = Comparer<double>.Default.Compare(x.Material.Mass, y.Material.Mass)) != 0)
                     return tmp;
-                return string.Compare(x.ToString(), y.ToString(), StringComparison.InvariantCulture);
+                return string.Compare(x.ToString(), y.ToString(), StringComparison.Ordinal);
             }
 
             private void Distill(List<Entry> changesTranspired)

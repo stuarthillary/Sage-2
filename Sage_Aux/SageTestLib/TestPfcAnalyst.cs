@@ -303,7 +303,7 @@ namespace PFCDemoMaterial
             string result = PfcDiagnostics.GetStructure(pfc).ToString();
             Console.WriteLine(result);
 
-            Assert.IsTrue(result.Equals("{START-->[L_000(SFC 1.Root)]-->T_000}\r\n{T_000-->[L_002(SFC 1.Root)]-->NEW_STEP}\r\n{NEW_STEP-->[L_003(SFC 1.Root)]-->T_001}\r\n{T_001-->[L_004(SFC 1.Root)]-->FINISH}\r\n"));
+            Assert.IsTrue(result.Equals("{START-->[L_000(SFC 1.Root)]-->T_000}\r\n{T_000-->[L_002(SFC 1.Root)]-->NEW_STEP}\r\n{NEW_STEP-->[L_003(SFC 1.Root)]-->T_001}\r\n{T_001-->[L_004(SFC 1.Root)]-->FINISH}\r\n", StringComparison.Ordinal));
 
         }
 
@@ -514,14 +514,14 @@ namespace PFCDemoMaterial
 
             structureString = PfcDiagnostics.GetStructure(pfc);
 
-            Assert.IsTrue(structureString.Contains("{Step_B-->[L_032(SFC 1.Root)]-->T_014}"));
-            Assert.IsTrue(structureString.Contains("{T_014-->[L_033(SFC 1.Root)]-->Step_N}"));
+            Assert.IsTrue(structureString.Contains("{Step_B-->[L_032(SFC 1.Root)]-->T_014}", StringComparison.Ordinal));
+            Assert.IsTrue(structureString.Contains("{T_014-->[L_033(SFC 1.Root)]-->Step_N}", StringComparison.Ordinal));
 
             pfc.Delete(pfc.Nodes["T_014"]);
             structureString = PfcDiagnostics.GetStructure(pfc);
 
-            Assert.IsFalse(structureString.Contains("{Step_B-->[L_032(SFC 1.Root)]-->T_014}"));
-            Assert.IsFalse(structureString.Contains("{T_014-->[L_033(SFC 1.Root)]-->Step_N}"));
+            Assert.IsFalse(structureString.Contains("{Step_B-->[L_032(SFC 1.Root)]-->T_014}", StringComparison.Ordinal));
+            Assert.IsFalse(structureString.Contains("{T_014-->[L_033(SFC 1.Root)]-->Step_N}", StringComparison.Ordinal));
 
         }
 
@@ -534,17 +534,17 @@ namespace PFCDemoMaterial
 
             structureString = PfcDiagnostics.GetStructure(pfc);
 
-            Assert.IsTrue(structureString.Contains("{T_003-->[L_007(SFC 1.Root)]-->Step_D}"));
-            Assert.IsTrue(structureString.Contains("{Step_D-->[L_008(SFC 1.Root)]-->T_004}"));
-            Assert.IsTrue(structureString.Contains("{T_004-->[L_009(SFC 1.Root)]-->Step_E}"));
+            Assert.IsTrue(structureString.Contains("{T_003-->[L_007(SFC 1.Root)]-->Step_D}", StringComparison.Ordinal));
+            Assert.IsTrue(structureString.Contains("{Step_D-->[L_008(SFC 1.Root)]-->T_004}", StringComparison.Ordinal));
+            Assert.IsTrue(structureString.Contains("{T_004-->[L_009(SFC 1.Root)]-->Step_E}", StringComparison.Ordinal));
 
             pfc.Delete(pfc.Nodes["Step_D"]);
             structureString = PfcDiagnostics.GetStructure(pfc);
 
-            Assert.IsFalse(structureString.Contains("{T_003-->[L_007(SFC 1.Root)]-->Step_D}"));
-            Assert.IsFalse(structureString.Contains("{Step_D-->[L_008(SFC 1.Root)]-->T_004}"));
-            Assert.IsFalse(structureString.Contains("{T_004-->[L_009(SFC 1.Root)]-->Step_E}"));
-            Assert.IsTrue(structureString.Contains("{T_003-->[L_034(SFC 1.Root)]-->Step_E}"));
+            Assert.IsFalse(structureString.Contains("{T_003-->[L_007(SFC 1.Root)]-->Step_D}", StringComparison.Ordinal));
+            Assert.IsFalse(structureString.Contains("{Step_D-->[L_008(SFC 1.Root)]-->T_004}", StringComparison.Ordinal));
+            Assert.IsFalse(structureString.Contains("{T_004-->[L_009(SFC 1.Root)]-->Step_E}", StringComparison.Ordinal));
+            Assert.IsTrue(structureString.Contains("{T_003-->[L_034(SFC 1.Root)]-->Step_E}", StringComparison.Ordinal));
 
         }
 
@@ -557,17 +557,17 @@ namespace PFCDemoMaterial
 
             structureString = PfcDiagnostics.GetStructure(pfc);
 
-            Assert.IsTrue(structureString.Contains("{T_003-->[L_007(SFC 1.Root)]-->Step_D}"));
-            Assert.IsTrue(structureString.Contains("{Step_D-->[L_008(SFC 1.Root)]-->T_004}"));
-            Assert.IsTrue(structureString.Contains("{T_004-->[L_009(SFC 1.Root)]-->Step_E}"));
+            Assert.IsTrue(structureString.Contains("{T_003-->[L_007(SFC 1.Root)]-->Step_D}", StringComparison.Ordinal));
+            Assert.IsTrue(structureString.Contains("{Step_D-->[L_008(SFC 1.Root)]-->T_004}", StringComparison.Ordinal));
+            Assert.IsTrue(structureString.Contains("{T_004-->[L_009(SFC 1.Root)]-->Step_E}", StringComparison.Ordinal));
 
             pfc.Delete(pfc.Nodes["T_004"]);
             structureString = PfcDiagnostics.GetStructure(pfc);
 
-            Assert.IsFalse(structureString.Contains("{T_003-->[L_007(SFC 1.Root)]-->Step_D}"));
-            Assert.IsFalse(structureString.Contains("{Step_D-->[L_008(SFC 1.Root)]-->T_004}"));
-            Assert.IsFalse(structureString.Contains("{T_004-->[L_009(SFC 1.Root)]-->Step_E}"));
-            Assert.IsTrue(structureString.Contains("{T_003-->[L_034(SFC 1.Root)]-->Step_E}"));
+            Assert.IsFalse(structureString.Contains("{T_003-->[L_007(SFC 1.Root)]-->Step_D}", StringComparison.Ordinal));
+            Assert.IsFalse(structureString.Contains("{Step_D-->[L_008(SFC 1.Root)]-->T_004}", StringComparison.Ordinal));
+            Assert.IsFalse(structureString.Contains("{T_004-->[L_009(SFC 1.Root)]-->Step_E}", StringComparison.Ordinal));
+            Assert.IsTrue(structureString.Contains("{T_003-->[L_034(SFC 1.Root)]-->Step_E}", StringComparison.Ordinal));
 
         }
 
@@ -811,7 +811,7 @@ namespace PFCDemoMaterial
 
             string resultString = Highpoint.Sage.Utility.StringOperations.ToCommasAndAndedListOfNames(new List<IHasName>(results.ToArray()));
             Console.WriteLine(resultString);
-            Assert.IsTrue(resultString.Equals("STEP2 and STEP5"), "Valid target steps should be STEP2 and STEP5, but they were " + resultString + ".");
+            Assert.IsTrue(resultString.Equals("STEP2 and STEP5", StringComparison.Ordinal), "Valid target steps should be STEP2 and STEP5, but they were " + resultString + ".");
 
         }
 
@@ -835,7 +835,7 @@ namespace PFCDemoMaterial
 
             string resultString = Highpoint.Sage.Utility.StringOperations.ToCommasAndAndedListOfNames(new List<IHasName>(results.ToArray()));
             Console.WriteLine(resultString);
-            Assert.IsTrue(resultString.Equals("STEP2 and STEP5"), "Valid target steps should be STEP2 and STEP5, but they were " + resultString + ".");
+            Assert.IsTrue(resultString.Equals("STEP2 and STEP5", StringComparison.Ordinal), "Valid target steps should be STEP2 and STEP5, but they were " + resultString + ".");
         }
 
         [TestMethod]
@@ -888,7 +888,7 @@ namespace PFCDemoMaterial
 
             string resultString = Highpoint.Sage.Utility.StringOperations.ToCommasAndAndedListOfNames(new List<IHasName>(results.ToArray()));
             Console.WriteLine(resultString);
-            Assert.IsTrue(resultString.Equals("STEP2 and STEP5"), "Valid target steps should be STEP2 and STEP5, but they were " + resultString + ".");
+            Assert.IsTrue(resultString.Equals("STEP2 and STEP5", StringComparison.Ordinal), "Valid target steps should be STEP2 and STEP5, but they were " + resultString + ".");
         }
 
         private ProcedureFunctionChart getProcedureFunctionChartFromFile(string fileName)

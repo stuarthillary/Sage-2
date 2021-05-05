@@ -199,31 +199,31 @@ namespace Highpoint.Sage.Materials.Chemistry
             foreach (string classification in classifications)
             {
                 ec = null;
-                if (classification.Equals("SARA"))
+                if (classification.Equals("SARA", StringComparison.Ordinal))
                 {
                     ec = new SaraToxicReleaseInventory();
                 }
-                else if (classification.Equals("HAP"))
+                else if (classification.Equals("HAP", StringComparison.Ordinal))
                 {
                     ec = new HazardousAirPollutant();
 
                 }
-                else if (classification.Equals("NATA"))
+                else if (classification.Equals("NATA", StringComparison.Ordinal))
                 {
                     ec = new NationalAirToxicsAssessment();
 
                 }
-                else if (classification.Equals("VOC"))
+                else if (classification.Equals("VOC", StringComparison.Ordinal))
                 {
                     ec = new VolatileOrganicCompound();
 
                 }
-                else if (classification.Equals("GHG"))
+                else if (classification.Equals("GHG", StringComparison.Ordinal))
                 {
                     ec = new GreenhouseGas();
 
                 }
-                else if (classification.Equals("ODC"))
+                else if (classification.Equals("ODC", StringComparison.Ordinal))
                 {
                     ec = new OzoneDepletingCompound();
                 }
@@ -620,7 +620,7 @@ namespace Highpoint.Sage.Materials.Chemistry
         /// <returns><c>true</c> if this one and the other one are equal, <c>false</c> otherwise.</returns>
         public bool Equals(MaterialType otherOne)
         {
-            if (!_name.Equals(otherOne._name))
+            if (!_name.Equals(otherOne._name, StringComparison.Ordinal))
                 return false;
             if (!_guid.Equals(otherOne._guid))
                 return false;
