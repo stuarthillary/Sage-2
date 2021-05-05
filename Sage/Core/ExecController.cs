@@ -231,7 +231,11 @@ namespace Highpoint.Sage.SimCore
 
         public void Dispose()
         {
-            _renderThread?.Abort();
+            if (_renderThread != null)
+            {
+                _renderThread.Interrupt();
+                _renderThread.Join();
+            }
         }
 
         internal void Begin(IExecutive iExecutive, object userData)
@@ -300,48 +304,55 @@ namespace Highpoint.Sage.SimCore
         {
             _Debug.Assert(Thread.CurrentThread.Equals(_renderThread));
 
-            while (!_abortRendering)
+            try
             {
-                if (_executive.State.Equals(ExecState.Running))
+                while (!_abortRendering)
                 {
-                    int nTicksToSleep = 500; // Check to see if we've changed frame rate from zero, every half-second.
-                    if (_frameRate > 0)
+                    if (_executive.State.Equals(ExecState.Running))
                     {
-
-                        nTicksToSleep = (int)TimeSpan.FromSeconds(1.0 / _frameRate).TotalMilliseconds;
-                        Thread.Sleep(nTicksToSleep);
-
-                        if (!_renderPending)
+                        int nTicksToSleep = 500; // Check to see if we've changed frame rate from zero, every half-second.
+                        if (_frameRate > 0)
                         {
-                            // If there's already one pending, we skip it and wait for the next one.
-                            if (_frameRate > 0 && _executive.State.Equals(ExecState.Running))
+
+                            nTicksToSleep = (int)TimeSpan.FromSeconds(1.0 / _frameRate).TotalMilliseconds;
+                            Thread.Sleep(nTicksToSleep);
+
+                            if (!_renderPending)
                             {
-                                // Race condition? Yes, race condition. Could complete between this and the next.
-                                _executive.RequestImmediateEvent(DoRender, null,
-                                    ExecEventType.Synchronous);
+                                // If there's already one pending, we skip it and wait for the next one.
+                                if (_frameRate > 0 && _executive.State.Equals(ExecState.Running))
+                                {
+                                    // Race condition? Yes, race condition. Could complete between this and the next.
+                                    _executive.RequestImmediateEvent(DoRender, null,
+                                        ExecEventType.Synchronous);
+                                }
+                                _renderPending = true;
                             }
-                            _renderPending = true;
+                        }
+                        else
+                        {
+                            Thread.Sleep(nTicksToSleep);
                         }
                     }
-                    else
+                    else if (_executive.State.Equals(ExecState.Paused))
                     {
-                        Thread.Sleep(nTicksToSleep);
+                        Thread.Sleep(500);
+                        _realWorldStartTime = DateTime.Now;
+                        _simWorldStartTime = _executive.Now;
+                    }
+                    else if (_executive.State.Equals(ExecState.Stopped))
+                    {
+                        break;
+                    }
+                    else if (_executive.State.Equals(ExecState.Finished))
+                    {
+                        break;
                     }
                 }
-                else if (_executive.State.Equals(ExecState.Paused))
-                {
-                    Thread.Sleep(500);
-                    _realWorldStartTime = DateTime.Now;
-                    _simWorldStartTime = _executive.Now;
-                }
-                else if (_executive.State.Equals(ExecState.Stopped))
-                {
-                    break;
-                }
-                else if (_executive.State.Equals(ExecState.Finished))
-                {
-                    break;
-                }
+            }
+            catch (ThreadInterruptedException)
+            {
+                
             }
         }
 

@@ -109,20 +109,19 @@ namespace Highpoint.Sage.Randoms
                     }
                 }
             }
-            catch (ThreadAbortException)
+            catch (ThreadInterruptedException e)
             {
-                Thread.ResetAbort();
             }
         }
 
         #region IDisposable Members
         public override void Dispose()
         {
-            try
+            if (_bufferThread != null)
             {
-                _bufferThread?.Abort();
+                _bufferThread.Interrupt();
+                _bufferThread.Join();
             }
-            catch (ThreadStateException) { }
         }
 
         #endregion
