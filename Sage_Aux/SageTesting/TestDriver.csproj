@@ -1,14 +1,11 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-
   <PropertyGroup>
     <OutputType>Exe</OutputType>
+    <TargetFramework>net8.0</TargetFramework>
   </PropertyGroup>
-
   <Import Condition="Exists('$(CommonAssemblyProps)')" Project="$(CommonAssemblyProps)" />
-
   <ItemGroup>
     <ProjectReference Include="..\..\Sage\Sage4.csproj" />
     <ProjectReference Include="..\SageTestLib\SageTestLib.csproj" />
   </ItemGroup>
-
 </Project>

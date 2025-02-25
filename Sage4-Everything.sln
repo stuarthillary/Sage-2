@@ -1,4 +1,4 @@
-﻿
+
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
 VisualStudioVersion = 14.0.25420.1
@@ -7,9 +7,9 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sage4", "Sage\Sage4.csproj"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sage_SampleCode", "Sage_SampleCode\Sage_SampleCode.csproj", "{4A8519F0-871E-4CF9-9E90-21ECEF2BD2DE}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestDriver", "Sage_Aux\SageTesting\TestDriver.csproj", "{4217951C-5A48-4262-B107-6213A7A327A0}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TestDriver", "Sage_Aux\SageTesting\TestDriver.csproj", "{4217951C-5A48-4262-B107-6213A7A327A0}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SageTestLib", "Sage_Aux\SageTestLib\SageTestLib.csproj", "{36127A0C-D659-4834-937B-8E16FAA8C4D4}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SageTestLib", "Sage_Aux\SageTestLib\SageTestLib.csproj", "{36127A0C-D659-4834-937B-8E16FAA8C4D4}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "License", "License", "{A3DD86B8-EDC2-41EB-94A4-29E7016D6412}"
 	ProjectSection(SolutionItems) = preProject
