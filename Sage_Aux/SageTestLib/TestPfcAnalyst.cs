@@ -818,8 +818,8 @@ namespace PFCDemoMaterial
         [TestMethod]
         public void Test_LoopbackWithinAParallelBranchFromSavedPFC_Passes()
         {
-            string testDataDir = (Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) ?? ".") + @"\TestData\";
-            ProcedureFunctionChart pfc = getProcedureFunctionChartFromFile(testDataDir + "RightPFC.xml");
+            string testFile = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location ?? "."), "TestData", "RightPFC.xml");
+            ProcedureFunctionChart pfc = getProcedureFunctionChartFromFile(testFile);
 
             //IPfcNode startStep = pfc.Steps.FirstOrDefault(x => x.Name == "START");
             //IPfcNode step1 = pfc.Steps.FirstOrDefault(x => x.Name == "STEP1");
@@ -841,8 +841,8 @@ namespace PFCDemoMaterial
         [TestMethod]
         public void Test_LoopbackWithinAParallelBranchFromSavedPFC_UsedToFail()
         {
-            string testDataDir = (Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) ?? ".") + @"\TestData\";
-            ProcedureFunctionChart pfc = getProcedureFunctionChartFromFile(testDataDir + "WrongPFC.xml");
+            string testFile = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location ?? "."), "TestData", "WrongPFC.xml");
+            ProcedureFunctionChart pfc = getProcedureFunctionChartFromFile(testFile);
 
             //IPfcNode startStep = pfc.Steps.FirstOrDefault(x => x.Name == "START");
             //IPfcNode step1 = pfc.Steps.FirstOrDefault(x => x.Name == "STEP1");
@@ -972,7 +972,8 @@ namespace PFCDemoMaterial
             }
             string resultString = sw.GetStringBuilder().ToString();
             Console.WriteLine(resultString);
-            Assert.AreEqual("Step_A : 0\r\nT_000 : 1\r\nStep_B : 2\r\nT_001 : 3\r\nT_002 : 4\r\nT_014 : 5\r\nStep_C : 6\r\nStep_F : 7\r\nT_003 : 8\r\nT_005 : 9\r\nStep_D : 10\r\nStep_G : 11\r\nT_004 : 12\r\nT_006 : 13\r\nStep_E : 14\r\nStep_H : 15\r\nStep_I : 16\r\nStep_P : 17\r\nT_011 : 18\r\nT_007 : 19\r\nT_008 : 20\r\nStep_J : 21\r\nStep_K : 22\r\nT_009 : 23\r\nStep_L : 24\r\nT_010 : 25\r\nStep_M : 26\r\nT_012 : 27\r\nStep_N : 28\r\nT_013 : 29\r\nStep_O : 30\r\n", resultString);
+            var nl = Environment.NewLine;
+            Assert.AreEqual($"Step_A : 0{nl}T_000 : 1{nl}Step_B : 2{nl}T_001 : 3{nl}T_002 : 4{nl}T_014 : 5{nl}Step_C : 6{nl}Step_F : 7{nl}T_003 : 8{nl}T_005 : 9{nl}Step_D : 10{nl}Step_G : 11{nl}T_004 : 12{nl}T_006 : 13{nl}Step_E : 14{nl}Step_H : 15{nl}Step_I : 16{nl}Step_P : 17{nl}T_011 : 18{nl}T_007 : 19{nl}T_008 : 20{nl}Step_J : 21{nl}Step_K : 22{nl}T_009 : 23{nl}Step_L : 24{nl}T_010 : 25{nl}Step_M : 26{nl}T_012 : 27{nl}Step_N : 28{nl}T_013 : 29{nl}Step_O : 30{nl}", resultString);
         }
 
 
@@ -990,7 +991,8 @@ namespace PFCDemoMaterial
             }
             string resultString = sw.GetStringBuilder().ToString();
             Console.WriteLine(resultString);
-            Assert.AreEqual(resultString, "Step_A : 0\r\nT_000 : 1\r\nStep_B : 2\r\nT_001 : 3\r\nT_002 : 4\r\nStep_C : 5\r\n");
+            var nl = Environment.NewLine;
+            Assert.AreEqual(resultString, $"Step_A : 0{nl}T_000 : 1{nl}Step_B : 2{nl}T_001 : 3{nl}T_002 : 4{nl}Step_C : 5{nl}");
         }
 
         [TestMethod]
@@ -1064,7 +1066,8 @@ namespace PFCDemoMaterial
             }
             string resultString = sw.GetStringBuilder().ToString();
             Console.WriteLine(resultString);
-            Assert.AreEqual("START : 0\r\nT_000 : 1\r\nSTEP1 : 2\r\nSTEP4 : 3\r\nT_003 : 4\r\nT_002 : 5\r\nSTEP5 : 6\r\nSTEP6 : 7\r\nT_004 : 8\r\nT_005 : 9\r\nSTEP2 : 10\r\nT_001 : 11\r\nSTEP3 : 12\r\nT_006 : 13\r\nFINISH : 14\r\n", resultString);
+            var nl = Environment.NewLine;
+            Assert.AreEqual($"START : 0{nl}T_000 : 1{nl}STEP1 : 2{nl}STEP4 : 3{nl}T_003 : 4{nl}T_002 : 5{nl}STEP5 : 6{nl}STEP6 : 7{nl}T_004 : 8{nl}T_005 : 9{nl}STEP2 : 10{nl}T_001 : 11{nl}STEP3 : 12{nl}T_006 : 13{nl}FINISH : 14{nl}", resultString);
         }
 
         [TestMethod]
@@ -1138,8 +1141,8 @@ namespace PFCDemoMaterial
             }
             string resultString = sw.GetStringBuilder().ToString();
             Console.WriteLine(resultString);
-            Assert.AreEqual("START : 0\r\nT_000 : 1 - from START to STEP3 )\r\nT_001 : 2 - from START to STEP1 )\r\nSTEP3 : 3\r\nSTEP1 : 4\r\nT_004 : 5 - from STEP3 to STEP2 )\r\nT_002 : 6 - from STEP1 to STEP2 )\r\nT_003 : 7 - from STEP1 to STEP4 )\r\nSTEP2 : 8\r\nSTEP4 : 9\r\nT_005 : 10 - from STEP2 to FINISH )\r\nT_006 : 11 - from STEP4 to FINISH )\r\nFINISH : 12\r\n", resultString);
-            // System.Diagnostics.Debug.Assert(resultString.Equals("START : 0\r\nT_000 : 1 - from START to STEP3 )\r\nT_001 : 2 - from START to STEP1 )\r\nSTEP3 : 3\r\nSTEP1 : 4\r\nT_004 : 5 - from STEP3 to STEP2 )\r\nT_002 : 6 - from STEP1 to STEP2 )\r\nT_003 : 7 - from STEP1 to STEP4 )\r\nSTEP2 : 8\r\nSTEP4 : 9\r\nT_005 : 10 - from STEP2 to FINISH )\r\nT_006 : 11 - from STEP4 to FINISH )\r\nFINISH : 12\r\n"));
+            var nl = Environment.NewLine;
+            Assert.AreEqual($"START : 0{nl}T_000 : 1 - from START to STEP3 ){nl}T_001 : 2 - from START to STEP1 ){nl}STEP3 : 3{nl}STEP1 : 4{nl}T_004 : 5 - from STEP3 to STEP2 ){nl}T_002 : 6 - from STEP1 to STEP2 ){nl}T_003 : 7 - from STEP1 to STEP4 ){nl}STEP2 : 8{nl}STEP4 : 9{nl}T_005 : 10 - from STEP2 to FINISH ){nl}T_006 : 11 - from STEP4 to FINISH ){nl}FINISH : 12{nl}", resultString);
         }
 
         [TestMethod]

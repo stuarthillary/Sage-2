@@ -5,6 +5,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections;
 using System.Diagnostics;
+using System.IO;
 
 
 namespace Highpoint.Sage.Persistence
@@ -41,17 +42,17 @@ namespace Highpoint.Sage.Persistence
 
             xsc.StoreObject("MTO", mto);
 
-            xsc.Save(Highpoint.Sage.Utility.DirectoryOperations.GetAppDataDir() + "foo.xml");
+            xsc.Save(Path.Combine(Path.GetTempPath(), "foo.xml"));
 
             xsc.Reset();
 
-            xsc.Load(Highpoint.Sage.Utility.DirectoryOperations.GetAppDataDir() + "foo.xml");
+            xsc.Load(Path.Combine(Path.GetTempPath(), "foo.xml"));
 
             MyTestObject mto3 = (MyTestObject)xsc.LoadObject("MTO");
 
             xsc = new XmlSerializationContext();
             xsc.StoreObject("MTO", mto3);
-            xsc.Save(Highpoint.Sage.Utility.DirectoryOperations.GetAppDataDir() + "foo2.xml");
+            xsc.Save(Path.Combine(Path.GetTempPath(), "foo2.xml"));
 
 
         }
@@ -71,13 +72,13 @@ namespace Highpoint.Sage.Persistence
 
             xsc.StoreObject("Water", water);
 
-            xsc.Save(Highpoint.Sage.Utility.DirectoryOperations.GetAppDataDir() + "water.xml");
+            xsc.Save(Path.Combine(Path.GetTempPath(), "water.xml"));
 
             xsc.Reset();
 
             xsc.StoreObject("MC", brs.MyMaterialCatalog);
 
-            xsc.Save(Highpoint.Sage.Utility.DirectoryOperations.GetAppDataDir() + "mc.xml");
+            xsc.Save(Path.Combine(Path.GetTempPath(), "mc.xml"));
 
         }
 
@@ -86,7 +87,7 @@ namespace Highpoint.Sage.Persistence
         {
 
             XmlSerializationContext xsc = new XmlSerializationContext();
-            xsc.Load(Highpoint.Sage.Utility.DirectoryOperations.GetAppDataDir() + "water.xml");
+            xsc.Load(Path.Combine(Path.GetTempPath(), "water.xml"));
             IMaterial water = (IMaterial)xsc.LoadObject("Water");
 
             Debug.WriteLine(water);
@@ -102,7 +103,7 @@ namespace Highpoint.Sage.Persistence
             XmlSerializationContext xsc = new XmlSerializationContext();
             xsc.StoreObject("Chemistry", brs);
 
-            xsc.Save(Highpoint.Sage.Utility.DirectoryOperations.GetAppDataDir() + "chemistry.xml");
+            xsc.Save(Path.Combine(Path.GetTempPath(), "chemistry.xml"));
         }
 
         private void Initialize(BasicReactionSupporter brs)

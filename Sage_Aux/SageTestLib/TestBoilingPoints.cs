@@ -28,8 +28,8 @@ namespace Highpoint.Sage.Materials.Chemistry.BoilingPoints
         {
             _brs = new BasicReactionSupporter();
 
-            string testDataDir = (Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) ?? ".") + @"\TestData\";
-            string filename = testDataDir + @"\PureComponentProperties.csv";
+            string testDataDir = Path.Combine((Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) ?? ".") ,"TestData");
+            string filename = Path.Combine(testDataDir, "PureComponentProperties.csv");
             Assert.IsTrue(File.Exists(filename), "Test data file not found - " + filename);
 
             string[][] data = Load(filename);
